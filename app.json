@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Arma tu outfit",
+    "slug": "arma-tu-outfit",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F6F3EC",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.armatuoutfit.prototype"
+    },
+    "web": {
+      "name": "Arma tu outfit",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Elige una foto para guardar tu prenda en este dispositivo.",
+          "cameraPermission": "Toma una foto para agregar una prenda a tu clóset.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Usa tu ubicación aproximada para encontrar tu ciudad y mostrar su clima.",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "locationFullAccuracyPermission": false,
+          "motionUsagePermission": false,
+          "isIosReducedAccuracyByDefault": true
+        }
+      ]
+    ]
+  }
+}
