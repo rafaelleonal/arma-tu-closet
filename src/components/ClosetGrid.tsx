@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { CATEGORIES, categoryLabels, type Category, type WardrobeItem } from '../domain';
+import {
+  CATEGORIES,
+  categoryLabels,
+  type Category,
+  type WardrobeItem,
+} from '../domain';
 import { Garment } from './Garment';
 import { Chip, useUI } from './ui';
 
@@ -17,8 +22,12 @@ export function ClosetGrid({
   const { palette, s } = useUI();
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [width, setWidth] = useState(0);
-  const present = CATEGORIES.filter((value) => items.some((item) => item.category === value));
-  const visible = items.filter((item) => category === 'all' || item.category === category);
+  const present = CATEGORIES.filter((value) =>
+    items.some((item) => item.category === value),
+  );
+  const visible = items.filter(
+    (item) => category === 'all' || item.category === category,
+  );
   const tile = width ? Math.floor((width - GAP * 2) / 3) : 0;
   return (
     <View>
@@ -53,7 +62,10 @@ export function ClosetGrid({
                 accessibilityRole="button"
                 accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}`}
                 onPress={() => onEdit(item)}
-                style={({ pressed }) => ({ width: tile, opacity: pressed ? 0.75 : 1 })}
+                style={({ pressed }) => ({
+                  width: tile,
+                  opacity: pressed ? 0.75 : 1,
+                })}
               >
                 <View
                   style={{
@@ -81,7 +93,11 @@ export function ClosetGrid({
                     <Image
                       accessible={false}
                       source={{ uri: item.photoUri }}
-                      style={{ width: tile, height: tile, opacity: item.available ? 1 : 0.45 }}
+                      style={{
+                        width: tile,
+                        height: tile,
+                        opacity: item.available ? 1 : 0.45,
+                      }}
                       resizeMode="cover"
                     />
                   ) : (
@@ -108,7 +124,10 @@ export function ClosetGrid({
                     </Text>
                   ) : null}
                 </View>
-                <Text numberOfLines={1} style={{ fontSize: 12, color: palette.ink, marginTop: 6 }}>
+                <Text
+                  numberOfLines={1}
+                  style={{ fontSize: 12, color: palette.ink, marginTop: 6 }}
+                >
                   {item.name}
                 </Text>
               </Pressable>

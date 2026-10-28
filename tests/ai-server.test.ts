@@ -3,13 +3,21 @@ import { once } from 'node:events';
 import { request, type Server } from 'node:http';
 import { test, type TestContext } from 'node:test';
 import { MAX_IMAGE_BYTES, parseGarmentSuggestion } from '../src/ai/contracts';
-import { createGarmentServer, ALLOWED_ORIGINS, type ServerOptions } from '../server/app';
+import {
+  createGarmentServer,
+  ALLOWED_ORIGINS,
+  type ServerOptions,
+} from '../server/app';
 import { MAX_BODY_BYTES, parseImageRequest } from '../server/image';
 import { createOpenAiAnalyzer } from '../server/openai';
 
 const photo =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3ioAAAAASUVORK5CYII=';
-const suggestion = { name: 'Camisa blanca', category: 'top', colors: ['blanco'] };
+const suggestion = {
+  name: 'Camisa blanca',
+  category: 'top',
+  colors: ['blanco'],
+};
 const success = { status: 'ok', suggestion };
 
 async function setup(t: TestContext, options: ServerOptions = {}) {
@@ -36,7 +44,8 @@ function call(
   } = {},
 ) {
   const address = server.address();
-  if (!address || typeof address === 'string') throw new Error('Expected listening server');
+  if (!address || typeof address === 'string')
+    throw new Error('Expected listening server');
   return new Promise<{
     status: number;
     headers: Record<string, string | string[] | undefined>;
@@ -48,7 +57,11 @@ function call(
         port: address.port,
         path: options.path ?? '/api/garment-analysis',
         method: options.method ?? 'POST',
-        headers: { 'Content-Type': 'application/json', Connection: 'close', ...options.headers },
+        headers: {
+          'Content-Type': 'application/json',
+          Connection: 'close',
+          ...options.headers,
+        },
       },
       (res) => {
         let text = '';
@@ -71,12 +84,17 @@ function call(
       },
     );
     req.on('error', reject);
-    req.end(options.raw ?? JSON.stringify(options.body ?? { imageDataUrl: photo }));
+    req.end(
+      options.raw ?? JSON.stringify(options.body ?? { imageDataUrl: photo }),
+    );
   });
 }
 
 test('shared suggestion parser accepts only visible, bounded attributes', () => {
-  assert.deepEqual(parseGarmentSuggestion({ ...suggestion, name: ' Camisa blanca ' }), suggestion);
+  assert.deepEqual(
+    parseGarmentSuggestion({ ...suggestion, name: ' Camisa blanca ' }),
+    suggestion,
+  );
   for (const invalid of [
     null,
     [],
@@ -105,21 +123,29 @@ test('valid image reaches injected provider and only suggestion leaves server', 
       return success;
     },
   });
-  const result = await call(server, { headers: { Origin: ALLOWED_ORIGINS[0] } });
+  const result = await call(server, {
+    headers: { Origin: ALLOWED_ORIGINS[0] },
+  });
   assert.equal(result.status, 200);
   assert.deepEqual(result.body, { suggestion });
   assert.equal(calls, 1);
-  assert.equal(result.headers['access-control-allow-origin'], ALLOWED_ORIGINS[0]);
+  assert.equal(
+    result.headers['access-control-allow-origin'],
+    ALLOWED_ORIGINS[0],
+  );
   assert.equal(result.headers['cache-control'], 'no-store');
   assert.equal(result.headers['x-content-type-options'], 'nosniff');
 });
 
 test('unconfigured server stays available and returns actionable 503 without a provider call', async (t) => {
   const server = await setup(t);
-  assert.deepEqual((await call(server, { method: 'GET', path: '/health', raw: '' })).body, {
-    status: 'ok',
-    configured: false,
-  });
+  assert.deepEqual(
+    (await call(server, { method: 'GET', path: '/health', raw: '' })).body,
+    {
+      status: 'ok',
+      configured: false,
+    },
+  );
   const result = await call(server);
   assert.equal(result.status, 503);
   assert.match(String(result.body.error), /a mano/);
@@ -141,7 +167,11 @@ test('Host and Origin are independently checked; rebinding and non-allowlisted o
     '127.0.0.1.attacker.test:8787',
   ]) {
     assert.equal(
-      (await call(server, { headers: { Host: host, Origin: ALLOWED_ORIGINS[0] } })).status,
+      (
+        await call(server, {
+          headers: { Host: host, Origin: ALLOWED_ORIGINS[0] },
+        })
+      ).status,
       403,
     );
   }
@@ -158,8 +188,15 @@ test('Host and Origin are independently checked; rebinding and non-allowlisted o
   }
   assert.equal(calls, 0);
   for (const origin of ALLOWED_ORIGINS)
-    assert.equal((await call(server, { headers: { Origin: origin } })).status, 200);
-  assert.equal((await call(server)).status, 200, 'native/local clients may omit Origin');
+    assert.equal(
+      (await call(server, { headers: { Origin: origin } })).status,
+      200,
+    );
+  assert.equal(
+    (await call(server)).status,
+    200,
+    'native/local clients may omit Origin',
+  );
 });
 
 test('CORS preflight and HTTP routing do not consume analysis budget', async (t) => {
@@ -176,7 +213,10 @@ test('CORS preflight and HTTP routing do not consume analysis budget', async (t)
     raw: '',
   });
   assert.equal(preflight.status, 204);
-  assert.equal(preflight.headers['access-control-allow-methods'], 'POST, OPTIONS');
+  assert.equal(
+    preflight.headers['access-control-allow-methods'],
+    'POST, OPTIONS',
+  );
   assert.equal((await call(server, { method: 'OPTIONS' })).status, 403);
   assert.equal((await call(server, { method: 'GET' })).status, 405);
   assert.equal((await call(server, { path: '/unknown' })).status, 404);
@@ -203,8 +243,14 @@ test('JSON, image format, signature and request attributes are validated before 
     assert.equal((await call(server, { body })).status, 400);
   }
   assert.equal((await call(server, { raw: '{' })).status, 400);
-  assert.equal((await call(server, { headers: { 'Content-Type': 'text/plain' } })).status, 415);
-  assert.equal((await call(server, { headers: { 'Content-Encoding': 'gzip' } })).status, 415);
+  assert.equal(
+    (await call(server, { headers: { 'Content-Type': 'text/plain' } })).status,
+    415,
+  );
+  assert.equal(
+    (await call(server, { headers: { 'Content-Encoding': 'gzip' } })).status,
+    415,
+  );
   assert.equal(calls, 0);
 });
 
@@ -233,8 +279,12 @@ test('oversized decoded images and chunked bodies are rejected before provider',
     413,
   );
   assert.equal(
-    (await call(server, { raw: '', headers: { 'Content-Length': String(MAX_BODY_BYTES + 1) } }))
-      .status,
+    (
+      await call(server, {
+        raw: '',
+        headers: { 'Content-Length': String(MAX_BODY_BYTES + 1) },
+      })
+    ).status,
     413,
   );
   assert.equal(calls, 0);
@@ -242,7 +292,9 @@ test('oversized decoded images and chunked bodies are rejected before provider',
 
 test('multiple garments, ambiguous photos and non-garments return explicit rejection without invented fields', async (t) => {
   for (const status of ['multiple_garments', 'unclear', 'not_garment']) {
-    const server = await setup(t, { analyze: async () => ({ status, suggestion: null }) });
+    const server = await setup(t, {
+      analyze: async () => ({ status, suggestion: null }),
+    });
     const result = await call(server);
     assert.equal(result.status, 422);
     assert.equal(typeof result.body.error, 'string');
@@ -256,8 +308,14 @@ test('provider errors and malformed output never leak raw errors, photos or unkn
     async () => {
       throw new Error(rawSecret);
     },
-    async () => ({ status: 'ok', suggestion: { ...suggestion, rainReady: true } }),
-    async () => ({ status: 'ok', suggestion: { ...suggestion, category: 'invented' } }),
+    async () => ({
+      status: 'ok',
+      suggestion: { ...suggestion, rainReady: true },
+    }),
+    async () => ({
+      status: 'ok',
+      suggestion: { ...suggestion, category: 'invented' },
+    }),
     async () => ({ status: 'unclear', suggestion }),
   ]) {
     const server = await setup(t, { analyze });
@@ -355,7 +413,9 @@ test('AI SDK adapter uses Responses, explicit model, inline image, strict output
     assert.equal(body.reasoning.effort, 'none');
     assert.equal(body.text.format.type, 'json_schema');
     assert.equal(body.text.format.strict, true);
-    const user = body.input.find((entry: { role: string }) => entry.role === 'user');
+    const user = body.input.find(
+      (entry: { role: string }) => entry.role === 'user',
+    );
     assert.ok(
       user.content.some(
         (part: { type: string; image_url?: string }) =>
@@ -376,7 +436,13 @@ test('AI SDK adapter uses Responses, explicit model, inline image, strict output
             type: 'message',
             role: 'assistant',
             status: 'completed',
-            content: [{ type: 'output_text', text: JSON.stringify(success), annotations: [] }],
+            content: [
+              {
+                type: 'output_text',
+                text: JSON.stringify(success),
+                annotations: [],
+              },
+            ],
           },
         ],
         usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
@@ -384,9 +450,16 @@ test('AI SDK adapter uses Responses, explicit model, inline image, strict output
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     );
   };
-  const analyze = createOpenAiAnalyzer('sk-not-a-real-key', undefined, transport);
+  const analyze = createOpenAiAnalyzer(
+    'sk-not-a-real-key',
+    undefined,
+    transport,
+  );
   assert.deepEqual(
-    await analyze(parseImageRequest({ imageDataUrl: photo }), new AbortController().signal),
+    await analyze(
+      parseImageRequest({ imageDataUrl: photo }),
+      new AbortController().signal,
+    ),
     success,
   );
   assert.equal(calls, 1);

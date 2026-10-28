@@ -40,7 +40,9 @@ export function Button({
         style,
       ]}
     >
-      <Text style={[s.buttonText, secondary && { color: palette.ink }]}>{label}</Text>
+      <Text style={[s.buttonText, secondary && { color: palette.ink }]}>
+        {label}
+      </Text>
     </MotionPressable>
   );
 }
@@ -65,7 +67,9 @@ export function Chip({
       style={[s.chip, selected && s.chipSelected]}
     >
       {swatch ? <View style={[s.swatch, { backgroundColor: swatch }]} /> : null}
-      <Text style={[s.chipText, selected && { color: palette.onInk }]}>{label}</Text>
+      <Text style={[s.chipText, selected && { color: palette.onInk }]}>
+        {label}
+      </Text>
     </MotionPressable>
   );
 }
@@ -103,7 +107,11 @@ const createStyles = (palette: Palette) =>
       justifyContent: 'center',
       borderRadius: 14,
     },
-    secondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.line },
+    secondary: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: palette.line,
+    },
     small: { paddingHorizontal: 13, paddingVertical: 11, minHeight: 44 },
     buttonText: { fontSize: 14, color: palette.onInk, fontWeight: '600' },
     chip: {

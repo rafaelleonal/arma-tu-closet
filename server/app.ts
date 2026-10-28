@@ -1,5 +1,13 @@
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { parseAnalysisResult, rejectionMessages, type GarmentAnalyzer } from './analysis';
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from 'node:http';
+import {
+  parseAnalysisResult,
+  rejectionMessages,
+  type GarmentAnalyzer,
+} from './analysis';
 import { MAX_BODY_BYTES, parseImageRequest, RequestError } from './image';
 
 export const ALLOWED_ORIGINS = [
@@ -53,24 +61,36 @@ export function createGarmentServer({
     try {
       const port = request.socket.localPort;
       const loopback = (address: string | undefined) =>
-        address === '127.0.0.1' || address === '::ffff:127.0.0.1' || address === '::1';
+        address === '127.0.0.1' ||
+        address === '::ffff:127.0.0.1' ||
+        address === '::1';
       if (
         !loopback(request.socket.localAddress) ||
         !loopback(request.socket.remoteAddress) ||
-        ![`127.0.0.1:${port}`, `localhost:${port}`].includes(request.headers.host ?? '')
+        ![`127.0.0.1:${port}`, `localhost:${port}`].includes(
+          request.headers.host ?? '',
+        )
       ) {
-        throw new RequestError(403, 'Este servidor solo acepta conexiones locales.');
+        throw new RequestError(
+          403,
+          'Este servidor solo acepta conexiones locales.',
+        );
       }
       const origin = request.headers.origin;
-      if (origin !== undefined && !(ALLOWED_ORIGINS as readonly string[]).includes(origin))
+      if (
+        origin !== undefined &&
+        !(ALLOWED_ORIGINS as readonly string[]).includes(origin)
+      )
         throw new RequestError(403, 'Este origen no está permitido.');
       if (origin) response.setHeader('Access-Control-Allow-Origin', origin);
       const path = request.url?.split('?')[0];
       if (request.method === 'GET' && path === '/health')
         return send(response, 200, { status: 'ok', configured: !!analyze });
-      if (path !== '/api/garment-analysis') throw new RequestError(404, 'Ruta no encontrada.');
+      if (path !== '/api/garment-analysis')
+        throw new RequestError(404, 'Ruta no encontrada.');
       if (request.method === 'OPTIONS') {
-        if (!origin) throw new RequestError(403, 'Este origen no está permitido.');
+        if (!origin)
+          throw new RequestError(403, 'Este origen no está permitido.');
         response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         return send(response, 204);
@@ -97,7 +117,10 @@ export function createGarmentServer({
       try {
         input = JSON.parse(body);
       } catch {
-        throw new RequestError(400, 'El cuerpo de la solicitud no es JSON válido.');
+        throw new RequestError(
+          400,
+          'El cuerpo de la solicitud no es JSON válido.',
+        );
       }
       const image = parseImageRequest(input);
       if (now() - windowStart >= 60_000) {
@@ -106,7 +129,10 @@ export function createGarmentServer({
       }
       if (active >= limits.concurrent) {
         response.setHeader('Retry-After', '2');
-        throw new RequestError(429, 'Hay un análisis en curso. Espera un momento.');
+        throw new RequestError(
+          429,
+          'Hay un análisis en curso. Espera un momento.',
+        );
       }
       if (sessionRequests >= limits.perSession)
         throw new RequestError(
@@ -116,7 +142,9 @@ export function createGarmentServer({
       if (minuteRequests >= limits.perMinute) {
         response.setHeader(
           'Retry-After',
-          String(Math.max(1, Math.ceil((60_000 - (now() - windowStart)) / 1_000))),
+          String(
+            Math.max(1, Math.ceil((60_000 - (now() - windowStart)) / 1_000)),
+          ),
         );
         throw new RequestError(
           429,
@@ -138,7 +166,8 @@ export function createGarmentServer({
         limits.providerTimeoutMs,
       );
       const onClose = () => {
-        if (!response.writableEnded) controller.abort(new Error('Client disconnected'));
+        if (!response.writableEnded)
+          controller.abort(new Error('Client disconnected'));
       };
       response.on('close', onClose);
       try {
@@ -148,12 +177,19 @@ export function createGarmentServer({
             active--;
           });
         const aborted = new Promise<never>((_, reject) =>
-          controller.signal.addEventListener('abort', () => reject(controller.signal.reason), {
-            once: true,
-          }),
+          controller.signal.addEventListener(
+            'abort',
+            () => reject(controller.signal.reason),
+            {
+              once: true,
+            },
+          ),
         );
-        const result = parseAnalysisResult(await Promise.race([analysis, aborted]));
-        if (result.status !== 'ok') throw new RequestError(422, rejectionMessages[result.status]);
+        const result = parseAnalysisResult(
+          await Promise.race([analysis, aborted]),
+        );
+        if (result.status !== 'ok')
+          throw new RequestError(422, rejectionMessages[result.status]);
         send(response, 200, { suggestion: result.suggestion });
       } finally {
         clearTimeout(timer);
@@ -161,10 +197,12 @@ export function createGarmentServer({
       }
     } catch (error) {
       if (response.destroyed || response.writableEnded) return;
-      if (error instanceof RequestError) send(response, error.status, { error: error.message });
+      if (error instanceof RequestError)
+        send(response, error.status, { error: error.message });
       else
         send(response, 502, {
-          error: 'No se pudo analizar la foto. Intenta de nuevo o completa los datos a mano.',
+          error:
+            'No se pudo analizar la foto. Intenta de nuevo o completa los datos a mano.',
         });
     }
   }
@@ -181,20 +219,32 @@ function send(response: ServerResponse, status: number, body?: unknown) {
   response.end(JSON.stringify(body));
 }
 
-function readBody(request: IncomingMessage, timeoutMs: number): Promise<string> {
+function readBody(
+  request: IncomingMessage,
+  timeoutMs: number,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const length = request.headers['content-length'];
     if (length && (!/^\d+$/.test(length) || Number(length) > MAX_BODY_BYTES)) {
       request.resume();
       reject(
-        new RequestError(413, 'La solicitud es demasiado grande. Elige una foto de hasta 4 MB.'),
+        new RequestError(
+          413,
+          'La solicitud es demasiado grande. Elige una foto de hasta 4 MB.',
+        ),
       );
       return;
     }
     let size = 0;
     let chunks: Buffer[] = [];
     const timer = setTimeout(
-      () => fail(new RequestError(408, 'La foto tardó demasiado en llegar. Intenta de nuevo.')),
+      () =>
+        fail(
+          new RequestError(
+            408,
+            'La foto tardó demasiado en llegar. Intenta de nuevo.',
+          ),
+        ),
       timeoutMs,
     );
     const cleanup = () => {
@@ -211,12 +261,20 @@ function readBody(request: IncomingMessage, timeoutMs: number): Promise<string> 
       reject(error);
     };
     const onAborted = () =>
-      fail(new RequestError(400, 'La carga de la foto se interrumpió. Intenta de nuevo.'));
+      fail(
+        new RequestError(
+          400,
+          'La carga de la foto se interrumpió. Intenta de nuevo.',
+        ),
+      );
     const onData = (chunk: Buffer) => {
       size += chunk.length;
       if (size > MAX_BODY_BYTES)
         fail(
-          new RequestError(413, 'La solicitud es demasiado grande. Elige una foto de hasta 4 MB.'),
+          new RequestError(
+            413,
+            'La solicitud es demasiado grande. Elige una foto de hasta 4 MB.',
+          ),
         );
       else chunks.push(chunk);
     };

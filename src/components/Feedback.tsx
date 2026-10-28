@@ -37,10 +37,13 @@ export function FeedbackProvider({
   useEffect(() => {
     let active = true;
     let changed = false;
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', (value) => {
-      changed = true;
-      setReduceMotion(value);
-    });
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      (value) => {
+        changed = true;
+        setReduceMotion(value);
+      },
+    );
     void AccessibilityInfo.isReduceMotionEnabled()
       .then((value) => {
         if (active && !changed) setReduceMotion(value);
@@ -52,22 +55,41 @@ export function FeedbackProvider({
     };
   }, []);
   const selection = useCallback(() => {
-    if (Platform.OS !== 'web' && enabledRef.current && AppState.currentState === 'active')
+    if (
+      Platform.OS !== 'web' &&
+      enabledRef.current &&
+      AppState.currentState === 'active'
+    )
       void Haptics.selectionAsync().catch(() => {});
   }, []);
   const success = useCallback(() => {
-    if (Platform.OS !== 'web' && enabledRef.current && AppState.currentState === 'active')
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    if (
+      Platform.OS !== 'web' &&
+      enabledRef.current &&
+      AppState.currentState === 'active'
+    )
+      void Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success,
+      ).catch(() => {});
   }, []);
   const value = useMemo(
     () => ({ reduceMotion, selection, success }),
     [reduceMotion, selection, success],
   );
-  return <FeedbackContext.Provider value={value}>{children}</FeedbackContext.Provider>;
+  return (
+    <FeedbackContext.Provider value={value}>
+      {children}
+    </FeedbackContext.Provider>
+  );
 }
 
 export const useFeedback = () => useContext(FeedbackContext);
-export function MotionPressable({ children, onPressIn, onPressOut, ...props }: PressableProps) {
+export function MotionPressable({
+  children,
+  onPressIn,
+  onPressOut,
+  ...props
+}: PressableProps) {
   const { reduceMotion } = useFeedback();
   const scale = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -144,9 +166,17 @@ export function MotionIn({
   return (
     <Animated.View
       style={{
-        opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }),
+        opacity: progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.4, 1],
+        }),
         transform: [
-          { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) },
+          {
+            translateY: progress.interpolate({
+              inputRange: [0, 1],
+              outputRange: [6, 0],
+            }),
+          },
         ],
       }}
     >

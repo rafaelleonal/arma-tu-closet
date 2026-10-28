@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
-import { CATEGORIES, COLOR_OPTIONS, categoryLabels, colorLabels } from '../domain';
-import { parseGarmentSuggestion, type GarmentSuggestion } from '../ai/contracts';
+import {
+  CATEGORIES,
+  COLOR_OPTIONS,
+  categoryLabels,
+  colorLabels,
+} from '../domain';
+import {
+  parseGarmentSuggestion,
+  type GarmentSuggestion,
+} from '../ai/contracts';
 import { Button, Chip, colorHex, FieldLabel, useUI } from './ui';
 
 export function GarmentSuggestionReview({
@@ -93,9 +101,15 @@ export function GarmentSuggestionReview({
           }
         }}
       />
-      <Button secondary label="Descartar análisis" style={{ marginTop: 8 }} onPress={onDismiss} />
+      <Button
+        secondary
+        label="Descartar análisis"
+        style={{ marginTop: 8 }}
+        onPress={onDismiss}
+      />
       <Text style={[s.subtitle, { fontSize: 11, marginTop: 12 }]}>
-        Aplicar reemplaza nombre, categoría y colores. Después debes guardar la prenda.
+        Aplicar reemplaza nombre, categoría y colores. Después debes guardar la
+        prenda.
       </Text>
     </View>
   );

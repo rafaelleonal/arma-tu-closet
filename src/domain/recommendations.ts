@@ -1,4 +1,9 @@
-import { CATEGORY_LABELS, OCCASION_LABELS, STYLE_IDS, STYLE_OPTIONS } from './types';
+import {
+  CATEGORY_LABELS,
+  OCCASION_LABELS,
+  STYLE_IDS,
+  STYLE_OPTIONS,
+} from './types';
 import type {
   Category,
   Outfit,
@@ -25,10 +30,14 @@ function normalized(colors: string[]): Set<string> {
   return new Set(colors.map(normalizeColor).filter(Boolean));
 }
 
-export function isItemEligible(item: WardrobeItem, context: RecommendationContext): boolean {
+export function isItemEligible(
+  item: WardrobeItem,
+  context: RecommendationContext,
+): boolean {
   const excluded = normalized(context.excludedColors);
   return (
-    item.available === true && !item.colors.some((color) => excluded.has(normalizeColor(color)))
+    item.available === true &&
+    !item.colors.some((color) => excluded.has(normalizeColor(color)))
   );
 }
 
@@ -39,15 +48,28 @@ function ageDays(item: WardrobeItem, now: string): number {
 }
 
 function recent(item: WardrobeItem, context: RecommendationContext): boolean {
-  return context.rotationDays > 0 && ageDays(item, context.now) < context.rotationDays;
+  return (
+    context.rotationDays > 0 &&
+    ageDays(item, context.now) < context.rotationDays
+  );
 }
 
-function matchedStyles(item: WardrobeItem, context: RecommendationContext): string[] {
-  const preferred = new Set((context.styleIds ?? []).filter((style) => STYLE_IDS.includes(style)));
-  return (item.styleIds ?? []).filter((style) => STYLE_IDS.includes(style) && preferred.has(style));
+function matchedStyles(
+  item: WardrobeItem,
+  context: RecommendationContext,
+): string[] {
+  const preferred = new Set(
+    (context.styleIds ?? []).filter((style) => STYLE_IDS.includes(style)),
+  );
+  return (item.styleIds ?? []).filter(
+    (style) => STYLE_IDS.includes(style) && preferred.has(style),
+  );
 }
 
-function styleAffinity(items: WardrobeItem[], context: RecommendationContext): number {
+function styleAffinity(
+  items: WardrobeItem[],
+  context: RecommendationContext,
+): number {
   // Extra tags on one garment do not inflate its influence.
   return (
     items.filter((item) => matchedStyles(item, context).length > 0).length /
@@ -65,8 +87,11 @@ function targetWarmth(context: RecommendationContext): number {
 }
 
 function bodyWarmth(items: WardrobeItem[]): number {
-  const base = items.filter((item) => ['top', 'bottom', 'one-piece'].includes(item.category));
-  const baseWarmth = base.reduce((sum, item) => sum + item.warmth, 0) / Math.max(1, base.length);
+  const base = items.filter((item) =>
+    ['top', 'bottom', 'one-piece'].includes(item.category),
+  );
+  const baseWarmth =
+    base.reduce((sum, item) => sum + item.warmth, 0) / Math.max(1, base.length);
   return (
     baseWarmth +
     items.reduce(
@@ -82,11 +107,16 @@ function bodyWarmth(items: WardrobeItem[]): number {
   );
 }
 
-function itemPriority(item: WardrobeItem, context: RecommendationContext): number {
+function itemPriority(
+  item: WardrobeItem,
+  context: RecommendationContext,
+): number {
   const preferred = normalized(context.preferredColors);
   return (
     (item.occasions.includes(context.occasion) ? 12 : 0) +
-    (item.colors.some((color) => preferred.has(normalizeColor(color))) ? 4 : 0) +
+    (item.colors.some((color) => preferred.has(normalizeColor(color)))
+      ? 4
+      : 0) +
     (context.raining && item.rainReady ? 5 : 0) +
     (matchedStyles(item, context).length ? 5 : 0) -
     (recent(item, context) ? 10 : 0) -
@@ -94,9 +124,14 @@ function itemPriority(item: WardrobeItem, context: RecommendationContext): numbe
   );
 }
 
-function scoreItems(items: WardrobeItem[], context: RecommendationContext): number {
+function scoreItems(
+  items: WardrobeItem[],
+  context: RecommendationContext,
+): number {
   const preferred = normalized(context.preferredColors);
-  const occasionMatches = items.filter((item) => item.occasions.includes(context.occasion)).length;
+  const occasionMatches = items.filter((item) =>
+    item.occasions.includes(context.occasion),
+  ).length;
   const colors = normalized(items.flatMap((item) => item.colors));
   const colorful = [...colors].filter((color) => !NEUTRALS.has(color)).length;
   const shoes = items.find((item) => item.category === 'shoes');
@@ -115,8 +150,9 @@ function scoreItems(items: WardrobeItem[], context: RecommendationContext): numb
     styleAffinity(items, context) * 15 +
     Math.min(
       12,
-      items.filter((item) => item.colors.some((color) => preferred.has(normalizeColor(color))))
-        .length * 4,
+      items.filter((item) =>
+        item.colors.some((color) => preferred.has(normalizeColor(color))),
+      ).length * 4,
     ) -
     Math.abs(bodyWarmth(items) - targetWarmth(context)) * 14 -
     (shoes ? Math.abs(shoes.warmth - shoeTarget) * 4 : 0) -
@@ -140,33 +176,57 @@ function lexical(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function compareSets(a: WardrobeItem[], b: WardrobeItem[], context: RecommendationContext): number {
-  return scoreItems(b, context) - scoreItems(a, context) || lexical(fingerprint(a), fingerprint(b));
+function compareSets(
+  a: WardrobeItem[],
+  b: WardrobeItem[],
+  context: RecommendationContext,
+): number {
+  return (
+    scoreItems(b, context) - scoreItems(a, context) ||
+    lexical(fingerprint(a), fingerprint(b))
+  );
 }
 
-function rankSets(sets: WardrobeItem[][], context: RecommendationContext): WardrobeItem[][] {
+function rankSets(
+  sets: WardrobeItem[][],
+  context: RecommendationContext,
+): WardrobeItem[][] {
   return sets
-    .map((items) => ({ items, score: scoreItems(items, context), key: fingerprint(items) }))
+    .map((items) => ({
+      items,
+      score: scoreItems(items, context),
+      key: fingerprint(items),
+    }))
     .sort((a, b) => b.score - a.score || lexical(a.key, b.key))
     .map((candidate) => candidate.items);
 }
 
-function makeOutfit(items: WardrobeItem[], context: RecommendationContext): Outfit {
+function makeOutfit(
+  items: WardrobeItem[],
+  context: RecommendationContext,
+): Outfit {
   const reasons: string[] = [];
   const warnings: string[] = [];
   const preferred = normalized(context.preferredColors);
-  const matchingOccasion = items.every((item) => item.occasions.includes(context.occasion));
-  if (matchingOccasion) reasons.push(`Ocasión: ${OCCASION_LABELS[context.occasion].toLowerCase()}`);
+  const matchingOccasion = items.every((item) =>
+    item.occasions.includes(context.occasion),
+  );
+  if (matchingOccasion)
+    reasons.push(`Ocasión: ${OCCASION_LABELS[context.occasion].toLowerCase()}`);
   else warnings.push('Hay prendas sin etiqueta para esta ocasión');
   if (Math.abs(bodyWarmth(items) - targetWarmth(context)) <= 0.8)
     reasons.push(`Abrigo estimado para ${temperature(context)} °C`);
   else warnings.push(`Revisa el abrigo para ${temperature(context)} °C`);
-  if (items.some((item) => item.colors.some((color) => preferred.has(normalizeColor(color)))))
+  if (
+    items.some((item) =>
+      item.colors.some((color) => preferred.has(normalizeColor(color))),
+    )
+  )
     reasons.push('Color favorito');
   const styles = new Set(items.flatMap((item) => matchedStyles(item, context)));
   if (styles.size) {
-    const labels = STYLE_OPTIONS.filter((style) => styles.has(style.id)).map((style) =>
-      style.label.toLowerCase(),
+    const labels = STYLE_OPTIONS.filter((style) => styles.has(style.id)).map(
+      (style) => style.label.toLowerCase(),
     );
     reasons.unshift(`Estilo: ${labels.join(', ')}`);
   }
@@ -185,7 +245,8 @@ function makeOutfit(items: WardrobeItem[], context: RecommendationContext): Outf
     )
       reasons.push('Calzado y capa marcados para lluvia');
   }
-  if (normalized(items.flatMap((item) => item.colors)).size === 1) reasons.push('Un solo color');
+  if (normalized(items.flatMap((item) => item.colors)).size === 1)
+    reasons.push('Un solo color');
   return {
     id: fingerprint(items),
     items: [...items],
@@ -197,10 +258,19 @@ function makeOutfit(items: WardrobeItem[], context: RecommendationContext): Outf
 
 /** A complete base is top + bottom OR one-piece, always with shoes. Extras are optional. */
 export function isValidOutfit(items: WardrobeItem[]): boolean {
-  if (!items.length || new Set(items.map((item) => item.id)).size !== items.length) return false;
+  if (
+    !items.length ||
+    new Set(items.map((item) => item.id)).size !== items.length
+  )
+    return false;
   const counts = new Map<Category, number>();
-  for (const item of items) counts.set(item.category, (counts.get(item.category) ?? 0) + 1);
-  if ([...counts.values()].some((count) => count > 1) || counts.get('shoes') !== 1) return false;
+  for (const item of items)
+    counts.set(item.category, (counts.get(item.category) ?? 0) + 1);
+  if (
+    [...counts.values()].some((count) => count > 1) ||
+    counts.get('shoes') !== 1
+  )
+    return false;
   return counts.get('one-piece') === 1
     ? !counts.has('top') && !counts.has('bottom')
     : counts.get('top') === 1 && counts.get('bottom') === 1;
@@ -213,20 +283,31 @@ export function generateRecommendations(
   options: { limit?: number } = {},
 ): RecommendationResult {
   if (!wardrobe.length)
-    return { status: 'empty', outfits: [], message: 'Agrega tus prendas para empezar a combinar.' };
+    return {
+      status: 'empty',
+      outfits: [],
+      message: 'Agrega tus prendas para empezar a combinar.',
+    };
   // Deduplicate IDs defensively after restoring local JSON or importing garments.
   const unique = [...new Map(wardrobe.map((item) => [item.id, item])).values()];
   const eligible = unique.filter((item) => isItemEligible(item, context));
   const pool = (category: Category, cap: number) =>
     eligible
       .filter((item) => item.category === category)
-      .sort((a, b) => itemPriority(b, context) - itemPriority(a, context) || lexical(a.id, b.id))
+      .sort(
+        (a, b) =>
+          itemPriority(b, context) - itemPriority(a, context) ||
+          lexical(a.id, b.id),
+      )
       .slice(0, cap);
   const tops = pool('top', 24);
   const bottoms = pool('bottom', 24);
   const onePieces = pool('one-piece', 24);
   const shoes = pool('shoes', 16);
-  if (!shoes.length || (!onePieces.length && (!tops.length || !bottoms.length))) {
+  if (
+    !shoes.length ||
+    (!onePieces.length && (!tops.length || !bottoms.length))
+  ) {
     const missing = !shoes.length
       ? 'calzado'
       : !tops.length && !bottoms.length
@@ -251,8 +332,14 @@ export function generateRecommendations(
     bases.flatMap((base) => shoes.map((shoe) => [...base, shoe])),
     context,
   ).slice(0, 96);
-  const layers: Array<WardrobeItem | undefined> = [undefined, ...pool('layer', 4)];
-  const accessories: Array<WardrobeItem | undefined> = [undefined, ...pool('accessory', 2)];
+  const layers: Array<WardrobeItem | undefined> = [
+    undefined,
+    ...pool('layer', 4),
+  ];
+  const accessories: Array<WardrobeItem | undefined> = [
+    undefined,
+    ...pool('accessory', 2),
+  ];
   const candidates = rankSets(
     dressed.flatMap((base) =>
       layers.flatMap((layer) =>
@@ -283,7 +370,8 @@ export function generateRecommendations(
         ? Math.max(
             ...selected.map((previous) => {
               const previousCore = previous.filter(
-                (item) => item.category !== 'accessory' && item.category !== 'layer',
+                (item) =>
+                  item.category !== 'accessory' && item.category !== 'layer',
               );
               return (
                 previousCore.filter((item) => ids.has(item.id)).length /
@@ -310,11 +398,15 @@ export function generateRecommendations(
   };
 }
 
-function currentItems(outfit: Outfit, wardrobe: WardrobeItem[]): WardrobeItem[] | undefined {
+function currentItems(
+  outfit: Outfit,
+  wardrobe: WardrobeItem[],
+): WardrobeItem[] | undefined {
   const current = new Map(wardrobe.map((item) => [item.id, item]));
   const items = outfit.items.map((item) => current.get(item.id));
-  return items.every((item): item is WardrobeItem => !!item && item.available === true) &&
-    isValidOutfit(items)
+  return items.every(
+    (item): item is WardrobeItem => !!item && item.available === true,
+  ) && isValidOutfit(items)
     ? items
     : undefined;
 }
@@ -328,13 +420,20 @@ export function swapOutfitItem(
   context: RecommendationContext,
 ): SwapResult {
   const current = currentItems(outfit, wardrobe);
-  const unavailable = (message: string): SwapResult => ({ status: 'unavailable', outfit, message });
+  const unavailable = (message: string): SwapResult => ({
+    status: 'unavailable',
+    outfit,
+    message,
+  });
   if (!current || !current.every((item) => isItemEligible(item, context)))
     return unavailable(
       'La combinación cambió o contiene prendas no disponibles. Genera opciones nuevas.',
     );
   const old = current.find((item) => item.category === slot);
-  if (!old) return unavailable('Esta combinación no tiene ese tipo de prenda para cambiar.');
+  if (!old)
+    return unavailable(
+      'Esta combinación no tiene ese tipo de prenda para cambiar.',
+    );
   const candidates = wardrobe
     .filter(
       (item) =>
@@ -343,7 +442,9 @@ export function swapOutfitItem(
         isItemEligible(item, context) &&
         (!itemId || item.id === itemId),
     )
-    .map((item) => current.map((existing) => (existing.id === old.id ? item : existing)))
+    .map((item) =>
+      current.map((existing) => (existing.id === old.id ? item : existing)),
+    )
     .filter((items) => isValidOutfit(items))
     .sort((a, b) => compareSets(a, b, context));
   if (!candidates.length)
@@ -367,14 +468,18 @@ export function recordOutfitWorn(
     return {
       status: 'unavailable',
       wardrobe,
-      message: 'No se pudo registrar: revisa la fecha y que las prendas sigan disponibles.',
+      message:
+        'No se pudo registrar: revisa la fecha y que las prendas sigan disponibles.',
     };
   const ids = new Set(outfit.items.map((item) => item.id));
   return {
     status: 'recorded',
     wardrobe: wardrobe.map((item) =>
-      ids.has(item.id) ? { ...item, lastWornAt: now, wearCount: (item.wearCount ?? 0) + 1 } : item,
+      ids.has(item.id)
+        ? { ...item, lastWornAt: now, wearCount: (item.wearCount ?? 0) + 1 }
+        : item,
     ),
-    message: 'Uso registrado. Lo tendremos en cuenta para la próxima combinación.',
+    message:
+      'Uso registrado. Lo tendremos en cuenta para la próxima combinación.',
   };
 }

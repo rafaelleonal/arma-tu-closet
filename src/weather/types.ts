@@ -25,14 +25,15 @@ export interface WeatherSettings {
 }
 
 export const WEATHER_CODES = [
-  0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86,
-  95, 96, 97, 99,
+  0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77,
+  80, 81, 82, 85, 86, 95, 96, 97, 99,
 ] as const;
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value);
 export const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
-const nonempty = (value: unknown): value is string => typeof value === 'string' && !!value.trim();
+const nonempty = (value: unknown): value is string =>
+  typeof value === 'string' && !!value.trim();
 const positiveId = (value: unknown): value is number =>
   isFiniteNumber(value) && Number.isSafeInteger(value) && value > 0;
 const instant = (value: unknown): value is string =>

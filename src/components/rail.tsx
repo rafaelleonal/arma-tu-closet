@@ -1,5 +1,11 @@
 import React from 'react';
-import { Image, StyleSheet, View, type ImageSourcePropType, type ViewStyle } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  View,
+  type ImageSourcePropType,
+  type ViewStyle,
+} from 'react-native';
 import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import type { Category, WardrobeItem } from '../domain';
 import { Garment } from './Garment';
@@ -38,7 +44,9 @@ export function garmentWidth(item: WardrobeItem, height: number): number {
   const fallback = !HANGING.has(item.category) ? 1.3 : source ? 0.8 : 0.75;
   return Math.min(
     MAX_WIDTH,
-    Math.round(height * (photoAspect(item.photoUri ? undefined : source) ?? fallback)),
+    Math.round(
+      height * (photoAspect(item.photoUri ? undefined : source) ?? fallback),
+    ),
   );
 }
 
@@ -56,7 +64,12 @@ export function GarmentImage({
   const source = sourceFor(item);
   if (source)
     return (
-      <Image accessible={false} source={source} style={{ width, height }} resizeMode="contain" />
+      <Image
+        accessible={false}
+        source={source}
+        style={{ width, height }}
+        resizeMode="contain"
+      />
     );
   if (!HANGING.has(item.category)) return <Garment item={item} size={height} />;
   return (
@@ -90,10 +103,17 @@ export function RailWall({
 }) {
   const { palette } = useUI();
   return (
-    <View style={[styles.wall, { backgroundColor: palette.art, height }, style]}>
+    <View
+      style={[styles.wall, { backgroundColor: palette.art, height }, style]}
+    >
       <Svg style={StyleSheet.absoluteFill} aria-hidden>
         <Defs>
-          <Pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+          <Pattern
+            id="dots"
+            width="14"
+            height="14"
+            patternUnits="userSpaceOnUse"
+          >
             <Circle cx="2" cy="2" r="1" fill={palette.line} />
           </Pattern>
         </Defs>

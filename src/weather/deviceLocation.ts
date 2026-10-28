@@ -14,18 +14,22 @@ export type DeviceCityResult =
   | { status: 'failed'; message: string };
 
 // Reverse geocoding is only available on iOS and Android; web keeps the search by name.
-export const deviceLocationSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+export const deviceLocationSupported =
+  Platform.OS === 'ios' || Platform.OS === 'android';
 const POSITION_TIMEOUT_MS = 10_000;
 
 /**
  * Asks for foreground location only after an explicit action. The device position is used once to
  * name the city; only the matched Open-Meteo city (its own coordinates) is returned and stored.
  */
-export async function findDeviceCity(signal?: AbortSignal): Promise<DeviceCityResult> {
+export async function findDeviceCity(
+  signal?: AbortSignal,
+): Promise<DeviceCityResult> {
   let permission = await Location.getForegroundPermissionsAsync();
   if (!permission.granted && permission.canAskAgain)
     permission = await Location.requestForegroundPermissionsAsync();
-  if (!permission.granted) return { status: 'denied', canAskAgain: permission.canAskAgain };
+  if (!permission.granted)
+    return { status: 'denied', canAskAgain: permission.canAskAgain };
   if (!(await Location.hasServicesEnabledAsync()))
     return {
       status: 'failed',
@@ -41,9 +45,16 @@ export async function findDeviceCity(signal?: AbortSignal): Promise<DeviceCityRe
       POSITION_TIMEOUT_MS,
     ).catch(() => Location.getLastKnownPositionAsync({ maxAge: 30 * 60_000 }));
     if (!position) throw new Error('position unavailable');
-    coords = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+    coords = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
     const [address] = await Location.reverseGeocodeAsync(coords);
-    names = placeSearchTerms([address?.city, address?.subregion, address?.district]);
+    names = placeSearchTerms([
+      address?.city,
+      address?.subregion,
+      address?.district,
+    ]);
   } catch {
     return {
       status: 'failed',
@@ -63,7 +74,10 @@ export async function findDeviceCity(signal?: AbortSignal): Promise<DeviceCityRe
         return { status: 'failed', message: cause.message };
     }
   }
-  return { status: 'failed', message: 'No pudimos identificar tu ciudad. Búscala por nombre.' };
+  return {
+    status: 'failed',
+    message: 'No pudimos identificar tu ciudad. Búscala por nombre.',
+  };
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {

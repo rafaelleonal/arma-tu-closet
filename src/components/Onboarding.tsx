@@ -27,7 +27,15 @@ import { WelcomeRail } from './ClosetRail';
 import { Button, Chip, colorHex, FieldLabel, useUI } from './ui';
 
 export type PersonalizationPatch = Partial<
-  Pick<LocalData, 'profile' | 'preferences' | 'appearance' | 'context' | 'onboarding' | 'weather'>
+  Pick<
+    LocalData,
+    | 'profile'
+    | 'preferences'
+    | 'appearance'
+    | 'context'
+    | 'onboarding'
+    | 'weather'
+  >
 >;
 export interface OnboardingProps {
   data: LocalData;
@@ -48,14 +56,24 @@ const styleMarks: Record<StyleId, string> = {
   feminine: '❀',
 };
 
-export function Onboarding({ data, mode, onChange, onFinish, onClose }: OnboardingProps) {
+export function Onboarding({
+  data,
+  mode,
+  onChange,
+  onFinish,
+  onClose,
+}: OnboardingProps) {
   const { s, palette } = useUI();
   const feedback = useFeedback();
-  const [step, setStep] = useState(mode === 'edit' ? 0 : (data.onboarding?.step ?? 0));
+  const [step, setStep] = useState(
+    mode === 'edit' ? 0 : (data.onboarding?.step ?? 0),
+  );
   const [colorMode, setColorMode] = useState<'favorite' | 'avoid'>('favorite');
   const [styleNotice, setStyleNotice] = useState('');
   // Shown once per launch before the first step; not persisted, so it needs no schema change.
-  const [welcome, setWelcome] = useState(mode === 'initial' && (data.onboarding?.step ?? 0) === 0);
+  const [welcome, setWelcome] = useState(
+    mode === 'initial' && (data.onboarding?.step ?? 0) === 0,
+  );
   const scroll = useRef<ScrollViewInstance>(null);
   const edit = mode === 'edit';
   function go(next: number) {
@@ -86,7 +104,8 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
   function selectColor(color: string) {
     feedback.selection();
     const { preferredColors, excludedColors } = data.preferences;
-    const selected = colorMode === 'favorite' ? preferredColors : excludedColors;
+    const selected =
+      colorMode === 'favorite' ? preferredColors : excludedColors;
     const next = selected.includes(color)
       ? selected.filter((value) => value !== color)
       : [...selected, color];
@@ -94,15 +113,22 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
       preferences: {
         ...data.preferences,
         preferredColors:
-          colorMode === 'favorite' ? next : preferredColors.filter((value) => value !== color),
+          colorMode === 'favorite'
+            ? next
+            : preferredColors.filter((value) => value !== color),
         excludedColors:
-          colorMode === 'avoid' ? next : excludedColors.filter((value) => value !== color),
+          colorMode === 'avoid'
+            ? next
+            : excludedColors.filter((value) => value !== color),
       },
     });
   }
   if (welcome)
     return (
-      <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: palette.paper }}>
+      <SafeAreaView
+        edges={['top', 'bottom']}
+        style={{ flex: 1, backgroundColor: palette.paper }}
+      >
         <View
           style={{
             flex: 1,
@@ -153,8 +179,14 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
               >
                 Arma tu outfit
               </Text>
-              <Text style={[s.subtitle, { fontSize: 16, lineHeight: 24, marginTop: 14 }]}>
-                Conjuntos con la ropa de tu clóset, según el clima y la ocasión del día.
+              <Text
+                style={[
+                  s.subtitle,
+                  { fontSize: 16, lineHeight: 24, marginTop: 14 },
+                ]}
+              >
+                Conjuntos con la ropa de tu clóset, según el clima y la ocasión
+                del día.
               </Text>
             </MotionIn>
           </View>
@@ -165,14 +197,22 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
               setWelcome(false);
             }}
           />
-          <Text style={[s.subtitle, { fontSize: 11, textAlign: 'center', marginTop: 14 }]}>
+          <Text
+            style={[
+              s.subtitle,
+              { fontSize: 11, textAlign: 'center', marginTop: 14 },
+            ]}
+          >
             Sin cuenta. Tus datos se quedan en este dispositivo.
           </Text>
         </View>
       </SafeAreaView>
     );
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: palette.paper }}>
+    <SafeAreaView
+      edges={['top', 'bottom']}
+      style={{ flex: 1, backgroundColor: palette.paper }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
@@ -188,7 +228,11 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
           }}
         >
           <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
           >
             <Text
               style={{
@@ -202,16 +246,26 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
             >
               a.
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-              <Text style={{ color: palette.muted, fontSize: 11 }}>{step + 1} de 4</Text>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}
+            >
+              <Text style={{ color: palette.muted, fontSize: 11 }}>
+                {step + 1} de 4
+              </Text>
               {onClose ? (
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Cerrar personalización"
                   onPress={onClose}
-                  style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 }}
+                  style={{
+                    minHeight: 44,
+                    justifyContent: 'center',
+                    paddingHorizontal: 4,
+                  }}
                 >
-                  <Text style={{ color: palette.ink, fontSize: 12 }}>Cerrar</Text>
+                  <Text style={{ color: palette.ink, fontSize: 12 }}>
+                    Cerrar
+                  </Text>
                 </Pressable>
               ) : null}
             </View>
@@ -255,7 +309,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                 <Text style={[s.subtitle, { marginTop: 12, marginBottom: 20 }]}>
                   Elige hasta 3.
                 </Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}
+                >
                   {STYLE_OPTIONS.map((option) => {
                     const selected = data.profile.styleIds.includes(option.id);
                     return (
@@ -273,7 +329,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                           minHeight: 112,
                           padding: 18,
                           borderRadius: 16,
-                          backgroundColor: selected ? palette.ink : palette.white,
+                          backgroundColor: selected
+                            ? palette.ink
+                            : palette.white,
                           borderWidth: 1,
                           borderColor: selected ? palette.ink : palette.line,
                         }}
@@ -324,7 +382,8 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                     fontSize: 11,
                   }}
                 >
-                  {styleNotice || `${data.profile.styleIds.length} de 3 · Opcional`}
+                  {styleNotice ||
+                    `${data.profile.styleIds.length} de 3 · Opcional`}
                 </Text>
                 <FieldLabel>Nombre · opcional</FieldLabel>
                 <TextInput
@@ -332,7 +391,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                   placeholder="Tu nombre"
                   placeholderTextColor={palette.muted}
                   value={data.profile.name}
-                  onChangeText={(name) => onChange({ profile: { ...data.profile, name } })}
+                  onChangeText={(name) =>
+                    onChange({ profile: { ...data.profile, name } })
+                  }
                   maxLength={40}
                   autoComplete="given-name"
                   style={s.input}
@@ -341,7 +402,10 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
             ) : null}
             {step === 1 ? (
               <>
-                <Text accessibilityRole="header" style={[s.title, { marginBottom: 22 }]}>
+                <Text
+                  accessibilityRole="header"
+                  style={[s.title, { marginBottom: 22 }]}
+                >
                   Colores
                 </Text>
                 <View
@@ -370,7 +434,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                     <Pressable
                       key={modeOption.id}
                       accessibilityRole="tab"
-                      accessibilityState={{ selected: colorMode === modeOption.id }}
+                      accessibilityState={{
+                        selected: colorMode === modeOption.id,
+                      }}
                       aria-selected={colorMode === modeOption.id}
                       onPress={() => setColorMode(modeOption.id)}
                       style={{
@@ -380,14 +446,17 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                         alignItems: 'center',
                         borderRadius: 10,
                         backgroundColor:
-                          colorMode === modeOption.id ? palette.white : 'transparent',
+                          colorMode === modeOption.id
+                            ? palette.white
+                            : 'transparent',
                       }}
                     >
                       <Text
                         style={{
                           fontSize: 12,
                           color: palette.ink,
-                          fontWeight: colorMode === modeOption.id ? '600' : '400',
+                          fontWeight:
+                            colorMode === modeOption.id ? '600' : '400',
                         }}
                       >
                         {modeOption.label} · {modeOption.count}
@@ -400,7 +469,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                     ? 'Se priorizan en tus sugerencias.'
                     : 'Excluye prendas con estos colores registrados.'}
                 </Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+                >
                   {COLOR_OPTIONS.map((color) => {
                     const selected = (
                       colorMode === 'favorite'
@@ -426,7 +497,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                           borderRadius: 14,
                           alignItems: 'center',
                           paddingVertical: 15,
-                          backgroundColor: selected ? palette.sand : palette.white,
+                          backgroundColor: selected
+                            ? palette.sand
+                            : palette.white,
                           borderWidth: 1,
                           borderColor: selected ? palette.ink : palette.line,
                         }}
@@ -446,7 +519,13 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                           {selected ? (
                             <Text
                               style={{
-                                color: ['negro', 'azul', 'cafe', 'rojo', 'morado'].includes(color)
+                                color: [
+                                  'negro',
+                                  'azul',
+                                  'cafe',
+                                  'rojo',
+                                  'morado',
+                                ].includes(color)
                                   ? '#FFFFFF'
                                   : '#242923',
                                 fontSize: 17,
@@ -456,12 +535,26 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                             </Text>
                           ) : null}
                         </View>
-                        <Text style={{ color: palette.ink, fontSize: 11, marginTop: 9 }}>
+                        <Text
+                          style={{
+                            color: palette.ink,
+                            fontSize: 11,
+                            marginTop: 9,
+                          }}
+                        >
                           {colorLabels[color]}
                         </Text>
                         {otherMode ? (
-                          <Text style={{ fontSize: 8, marginTop: 3, color: palette.muted }}>
-                            {colorMode === 'favorite' ? 'En evitar' : 'En favoritos'}
+                          <Text
+                            style={{
+                              fontSize: 8,
+                              marginTop: 3,
+                              color: palette.muted,
+                            }}
+                          >
+                            {colorMode === 'favorite'
+                              ? 'En evitar'
+                              : 'En favoritos'}
                           </Text>
                         ) : null}
                       </Pressable>
@@ -485,7 +578,9 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                       key={occasion}
                       label={occasionLabels[occasion]}
                       selected={data.context.occasion === occasion}
-                      onPress={() => onChange({ context: { ...data.context, occasion } })}
+                      onPress={() =>
+                        onChange({ context: { ...data.context, occasion } })
+                      }
                     />
                   ))}
                 </View>
@@ -500,9 +595,11 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                   >
                     Rotación
                   </Text>
-                  <Text style={[s.subtitle, { fontSize: 12, marginBottom: 20 }]}>
-                    Preferimos no repetir durante este periodo. Puede repetirse si faltan
-                    alternativas.
+                  <Text
+                    style={[s.subtitle, { fontSize: 12, marginBottom: 20 }]}
+                  >
+                    Preferimos no repetir durante este periodo. Puede repetirse
+                    si faltan alternativas.
                   </Text>
                   <View style={s.wrap}>
                     {[0, 3, 7, 14].map((days) => (
@@ -511,7 +608,12 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                         label={days ? `${days} días` : 'Sin rotación'}
                         selected={data.preferences.rotationDays === days}
                         onPress={() =>
-                          onChange({ preferences: { ...data.preferences, rotationDays: days } })
+                          onChange({
+                            preferences: {
+                              ...data.preferences,
+                              rotationDays: days,
+                            },
+                          })
                         }
                       />
                     ))}
@@ -528,11 +630,18 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                   >
                     Clima · opcional
                   </Text>
-                  <Text style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}>
-                    Con tu ciudad ajustamos el abrigo al clima actual. Puedes cambiarlo en Hoy.
+                  <Text
+                    style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}
+                  >
+                    Con tu ciudad ajustamos el abrigo al clima actual. Puedes
+                    cambiarlo en Hoy.
                   </Text>
                   <CityPicker
-                    value={data.weather.mode === 'automatic' ? data.weather.location : undefined}
+                    value={
+                      data.weather.mode === 'automatic'
+                        ? data.weather.location
+                        : undefined
+                    }
                     onSelect={(place) =>
                       onChange({
                         weather: {
@@ -551,7 +660,10 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
             ) : null}
             {step === 3 ? (
               <>
-                <Text accessibilityRole="header" style={[s.title, { marginBottom: 24 }]}>
+                <Text
+                  accessibilityRole="header"
+                  style={[s.title, { marginBottom: 24 }]}
+                >
                   Apariencia
                 </Text>
                 <AppearanceSettings
@@ -571,10 +683,15 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                     >
                       Clóset
                     </Text>
-                    <Text style={[s.subtitle, { fontSize: 12, marginBottom: 17 }]}>
+                    <Text
+                      style={[s.subtitle, { fontSize: 12, marginBottom: 17 }]}
+                    >
                       El ejemplo contiene prendas ficticias.
                     </Text>
-                    <Button label="Empezar con mi ropa" onPress={() => onFinish('own')} />
+                    <Button
+                      label="Empezar con mi ropa"
+                      onPress={() => onFinish('own')}
+                    />
                     <Button
                       secondary
                       label="Usar clóset de ejemplo"
@@ -587,7 +704,12 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
                     <Button label="Listo" onPress={() => onFinish('keep')} />
                   </View>
                 )}
-                <Text style={[s.subtitle, { fontSize: 10, textAlign: 'center', marginTop: 21 }]}>
+                <Text
+                  style={[
+                    s.subtitle,
+                    { fontSize: 10, textAlign: 'center', marginTop: 21 },
+                  ]}
+                >
                   Datos solo en este dispositivo.
                 </Text>
               </>
@@ -613,17 +735,30 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
               gap: 10,
             }}
           >
-            {step > 0 ? <Button secondary label="Atrás" onPress={() => go(step - 1)} /> : null}
+            {step > 0 ? (
+              <Button secondary label="Atrás" onPress={() => go(step - 1)} />
+            ) : null}
             {step < 3 ? (
               <>
                 <Pressable
                   accessibilityRole="button"
                   onPress={() => go(step + 1)}
-                  style={{ flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center' }}
+                  style={{
+                    flex: 1,
+                    minHeight: 48,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <Text style={{ fontSize: 12, color: palette.muted }}>Ahora no</Text>
+                  <Text style={{ fontSize: 12, color: palette.muted }}>
+                    Ahora no
+                  </Text>
                 </Pressable>
-                <Button label="Continuar" onPress={() => go(step + 1)} style={{ flex: 1 }} />
+                <Button
+                  label="Continuar"
+                  onPress={() => go(step + 1)}
+                  style={{ flex: 1 }}
+                />
               </>
             ) : null}
           </View>

@@ -10,7 +10,11 @@ export type {
   ThemeId,
   OnboardingProgress,
 } from './schema';
-export { createDefaultProfile, createDefaultAppearance, createLocalData } from './schema';
+export {
+  createDefaultProfile,
+  createDefaultAppearance,
+  createLocalData,
+} from './schema';
 const KEY = '@arma-tu-outfit/v1';
 let writes: Promise<void> = Promise.resolve();
 export async function readLocalData(): Promise<LocalData | null> {
@@ -20,7 +24,9 @@ export async function readLocalData(): Promise<LocalData | null> {
 }
 export async function writeLocalData(data: LocalData): Promise<void> {
   const payload = serializeLocalData(data, Platform.OS === 'web');
-  const next = writes.catch(() => undefined).then(() => AsyncStorage.setItem(KEY, payload));
+  const next = writes
+    .catch(() => undefined)
+    .then(() => AsyncStorage.setItem(KEY, payload));
   writes = next;
   return next;
 }

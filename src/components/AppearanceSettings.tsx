@@ -15,13 +15,24 @@ export interface AppearanceSettingsProps {
 }
 
 /** These are rendered app elements in each palette, not screenshots. */
-export function AppearanceSettings({ value, onChange, compact = false }: AppearanceSettingsProps) {
+export function AppearanceSettings({
+  value,
+  onChange,
+  compact = false,
+}: AppearanceSettingsProps) {
   const { s, palette } = useUI();
   const feedback = useFeedback();
   return (
     <View>
       {!compact ? (
-        <Text style={{ color: palette.ink, fontSize: 20, letterSpacing: -0.5, marginBottom: 18 }}>
+        <Text
+          style={{
+            color: palette.ink,
+            fontSize: 20,
+            letterSpacing: -0.5,
+            marginBottom: 18,
+          }}
+        >
           Apariencia
         </Text>
       ) : null}
@@ -71,9 +82,22 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                     alignItems: 'center',
                   }}
                 >
-                  <Text style={{ color: preview.ink, fontSize: 12, fontWeight: '600' }}>Hoy</Text>
+                  <Text
+                    style={{
+                      color: preview.ink,
+                      fontSize: 12,
+                      fontWeight: '600',
+                    }}
+                  >
+                    Hoy
+                  </Text>
                   <View
-                    style={{ width: 5, height: 5, backgroundColor: preview.green, borderRadius: 4 }}
+                    style={{
+                      width: 5,
+                      height: 5,
+                      backgroundColor: preview.green,
+                      borderRadius: 4,
+                    }}
                   />
                 </View>
                 <View
@@ -87,7 +111,9 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                   }}
                 >
                   <Text style={{ color: preview.ink, fontSize: 8 }}>22°</Text>
-                  <Text style={{ color: preview.rust, fontSize: 8 }}>Cambiar</Text>
+                  <Text style={{ color: preview.rust, fontSize: 8 }}>
+                    Cambiar
+                  </Text>
                 </View>
                 <View
                   style={{
@@ -102,9 +128,21 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                     justifyContent: 'center',
                   }}
                 >
-                  <GarmentIllustration ink={preview.green} kind="tee" size={31} />
-                  <GarmentIllustration ink={preview.green} kind="trousers" size={31} />
-                  <GarmentIllustration ink={preview.green} kind="sneakers" size={31} />
+                  <GarmentIllustration
+                    ink={preview.green}
+                    kind="tee"
+                    size={31}
+                  />
+                  <GarmentIllustration
+                    ink={preview.green}
+                    kind="trousers"
+                    size={31}
+                  />
+                  <GarmentIllustration
+                    ink={preview.green}
+                    kind="sneakers"
+                    size={31}
+                  />
                 </View>
                 <View
                   style={{
@@ -117,7 +155,14 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                   }}
                 />
                 {value.showReasons ? (
-                  <Text style={{ marginLeft: 11, marginTop: 5, color: preview.muted, fontSize: 7 }}>
+                  <Text
+                    style={{
+                      marginLeft: 11,
+                      marginTop: 5,
+                      color: preview.muted,
+                      fontSize: 7,
+                    }}
+                  >
                     3 prendas
                   </Text>
                 ) : null}
@@ -129,7 +174,13 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                     paddingVertical: 6,
                   }}
                 >
-                  <Text style={{ textAlign: 'center', color: preview.onInk, fontSize: 8 }}>
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      color: preview.onInk,
+                      fontSize: 8,
+                    }}
+                  >
                     Lo usé hoy
                   </Text>
                 </View>
@@ -143,10 +194,21 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
                   marginTop: 10,
                 }}
               >
-                <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '600' }}>
+                <Text
+                  style={{
+                    color: palette.ink,
+                    fontSize: 13,
+                    fontWeight: '600',
+                  }}
+                >
                   {option.name}
                 </Text>
-                <Text style={{ color: selected ? palette.green : palette.muted, fontSize: 13 }}>
+                <Text
+                  style={{
+                    color: selected ? palette.green : palette.muted,
+                    fontSize: 13,
+                  }}
+                >
                   {selected ? '✓' : '○'}
                 </Text>
               </View>
@@ -167,10 +229,19 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
           onPress={() => onChange({ ...value, outfitLayout: 'compact' })}
         />
       </View>
-      <View style={[s.row, { justifyContent: 'space-between', marginTop: 24, gap: 20 }]}>
+      <View
+        style={[
+          s.row,
+          { justifyContent: 'space-between', marginTop: 24, gap: 20 },
+        ]}
+      >
         <View style={{ flex: 1 }}>
-          <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '500' }}>Explicaciones</Text>
-          <Text style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 4 }]}>
+          <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '500' }}>
+            Explicaciones
+          </Text>
+          <Text
+            style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 4 }]}
+          >
             Las advertencias siguen visibles.
           </Text>
         </View>
@@ -182,12 +253,16 @@ export function AppearanceSettings({ value, onChange, compact = false }: Appeara
         />
       </View>
       {Platform.OS !== 'web' ? (
-        <View style={[s.row, { justifyContent: 'space-between', marginTop: 24 }]}>
+        <View
+          style={[s.row, { justifyContent: 'space-between', marginTop: 24 }]}
+        >
           <Text style={{ color: palette.ink, fontSize: 13 }}>Vibración</Text>
           <Switch
             accessibilityLabel="Vibración"
             value={value.hapticsEnabled !== false}
-            onValueChange={(hapticsEnabled) => onChange({ ...value, hapticsEnabled })}
+            onValueChange={(hapticsEnabled) =>
+              onChange({ ...value, hapticsEnabled })
+            }
             trackColor={{ true: palette.green }}
           />
         </View>

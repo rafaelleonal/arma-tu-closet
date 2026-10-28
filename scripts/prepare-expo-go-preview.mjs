@@ -17,9 +17,13 @@ const archive = execFileSync(
   .split('\n')
   .at(-1);
 const nativeVersions = JSON.parse(
-  execFileSync('tar', ['-xOf', join(preview, archive), 'package/bundledNativeModules.json'], {
-    encoding: 'utf8',
-  }),
+  execFileSync(
+    'tar',
+    ['-xOf', join(preview, archive), 'package/bundledNativeModules.json'],
+    {
+      encoding: 'utf8',
+    },
+  ),
 );
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 pkg.dependencies.expo = expoVersion;
@@ -39,12 +43,20 @@ for (const path of [
 ]) {
   await cp(join(root, path), join(preview, path), { recursive: true });
 }
-await writeFile(join(preview, 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
+await writeFile(
+  join(preview, 'package.json'),
+  JSON.stringify(pkg, null, 2) + '\n',
+);
 await writeFile(
   join(preview, 'PREVIEW.txt'),
   `Temporary SDK 54 preview of ${root}. Edit the original project, then prepare a new preview. No environment files copied.\n`,
 );
 console.log(`Preview: ${preview}`);
 execFileSync('npm', ['install'], { cwd: preview, stdio: 'inherit' });
-execFileSync('npx', ['expo', 'install', '--check'], { cwd: preview, stdio: 'inherit' });
-console.log(`\nReady. Run:\ncd '${preview}'\nnpx expo start --go --lan --port 8083\n`);
+execFileSync('npx', ['expo', 'install', '--check'], {
+  cwd: preview,
+  stdio: 'inherit',
+});
+console.log(
+  `\nReady. Run:\ncd '${preview}'\nnpx expo start --go --lan --port 8083\n`,
+);

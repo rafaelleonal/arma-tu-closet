@@ -30,7 +30,11 @@ export function Sheet({
   const { reduceMotion } = useFeedback();
   const styles = useMemo(() => createStyles(palette), [palette]);
   return (
-    <Modal animationType={reduceMotion ? 'none' : 'slide'} transparent onRequestClose={onClose}>
+    <Modal
+      animationType={reduceMotion ? 'none' : 'slide'}
+      transparent
+      onRequestClose={onClose}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.backdrop}
@@ -64,7 +68,11 @@ export function Sheet({
 }
 const createStyles = (palette: Palette) =>
   StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: palette.overlay, justifyContent: 'flex-end' },
+    backdrop: {
+      flex: 1,
+      backgroundColor: palette.overlay,
+      justifyContent: 'flex-end',
+    },
     sheet: {
       maxHeight: '94%',
       width: '100%',

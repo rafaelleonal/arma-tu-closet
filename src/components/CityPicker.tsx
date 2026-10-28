@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Linking, Pressable, Text, TextInput, View } from 'react-native';
 import type { WeatherLocation } from '../weather/types';
 import { searchLocations } from '../weather/openMeteo';
-import { deviceLocationSupported, findDeviceCity } from '../weather/deviceLocation';
+import {
+  deviceLocationSupported,
+  findDeviceCity,
+} from '../weather/deviceLocation';
 import { Button, useUI } from './ui';
 
 /** Location first on iOS/Android; the search by name stays available and opens after a denial or failure. */
@@ -74,7 +77,9 @@ export function CityPicker({
     } catch {
       if (!active.signal.aborted) {
         setSearchOpen(true);
-        setError('No pudimos obtener tu ubicación. Busca tu ciudad por nombre.');
+        setError(
+          'No pudimos obtener tu ubicación. Busca tu ciudad por nombre.',
+        );
       }
     } finally {
       if (controller.current === active) setLocating(false);
@@ -92,7 +97,11 @@ export function CityPicker({
       }
     } catch (cause) {
       if (!active.signal.aborted)
-        setError(cause instanceof Error ? cause.message : 'No pudimos buscar la ciudad.');
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : 'No pudimos buscar la ciudad.',
+        );
     } finally {
       if (controller.current === active) setSearching(false);
     }
@@ -102,7 +111,8 @@ export function CityPicker({
     <View>
       {value ? (
         <Text style={[s.subtitle, { marginBottom: 12 }]}>
-          Seleccionada: <Text style={{ color: palette.ink }}>{placeLabel(value)}</Text>
+          Seleccionada:{' '}
+          <Text style={{ color: palette.ink }}>{placeLabel(value)}</Text>
         </Text>
       ) : null}
       {deviceLocationSupported ? (
@@ -119,7 +129,9 @@ export function CityPicker({
             disabled={locating}
             onPress={() => void locate()}
           />
-          <Text style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 8 }]}>
+          <Text
+            style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 8 }]}
+          >
             Solo para encontrar tu ciudad. No guardamos tu ubicación exacta.
           </Text>
         </>
@@ -127,7 +139,12 @@ export function CityPicker({
       {error ? (
         <Text
           accessibilityRole="alert"
-          style={{ color: palette.rust, fontSize: 12, lineHeight: 19, marginTop: 12 }}
+          style={{
+            color: palette.rust,
+            fontSize: 12,
+            lineHeight: 19,
+            marginTop: 12,
+          }}
         >
           {error}
         </Text>
@@ -189,7 +206,13 @@ export function CityPicker({
           onPress={() => setSearchOpen(true)}
           style={{ minHeight: 44, justifyContent: 'center', marginTop: 4 }}
         >
-          <Text style={{ color: palette.green, fontSize: 13, textDecorationLine: 'underline' }}>
+          <Text
+            style={{
+              color: palette.green,
+              fontSize: 13,
+              textDecorationLine: 'underline',
+            }}
+          >
             Buscar por nombre
           </Text>
         </Pressable>

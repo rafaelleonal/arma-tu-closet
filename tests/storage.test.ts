@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { generateRecommendations, seedWardrobe, createDefaultContext } from '../src/domain';
+import {
+  generateRecommendations,
+  seedWardrobe,
+  createDefaultContext,
+} from '../src/domain';
 import {
   MAX_WEB_PAYLOAD_CHARS,
   createLocalData,
@@ -19,8 +23,18 @@ const fixture = (): LocalData => ({
   ...createLocalData(),
   onboarded: true,
   items: structuredClone(seedWardrobe),
-  preferences: { preferredColors: ['negro'], excludedColors: [], rotationDays: 3 },
-  context: { city: '', season: 'Otoño', temperatureC: 22, raining: false, occasion: 'casual' },
+  preferences: {
+    preferredColors: ['negro'],
+    excludedColors: [],
+    rotationDays: 3,
+  },
+  context: {
+    city: '',
+    season: 'Otoño',
+    temperatureC: 22,
+    raining: false,
+    occasion: 'casual',
+  },
   savedOutfits: [],
   dislikedOutfitIds: [],
   wearHistory: [],
@@ -28,12 +42,18 @@ const fixture = (): LocalData => ({
 
 test('local round trip retains wardrobe, saved outfits, photos, preferences and history', () => {
   const data = fixture();
-  const outfit = generateRecommendations(data.items, createDefaultContext('2026-10-23T18:00:00Z'))
-    .outfits[0];
+  const outfit = generateRecommendations(
+    data.items,
+    createDefaultContext('2026-10-23T18:00:00Z'),
+  ).outfits[0];
   data.items[0].photoUri = 'file:///documents/wardrobe/photo.jpg';
   data.savedOutfits = [outfit];
   data.wearHistory = [
-    { id: outfit.id, itemIds: outfit.items.map((item) => item.id), date: '2026-10-23T18:00:00Z' },
+    {
+      id: outfit.id,
+      itemIds: outfit.items.map((item) => item.id),
+      date: '2026-10-23T18:00:00Z',
+    },
   ];
   assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
 });
@@ -131,7 +151,10 @@ test('malformed nested data is rejected before the UI can hydrate it', () => {
   for (const mutate of badCases) {
     const data = fixture();
     mutate(data);
-    assert.throws(() => parseLocalData(JSON.stringify(data)), /no es compatible/);
+    assert.throws(
+      () => parseLocalData(JSON.stringify(data)),
+      /no es compatible/,
+    );
   }
   assert.throws(() => parseLocalData('{invalid'));
 });
@@ -142,7 +165,11 @@ test('v1 migration preserves every original field and completed users stay onboa
   current.items[0].photoUri = 'file:///documents/wardrobe/existing-photo.jpg';
   current.items[1].available = false;
   current.items[2].lastWornAt = '2026-10-22T18:00:00Z';
-  current.preferences = { preferredColors: ['azul'], excludedColors: ['rosa'], rotationDays: 14 };
+  current.preferences = {
+    preferredColors: ['azul'],
+    excludedColors: ['rosa'],
+    rotationDays: 14,
+  };
   current.context = {
     city: 'Comitán',
     season: 'Invierno',
@@ -197,7 +224,10 @@ test('v1 empty closet and unfinished completion flag survive migration without d
 test('unknown versions and invalid v1 payloads reject instead of yielding fresh data', () => {
   const data = fixture();
   for (const version of [0, 4, '3', null])
-    assert.throws(() => parseLocalData(JSON.stringify({ ...data, version })), /no es compatible/);
+    assert.throws(
+      () => parseLocalData(JSON.stringify({ ...data, version })),
+      /no es compatible/,
+    );
   assert.throws(
     () => parseLocalData(JSON.stringify({ ...data, version: 1, items: null })),
     /no es compatible/,
@@ -207,7 +237,11 @@ test('unknown versions and invalid v1 payloads reject instead of yielding fresh 
 test('v3 stores partial onboarding, styles and appearance through a semantic round trip', () => {
   const data = fixture();
   data.profile = { name: 'Rafael', styleIds: ['minimal', 'street'] };
-  data.appearance = { themeId: 'midnight', outfitLayout: 'compact', showReasons: false };
+  data.appearance = {
+    themeId: 'midnight',
+    outfitLayout: 'compact',
+    showReasons: false,
+  };
   data.onboarded = false;
   data.onboarding = { step: 2 };
   assert.ok(isLocalData(data));
@@ -225,10 +259,17 @@ test('a cutout is optional, keeps its original photo and is rejected without one
   };
   assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
   const orphan = fixture();
-  orphan.items[0] = { ...orphan.items[0], cutoutUri: 'file:///wardrobe/cutout-a.png' };
+  orphan.items[0] = {
+    ...orphan.items[0],
+    cutoutUri: 'file:///wardrobe/cutout-a.png',
+  };
   assert.equal(isLocalData(orphan), false);
   const blank = fixture();
-  blank.items[0] = { ...blank.items[0], photoUri: 'file:///wardrobe/a.jpg', cutoutUri: ' ' };
+  blank.items[0] = {
+    ...blank.items[0],
+    photoUri: 'file:///wardrobe/a.jpg',
+    cutoutUri: ' ',
+  };
   assert.equal(isLocalData(blank), false);
 });
 
@@ -244,7 +285,11 @@ test('styles and themes added after v3 stay valid in the same document version',
 test('v2 migrates to manual weather preserving profile, appearance, progress and all existing fields', () => {
   const current = fixture();
   current.profile = { name: 'Rafael', styleIds: ['minimal', 'creative'] };
-  current.appearance = { themeId: 'midnight', outfitLayout: 'compact', showReasons: false };
+  current.appearance = {
+    themeId: 'midnight',
+    outfitLayout: 'compact',
+    showReasons: false,
+  };
   current.onboarding = { step: 3 };
   current.context = {
     occasion: 'work',
@@ -256,7 +301,11 @@ test('v2 migrates to manual weather preserving profile, appearance, progress and
   current.items[0].photoUri = 'file:///documents/existing.jpg';
   current.items[0].lastWornAt = '2026-10-22T18:00:00Z';
   current.items[1].available = false;
-  current.preferences = { preferredColors: ['azul'], excludedColors: ['rosa'], rotationDays: 7 };
+  current.preferences = {
+    preferredColors: ['azul'],
+    excludedColors: ['rosa'],
+    rotationDays: 7,
+  };
   const outfit = generateRecommendations(
     current.items,
     createDefaultContext('2026-10-23T18:00:00Z'),
@@ -264,16 +313,27 @@ test('v2 migrates to manual weather preserving profile, appearance, progress and
   current.savedOutfits = [outfit];
   current.dislikedOutfitIds = ['old-outfit'];
   current.wearHistory = [
-    { id: 'history', itemIds: outfit.items.map((item) => item.id), date: '2026-10-22T18:00:00Z' },
+    {
+      id: 'history',
+      itemIds: outfit.items.map((item) => item.id),
+      date: '2026-10-22T18:00:00Z',
+    },
   ];
   const { weather, ...existing } = current;
   const legacy: LegacyLocalDataV2 = { ...existing, version: 2 };
   const raw = JSON.stringify(legacy);
   const migrated = parseLocalData(raw);
-  assert.deepEqual(migrated, { ...legacy, version: 3, weather: { mode: 'manual' } });
+  assert.deepEqual(migrated, {
+    ...legacy,
+    version: 3,
+    weather: { mode: 'manual' },
+  });
   assert.equal(JSON.stringify(legacy), raw);
   assert.deepEqual(parseLocalData(serializeLocalData(migrated)), migrated);
-  assert.deepEqual(parseLocalData(JSON.stringify({ ...legacy, items: [] })).items, []);
+  assert.deepEqual(
+    parseLocalData(JSON.stringify({ ...legacy, items: [] })).items,
+    [],
+  );
   assert.throws(
     () => parseLocalData(JSON.stringify({ ...legacy, profile: null })),
     /no es compatible/,
@@ -332,7 +392,10 @@ test('v3 weather roundtrip preserves manual controls and validates snapshot loca
   ]) {
     const bad = structuredClone(data);
     mutate(bad);
-    assert.throws(() => parseLocalData(JSON.stringify(bad)), /no es compatible/);
+    assert.throws(
+      () => parseLocalData(JSON.stringify(bad)),
+      /no es compatible/,
+    );
   }
 });
 
@@ -370,6 +433,12 @@ test('v3 without haptics stays readable and an explicit opt-out survives a round
   assert.deepEqual(parseLocalData(original), data);
   data.appearance.hapticsEnabled = false;
   assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
-  const malformed = { ...data, appearance: { ...data.appearance, hapticsEnabled: 'false' } };
-  assert.throws(() => parseLocalData(JSON.stringify(malformed)), /no es compatible/);
+  const malformed = {
+    ...data,
+    appearance: { ...data.appearance, hapticsEnabled: 'false' },
+  };
+  assert.throws(
+    () => parseLocalData(JSON.stringify(malformed)),
+    /no es compatible/,
+  );
 });

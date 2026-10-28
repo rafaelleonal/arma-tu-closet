@@ -1,9 +1,19 @@
-import { MAX_IMAGE_BYTES, parseGarmentSuggestion, type GarmentSuggestion } from './contracts';
+import {
+  MAX_IMAGE_BYTES,
+  parseGarmentSuggestion,
+  type GarmentSuggestion,
+} from './contracts';
 
 export class AiClientError extends Error {
   constructor(
     public readonly code:
-      'configuration' | 'image' | 'network' | 'timeout' | 'aborted' | 'response' | 'server',
+      | 'configuration'
+      | 'image'
+      | 'network'
+      | 'timeout'
+      | 'aborted'
+      | 'response'
+      | 'server',
     message: string,
   ) {
     super(message);
@@ -14,7 +24,8 @@ export type SupportedImageMime = 'image/jpeg' | 'image/png' | 'image/webp';
 
 /** Inspects only the local bytes; a URI or filename never determines the format. */
 export function imageMimeTypeFromBase64(base64: string): SupportedImageMime {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const alphabet =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   const bytes: number[] = [];
   let bits = 0;
   let value = 0;
@@ -28,29 +39,44 @@ export function imageMimeTypeFromBase64(base64: string): SupportedImageMime {
       bytes.push((value >> bits) & 255);
     }
   }
-  if (bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) return 'image/jpeg';
-  if ([137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte))
+  if (bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255)
+    return 'image/jpeg';
+  if (
+    [137, 80, 78, 71, 13, 10, 26, 10].every(
+      (byte, index) => bytes[index] === byte,
+    )
+  )
     return 'image/png';
   if (
     String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' &&
     String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP'
   )
     return 'image/webp';
-  throw new AiClientError('image', 'Usa una foto JPEG, PNG o WebP. No se envió la imagen.');
+  throw new AiClientError(
+    'image',
+    'Usa una foto JPEG, PNG o WebP. No se envió la imagen.',
+  );
 }
 
 export function validateImageDataUrl(imageDataUrl: string): void {
   if (typeof imageDataUrl !== 'string')
     throw new AiClientError('image', 'Elige una foto local para analizar.');
-  const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(
-    imageDataUrl,
-  );
+  const match =
+    /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(
+      imageDataUrl,
+    );
   if (!match || match[2].length % 4 !== 0)
-    throw new AiClientError('image', 'Usa una foto JPEG, PNG o WebP. No se envió la imagen.');
+    throw new AiClientError(
+      'image',
+      'Usa una foto JPEG, PNG o WebP. No se envió la imagen.',
+    );
   const base64 = match[2];
   const padding = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
   if ((base64.length / 4) * 3 - padding > MAX_IMAGE_BYTES)
-    throw new AiClientError('image', 'La foto supera 4 MiB. Elige una más pequeña para analizar.');
+    throw new AiClientError(
+      'image',
+      'La foto supera 4 MiB. Elige una más pequeña para analizar.',
+    );
   if (imageMimeTypeFromBase64(base64) !== match[1])
     throw new AiClientError(
       'image',
@@ -70,7 +96,10 @@ export function resolveAiApiUrl(
         'configuration',
         'El análisis no está configurado en este dispositivo. Puedes completar la prenda manualmente.',
       );
-    if (!hostname || ['localhost', '127.0.0.1', '::1', '[::1]'].includes(hostname))
+    if (
+      !hostname ||
+      ['localhost', '127.0.0.1', '::1', '[::1]'].includes(hostname)
+    )
       base = 'http://127.0.0.1:8787';
     else
       throw new AiClientError(
@@ -82,7 +111,10 @@ export function resolveAiApiUrl(
   try {
     url = new URL(base);
   } catch {
-    throw new AiClientError('configuration', 'La dirección del servicio de análisis no es válida.');
+    throw new AiClientError(
+      'configuration',
+      'La dirección del servicio de análisis no es válida.',
+    );
   }
   if (
     !['http:', 'https:'].includes(url.protocol) ||
@@ -91,7 +123,10 @@ export function resolveAiApiUrl(
     url.search ||
     url.hash
   )
-    throw new AiClientError('configuration', 'La dirección del servicio de análisis no es válida.');
+    throw new AiClientError(
+      'configuration',
+      'La dirección del servicio de análisis no es válida.',
+    );
   return `${url.toString().replace(/\/$/, '')}/api/garment-analysis`;
 }
 
@@ -104,12 +139,21 @@ export interface AnalyzePhotoOptions {
 
 export async function analyzeGarmentPhoto(
   imageDataUrl: string,
-  { apiUrl, signal, timeoutMs = 30_000, fetchImpl = fetch }: AnalyzePhotoOptions,
+  {
+    apiUrl,
+    signal,
+    timeoutMs = 30_000,
+    fetchImpl = fetch,
+  }: AnalyzePhotoOptions,
 ): Promise<GarmentSuggestion> {
   validateImageDataUrl(imageDataUrl);
-  if (signal?.aborted) throw new AiClientError('aborted', 'Análisis cancelado.');
+  if (signal?.aborted)
+    throw new AiClientError('aborted', 'Análisis cancelado.');
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0)
-    throw new AiClientError('configuration', 'El tiempo límite del análisis no es válido.');
+    throw new AiClientError(
+      'configuration',
+      'El tiempo límite del análisis no es válido.',
+    );
   const controller = new AbortController();
   let stopReason: AiClientError | undefined;
   let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -157,7 +201,10 @@ export async function analyzeGarmentPhoto(
     }
     if (!response.ok) {
       const message =
-        body && typeof body === 'object' && 'error' in body && typeof body.error === 'string'
+        body &&
+        typeof body === 'object' &&
+        'error' in body &&
+        typeof body.error === 'string'
           ? body.error.trim().slice(0, 240)
           : '';
       throw new AiClientError(
@@ -167,7 +214,8 @@ export async function analyzeGarmentPhoto(
       );
     }
     try {
-      if (!body || typeof body !== 'object' || !('suggestion' in body)) throw new Error('missing');
+      if (!body || typeof body !== 'object' || !('suggestion' in body))
+        throw new Error('missing');
       return parseGarmentSuggestion(body.suggestion);
     } catch {
       throw new AiClientError(

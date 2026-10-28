@@ -69,7 +69,11 @@ test('city search uses the fixed geocoding host, encoded query, Spanish labels a
       requested = String(url);
       return new Response(
         JSON.stringify({
-          results: [location, { ...location, id: 2, country: 'Guatemala' }, location],
+          results: [
+            location,
+            { ...location, id: 2, country: 'Guatemala' },
+            location,
+          ],
         }),
       );
     },
@@ -99,7 +103,10 @@ test('search handles no matches and short queries without making a request', asy
   assert.equal(calls, 0);
   assert.deepEqual(await client.searchLocations('NoExiste'), []);
   assert.equal(calls, 1);
-  await assert.rejects(client.searchLocations('a'.repeat(121)), code('invalid'));
+  await assert.rejects(
+    client.searchLocations('a'.repeat(121)),
+    code('invalid'),
+  );
 });
 
 test('weather requests only the selected location and parses unixtime as UTC without applying offsets', async () => {
@@ -153,7 +160,10 @@ test('malformed geocoding responses and invalid coordinates never become choices
     { results: [{ ...location, timezone: '' }] },
     { results: [{ ...location, admin1: 0 }] },
   ]) {
-    await assert.rejects(clientWith(data).searchLocations('Comitán'), code('invalid'));
+    await assert.rejects(
+      clientWith(data).searchLocations('Comitán'),
+      code('invalid'),
+    );
   }
 });
 
@@ -165,14 +175,26 @@ test('malformed weather, distant model coordinates and impossible observation ti
     { current: {} },
     { ...payload(), latitude: 50 },
     { ...payload(), current: { ...payload().current, temperature_2m: null } },
-    { ...payload(), current: { ...payload().current, apparent_temperature: 150 } },
+    {
+      ...payload(),
+      current: { ...payload().current, apparent_temperature: 150 },
+    },
     { ...payload(), current: { ...payload().current, precipitation: -1 } },
     { ...payload(), current: { ...payload().current, weather_code: 999 } },
-    { ...payload(), current: { ...payload().current, time: '2026-10-23T18:00' } },
-    { ...payload(), current: { ...payload().current, time: Date.parse(NOW) / 1000 + 86400 } },
+    {
+      ...payload(),
+      current: { ...payload().current, time: '2026-10-23T18:00' },
+    },
+    {
+      ...payload(),
+      current: { ...payload().current, time: Date.parse(NOW) / 1000 + 86400 },
+    },
   ];
   for (const data of cases)
-    await assert.rejects(clientWith(data).fetchWeather(location), code('invalid'));
+    await assert.rejects(
+      clientWith(data).fetchWeather(location),
+      code('invalid'),
+    );
   await assert.rejects(
     clientWith(payload()).fetchWeather({ ...location, latitude: NaN }),
     code('invalid'),
@@ -180,13 +202,17 @@ test('malformed weather, distant model coordinates and impossible observation ti
 });
 
 test('HTTP, network and malformed JSON failures have recoverable error codes', async () => {
-  const http = createOpenMeteoClient({ fetcher: async () => new Response('{}', { status: 503 }) });
+  const http = createOpenMeteoClient({
+    fetcher: async () => new Response('{}', { status: 503 }),
+  });
   const network = createOpenMeteoClient({
     fetcher: async () => {
       throw new TypeError('offline');
     },
   });
-  const malformed = createOpenMeteoClient({ fetcher: async () => new Response('{broken') });
+  const malformed = createOpenMeteoClient({
+    fetcher: async () => new Response('{broken'),
+  });
   await assert.rejects(http.fetchWeather(location), code('http'));
   await assert.rejects(network.fetchWeather(location), code('network'));
   await assert.rejects(malformed.fetchWeather(location), code('invalid'));
@@ -202,7 +228,10 @@ test('caller cancellation works before and during a request even if transport ig
   });
   const already = new AbortController();
   already.abort();
-  await assert.rejects(client.fetchWeather(location, already.signal), code('aborted'));
+  await assert.rejects(
+    client.fetchWeather(location, already.signal),
+    code('aborted'),
+  );
   assert.equal(calls, 0);
   const controller = new AbortController();
   const request = client.searchLocations('Comitán', controller.signal);
@@ -225,7 +254,10 @@ test('timeout bounds both a stalled fetch and stalled JSON body and aborts the t
   const stalledBody = createOpenMeteoClient({
     timeoutMs: 5,
     fetcher: async () =>
-      ({ ok: true, json: () => new Promise(() => undefined) }) as unknown as Response,
+      ({
+        ok: true,
+        json: () => new Promise(() => undefined),
+      }) as unknown as Response,
   });
   await assert.rejects(stalledBody.fetchWeather(location), code('timeout'));
 });
@@ -300,7 +332,10 @@ test('effective context uses apparent temperature without mutating manual contro
     assert.deepEqual(fallback.context, manual);
     assert.notEqual(fallback.context, manual);
   }
-  assert.equal(getEffectiveWeatherContext(manual, settings(120), NOW).source, 'automatic');
+  assert.equal(
+    getEffectiveWeatherContext(manual, settings(120), NOW).source,
+    'automatic',
+  );
 });
 
 test('device position matches the closest same-name city and rejects distant homonyms', () => {
@@ -311,21 +346,33 @@ test('device position matches the closest same-name city and rejects distant hom
     latitude: 19.93,
     longitude: -103.57,
   };
-  assert.equal(nearestLocation([jalisco, location], 16.24, -92.1)?.id, location.id);
+  assert.equal(
+    nearestLocation([jalisco, location], 16.24, -92.1)?.id,
+    location.id,
+  );
   assert.equal(nearestLocation([jalisco], 16.24, -92.1), undefined);
   assert.equal(nearestLocation([], 16.24, -92.1), undefined);
 });
 
 test('reverse-geocoded official names also search their short form without duplicates', () => {
-  assert.deepEqual(placeSearchTerms(['Comitán de Domínguez', 'Comitán de Domínguez', undefined]), [
-    'Comitán de Domínguez',
-    'Comitán',
+  assert.deepEqual(
+    placeSearchTerms([
+      'Comitán de Domínguez',
+      'Comitán de Domínguez',
+      undefined,
+    ]),
+    ['Comitán de Domínguez', 'Comitán'],
+  );
+  assert.deepEqual(placeSearchTerms(['Ciudad de México']), [
+    'Ciudad de México',
+    'Ciudad',
   ]);
-  assert.deepEqual(placeSearchTerms(['Ciudad de México']), ['Ciudad de México', 'Ciudad']);
-  assert.deepEqual(placeSearchTerms(['San Cristóbal de las Casas', ' ', null, 'Chiapas']), [
-    'San Cristóbal de las Casas',
-    'San Cristóbal',
-    'Chiapas',
-  ]);
-  assert.equal(placeSearchTerms(['Uno de Dos', 'Tres de Cuatro', 'Cinco de Seis']).length, 4);
+  assert.deepEqual(
+    placeSearchTerms(['San Cristóbal de las Casas', ' ', null, 'Chiapas']),
+    ['San Cristóbal de las Casas', 'San Cristóbal', 'Chiapas'],
+  );
+  assert.equal(
+    placeSearchTerms(['Uno de Dos', 'Tres de Cuatro', 'Cinco de Seis']).length,
+    4,
+  );
 });

@@ -16,12 +16,16 @@ const DEMO_PHOTOS: Record<string, ImageSourcePropType> = {
 };
 
 /** Only example items use these; a person's own garments show their own photo or the generic drawing. */
-export function demoPhotoFor(item: WardrobeItem): ImageSourcePropType | undefined {
+export function demoPhotoFor(
+  item: WardrobeItem,
+): ImageSourcePropType | undefined {
   return item.isDemo ? DEMO_PHOTOS[item.id] : undefined;
 }
 
 /** Width/height ratio of a bundled photo, or undefined when it is not known synchronously. */
-export function photoAspect(source: ImageSourcePropType | undefined): number | undefined {
+export function photoAspect(
+  source: ImageSourcePropType | undefined,
+): number | undefined {
   if (!source) return undefined;
   // Native resolves bundled assets by id; react-native-web has no resolveAssetSource but its require() already carries the size.
   const resolved = (
@@ -29,5 +33,7 @@ export function photoAspect(source: ImageSourcePropType | undefined): number | u
       ? source
       : Image.resolveAssetSource?.(source as number)
   ) as { width?: number; height?: number } | undefined;
-  return resolved?.width && resolved?.height ? resolved.width / resolved.height : undefined;
+  return resolved?.width && resolved?.height
+    ? resolved.width / resolved.height
+    : undefined;
 }

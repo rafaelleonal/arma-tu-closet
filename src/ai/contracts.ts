@@ -14,7 +14,9 @@ export function parseGarmentSuggestion(value: unknown): GarmentSuggestion {
     throw new Error('La sugerencia de prenda no es válida.');
   const candidate = value as Record<string, unknown>;
   if (
-    Object.keys(candidate).some((key) => !['name', 'category', 'colors'].includes(key)) ||
+    Object.keys(candidate).some(
+      (key) => !['name', 'category', 'colors'].includes(key),
+    ) ||
     typeof candidate.name !== 'string' ||
     !candidate.name.trim() ||
     candidate.name.trim().length > 60 ||
@@ -24,7 +26,9 @@ export function parseGarmentSuggestion(value: unknown): GarmentSuggestion {
     !Array.isArray(candidate.colors) ||
     !candidate.colors.length ||
     candidate.colors.length > COLOR_OPTIONS.length ||
-    candidate.colors.some((color) => typeof color !== 'string' || !COLOR_OPTIONS.includes(color)) ||
+    candidate.colors.some(
+      (color) => typeof color !== 'string' || !COLOR_OPTIONS.includes(color),
+    ) ||
     new Set(candidate.colors).size !== candidate.colors.length
   ) {
     throw new Error('La sugerencia de prenda no es válida.');

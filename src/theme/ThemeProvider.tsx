@@ -4,7 +4,11 @@ import { getTheme, type Palette, type ThemeId } from './palettes';
 export { THEME_OPTIONS, getTheme } from './palettes';
 export type { Palette, ThemeId } from './palettes';
 
-const ThemeContext = createContext<{ palette: Palette; themeId: ThemeId; isDark: boolean }>({
+const ThemeContext = createContext<{
+  palette: Palette;
+  themeId: ThemeId;
+  isDark: boolean;
+}>({
   palette: getTheme('linen'),
   themeId: 'linen',
   isDark: false,
@@ -18,7 +22,11 @@ export function ThemeProvider({
   children: React.ReactNode;
 }) {
   const theme = useMemo(
-    () => ({ palette: getTheme(themeId), themeId, isDark: themeId === 'midnight' }),
+    () => ({
+      palette: getTheme(themeId),
+      themeId,
+      isDark: themeId === 'midnight',
+    }),
     [themeId],
   );
   return (

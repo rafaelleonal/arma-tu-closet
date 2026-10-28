@@ -8,10 +8,24 @@ import {
   type StyleId,
   type WardrobeItem,
 } from '../domain';
-import { createDefaultWeather, isWeatherSettings, type WeatherSettings } from '../weather/types';
+import {
+  createDefaultWeather,
+  isWeatherSettings,
+  type WeatherSettings,
+} from '../weather/types';
 
-export type Preferences = Pick<Context, 'preferredColors' | 'excludedColors' | 'rotationDays'>;
-export const THEME_IDS = ['linen', 'paper', 'midnight', 'sage', 'bubblegum', 'mauve'] as const;
+export type Preferences = Pick<
+  Context,
+  'preferredColors' | 'excludedColors' | 'rotationDays'
+>;
+export const THEME_IDS = [
+  'linen',
+  'paper',
+  'midnight',
+  'sage',
+  'bubblegum',
+  'mauve',
+] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 export interface Profile {
   name: string;
@@ -72,7 +86,13 @@ export function createLocalData(): LocalData {
     onboarding: { step: 0 },
     weather: createDefaultWeather(),
     preferences: { preferredColors: [], excludedColors: [], rotationDays: 3 },
-    context: { occasion: 'casual', temperatureC: 22, raining: false, city: '', season: 'Otoño' },
+    context: {
+      occasion: 'casual',
+      temperatureC: 22,
+      raining: false,
+      city: '',
+      season: 'Otoño',
+    },
     savedOutfits: [],
     dislikedOutfitIds: [],
     wearHistory: [],
@@ -115,9 +135,12 @@ function wardrobeItem(value: unknown): value is WardrobeItem {
     typeof value.available === 'boolean' &&
     (value.lastWornAt === undefined || date(value.lastWornAt)) &&
     (value.wearCount === undefined ||
-      (finite(value.wearCount) && Number.isInteger(value.wearCount) && value.wearCount >= 0)) &&
+      (finite(value.wearCount) &&
+        Number.isInteger(value.wearCount) &&
+        value.wearCount >= 0)) &&
     (value.photoUri === undefined || nonempty(value.photoUri)) &&
-    (value.cutoutUri === undefined || (nonempty(value.cutoutUri) && nonempty(value.photoUri))) &&
+    (value.cutoutUri === undefined ||
+      (nonempty(value.cutoutUri) && nonempty(value.photoUri))) &&
     (value.isDemo === undefined || typeof value.isDemo === 'boolean') &&
     (value.styleIds === undefined || styles(value.styleIds))
   );
@@ -136,7 +159,9 @@ function outfit(value: unknown): value is Outfit {
   );
 }
 
-function commonLocalData(value: unknown): value is CommonLocalData & Record<string, unknown> {
+function commonLocalData(
+  value: unknown,
+): value is CommonLocalData & Record<string, unknown> {
   if (
     !record(value) ||
     typeof value.onboarded !== 'boolean' ||
@@ -162,7 +187,8 @@ function commonLocalData(value: unknown): value is CommonLocalData & Record<stri
     typeof context.season === 'string' &&
     Array.isArray(value.savedOutfits) &&
     value.savedOutfits.every(outfit) &&
-    new Set(value.savedOutfits.map((item) => item.id)).size === value.savedOutfits.length &&
+    new Set(value.savedOutfits.map((item) => item.id)).size ===
+      value.savedOutfits.length &&
     strings(value.dislikedOutfitIds) &&
     Array.isArray(value.wearHistory) &&
     value.wearHistory.every(
@@ -189,7 +215,8 @@ function personalizedLocalData(
     known(appearance.themeId, THEME_IDS) &&
     known(appearance.outfitLayout, ['editorial', 'compact']) &&
     typeof appearance.showReasons === 'boolean' &&
-    (appearance.hapticsEnabled === undefined || typeof appearance.hapticsEnabled === 'boolean') &&
+    (appearance.hapticsEnabled === undefined ||
+      typeof appearance.hapticsEnabled === 'boolean') &&
     (onboarding === undefined ||
       (record(onboarding) &&
         finite(onboarding.step) &&
@@ -200,7 +227,11 @@ function personalizedLocalData(
 }
 
 export function isLocalData(value: unknown): value is LocalData {
-  return personalizedLocalData(value) && value.version === 3 && isWeatherSettings(value.weather);
+  return (
+    personalizedLocalData(value) &&
+    value.version === 3 &&
+    isWeatherSettings(value.weather)
+  );
 }
 
 function isLegacyLocalData(value: unknown): value is LegacyLocalData {
@@ -224,7 +255,9 @@ export function parseLocalData(raw: string): LocalData {
   if (personalizedLocalData(value) && value.version === 2)
     return { ...value, version: 3, weather: createDefaultWeather() };
   if (!isLocalData(value))
-    throw new Error('El formato guardado no es compatible. Tus datos no se reemplazaron.');
+    throw new Error(
+      'El formato guardado no es compatible. Tus datos no se reemplazaron.',
+    );
   return value;
 }
 
@@ -233,7 +266,9 @@ export function parseLocalData(raw: string): LocalData {
 export const MAX_WEB_PAYLOAD_CHARS = 2_000_000;
 export function serializeLocalData(data: LocalData, web = false): string {
   if (!isLocalData(data))
-    throw new Error('No se guardó el cambio porque contiene datos incompletos.');
+    throw new Error(
+      'No se guardó el cambio porque contiene datos incompletos.',
+    );
   const payload = JSON.stringify(data);
   if (web && payload.length > MAX_WEB_PAYLOAD_CHARS) {
     throw new Error(

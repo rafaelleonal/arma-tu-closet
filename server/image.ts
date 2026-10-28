@@ -23,10 +23,15 @@ export function parseImageRequest(value: unknown): AnalysisImage {
   ) {
     throw new RequestError(400, 'Envía una foto en imageDataUrl.');
   }
-  const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(
-    value.imageDataUrl,
-  );
-  if (!match) throw new RequestError(400, 'Elige una foto JPEG, PNG o WebP en formato base64.');
+  const match =
+    /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(
+      value.imageDataUrl,
+    );
+  if (!match)
+    throw new RequestError(
+      400,
+      'Elige una foto JPEG, PNG o WebP en formato base64.',
+    );
   const [, mediaType, encoded] = match;
   if (encoded.length > Math.ceil(MAX_IMAGE_BYTES / 3) * 4)
     throw new RequestError(413, 'La foto supera 4 MB. Elige una más pequeña.');
@@ -44,7 +49,9 @@ export function parseImageRequest(value: unknown): AnalysisImage {
     bytes.at(-1) === 0xd9;
   const png =
     bytes.length >= 33 &&
-    bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
+    bytes
+      .subarray(0, 8)
+      .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
     bytes.toString('ascii', 12, 16) === 'IHDR';
   const webp =
     bytes.length >= 16 &&

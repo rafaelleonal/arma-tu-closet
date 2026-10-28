@@ -37,11 +37,24 @@ import {
 } from '../ai/client';
 import { MAX_IMAGE_BYTES, type GarmentSuggestion } from '../ai/contracts';
 import { useFeedback } from './Feedback';
-import { defaultWarmth, itemFormErrors, itemFormFingerprint, suggestedItemName } from './itemForm';
+import {
+  defaultWarmth,
+  itemFormErrors,
+  itemFormFingerprint,
+  suggestedItemName,
+} from './itemForm';
 import { GarmentSuggestionReview } from './GarmentSuggestionReview';
-import { isSubjectCutoutAvailable, removeBackground } from '../../modules/subject-cutout';
+import {
+  isSubjectCutoutAvailable,
+  removeBackground,
+} from '../../modules/subject-cutout';
 
-const warmthLabels = ['Muy ligera', 'Ligera', 'Abrigadora', 'Muy abrigadora'] as const;
+const warmthLabels = [
+  'Muy ligera',
+  'Ligera',
+  'Abrigadora',
+  'Muy abrigadora',
+] as const;
 
 export function ItemEditor({
   item,
@@ -64,10 +77,14 @@ export function ItemEditor({
   const [category, setCategory] = useState<Category>(item?.category || 'top');
   // New items start without a color so a default is never saved by accident.
   const [colors, setColors] = useState<string[]>(item?.colors || []);
-  const [occasions, setOccasions] = useState<Occasion[]>(item?.occasions || ['casual']);
+  const [occasions, setOccasions] = useState<Occasion[]>(
+    item?.occasions || ['casual'],
+  );
   const [styleIds, setStyleIds] = useState<StyleId[]>(item?.styleIds || []);
   const [styleNotice, setStyleNotice] = useState('');
-  const [warmth, setWarmth] = useState<0 | 1 | 2 | 3>(item?.warmth ?? defaultWarmth('top'));
+  const [warmth, setWarmth] = useState<0 | 1 | 2 | 3>(
+    item?.warmth ?? defaultWarmth('top'),
+  );
   const warmthChosen = useRef(!!item);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [rainReady, setRainReady] = useState(item?.rainReady || false);
@@ -124,12 +141,18 @@ export function ItemEditor({
   function save() {
     setSubmitted(true);
     if (errors.colors) {
-      scroll.current?.scrollTo({ y: fieldY.current.colors, animated: !reduceMotion });
+      scroll.current?.scrollTo({
+        y: fieldY.current.colors,
+        animated: !reduceMotion,
+      });
       return;
     }
     if (errors.occasions) {
       setDetailsOpen(true);
-      scroll.current?.scrollTo({ y: fieldY.current.details, animated: !reduceMotion });
+      scroll.current?.scrollTo({
+        y: fieldY.current.details,
+        animated: !reduceMotion,
+      });
       return;
     }
     cancelAnalysis();
@@ -169,7 +192,10 @@ export function ItemEditor({
       );
       const imageDataUrl = await localPhotoDataUrl(photoUri);
       if (!active.current || job !== analysisJob.current) return;
-      const result = await analyzeGarmentPhoto(imageDataUrl, { apiUrl, signal: abort.signal });
+      const result = await analyzeGarmentPhoto(imageDataUrl, {
+        apiUrl,
+        signal: abort.signal,
+      });
       if (active.current && job === analysisJob.current) setSuggestion(result);
     } catch (failure) {
       if (
@@ -210,7 +236,9 @@ export function ItemEditor({
     occasions.map((value) => occasionLabels[value]).join(', ') || 'Sin ocasión',
     warmthLabels[warmth],
     rainReady ? 'Para lluvia' : '',
-    styleIds.length ? `${styleIds.length} ${styleIds.length === 1 ? 'estilo' : 'estilos'}` : '',
+    styleIds.length
+      ? `${styleIds.length} ${styleIds.length === 1 ? 'estilo' : 'estilos'}`
+      : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -249,7 +277,11 @@ export function ItemEditor({
       if (!active.current || job !== photoJob.current) return;
       if (result.canceled) return;
       const asset = result.assets[0];
-      const persisted = await persistPhoto(asset.uri, asset.base64, asset.mimeType);
+      const persisted = await persistPhoto(
+        asset.uri,
+        asset.base64,
+        asset.mimeType,
+      );
       if (active.current && job === photoJob.current) {
         setPhotoUri(persisted);
         setCutoutUri(undefined);
@@ -277,7 +309,10 @@ export function ItemEditor({
           >
             ¿Descartar cambios?
           </Text>
-          <Button label="Seguir editando" onPress={() => setConfirmClose(false)} />
+          <Button
+            label="Seguir editando"
+            onPress={() => setConfirmClose(false)}
+          />
           <Button
             secondary
             label="Descartar cambios"
@@ -319,7 +354,12 @@ export function ItemEditor({
       {photoError ? (
         <Text
           accessibilityRole="alert"
-          style={{ color: palette.rust, fontSize: 12, lineHeight: 19, marginTop: 12 }}
+          style={{
+            color: palette.rust,
+            fontSize: 12,
+            lineHeight: 19,
+            marginTop: 12,
+          }}
         >
           {photoError}
         </Text>
@@ -384,8 +424,8 @@ export function ItemEditor({
           ) : null}
           <View style={{ marginTop: 18 }}>
             <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
-              Se enviará esta foto a OpenAI para proponer nombre, categoría y colores. Es opcional;
-              puedes completar los datos a mano.
+              Se enviará esta foto a OpenAI para proponer nombre, categoría y
+              colores. Es opcional; puedes completar los datos a mano.
             </Text>
             <Button
               secondary
@@ -407,7 +447,8 @@ export function ItemEditor({
                   accessibilityLiveRegion="polite"
                   style={[s.subtitle, { fontSize: 11, marginTop: 10 }]}
                 >
-                  Puedes seguir editando a mano. El análisis no cambiará el formulario.
+                  Puedes seguir editando a mano. El análisis no cambiará el
+                  formulario.
                 </Text>
                 <Button
                   secondary
@@ -421,7 +462,12 @@ export function ItemEditor({
             {analysisError ? (
               <Text
                 accessibilityRole="alert"
-                style={{ color: palette.rust, fontSize: 12, lineHeight: 19, marginTop: 12 }}
+                style={{
+                  color: palette.rust,
+                  fontSize: 12,
+                  lineHeight: 19,
+                  marginTop: 12,
+                }}
               >
                 {analysisError}
               </Text>
@@ -444,7 +490,9 @@ export function ItemEditor({
                 chooseCategory(confirmed.category);
                 setColors([...confirmed.colors]);
                 setSuggestion(null);
-                setAnalysisNotice('Datos aplicados. Revisa los demás campos y guarda la prenda.');
+                setAnalysisNotice(
+                  'Datos aplicados. Revisa los demás campos y guarda la prenda.',
+                );
               }}
             />
           ) : null}
@@ -500,11 +548,15 @@ export function ItemEditor({
       <TextInput
         accessibilityLabel="Nombre de la prenda, opcional"
         accessibilityHint={
-          name.trim() || !colors.length ? undefined : `Si lo dejas vacío se llamará ${draft.name}`
+          name.trim() || !colors.length
+            ? undefined
+            : `Si lo dejas vacío se llamará ${draft.name}`
         }
         placeholderTextColor={palette.muted}
         placeholder={
-          name.trim() ? undefined : suggestedItemName(category, colors) || 'Ej. Camisa de lino'
+          name.trim()
+            ? undefined
+            : suggestedItemName(category, colors) || 'Ej. Camisa de lino'
         }
         value={name}
         maxLength={60}
@@ -512,7 +564,9 @@ export function ItemEditor({
         style={s.input}
       />
       {item ? (
-        <View style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}>
+        <View
+          style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}
+        >
           <View style={{ flex: 1 }}>
             <Text style={{ color: palette.ink }}>Disponible para usar</Text>
             <Text style={[s.subtitle, { fontSize: 12 }]}>
@@ -548,22 +602,37 @@ export function ItemEditor({
           }}
         >
           <View style={{ flex: 1 }}>
-            <Text style={{ color: palette.ink, fontSize: 15, fontWeight: '600' }}>
+            <Text
+              style={{ color: palette.ink, fontSize: 15, fontWeight: '600' }}
+            >
               Más detalles
             </Text>
             <Text
               numberOfLines={2}
-              style={[s.subtitle, { fontSize: 12, lineHeight: 18, marginTop: 3 }]}
+              style={[
+                s.subtitle,
+                { fontSize: 12, lineHeight: 18, marginTop: 3 },
+              ]}
             >
               {detailsSummary}
             </Text>
           </View>
-          <Text style={{ color: palette.ink, fontSize: 20, width: 24, textAlign: 'center' }}>
+          <Text
+            style={{
+              color: palette.ink,
+              fontSize: 20,
+              width: 24,
+              textAlign: 'center',
+            }}
+          >
             {detailsOpen ? '−' : '+'}
           </Text>
         </Pressable>
         {submitted && errors.occasions && !detailsOpen ? (
-          <Text accessibilityRole="alert" style={{ color: palette.rust, fontSize: 12 }}>
+          <Text
+            accessibilityRole="alert"
+            style={{ color: palette.rust, fontSize: 12 }}
+          >
             {errors.occasions}
           </Text>
         ) : null}
@@ -612,8 +681,12 @@ export function ItemEditor({
               />
             ))}
           </View>
-          <View style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}>
-            <Text style={{ color: palette.ink, flex: 1 }}>La uso cuando llueve</Text>
+          <View
+            style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}
+          >
+            <Text style={{ color: palette.ink, flex: 1 }}>
+              La uso cuando llueve
+            </Text>
             <Switch
               accessibilityLabel="Apta para lluvia"
               value={rainReady}
@@ -622,7 +695,9 @@ export function ItemEditor({
             />
           </View>
           <FieldLabel>Estilos · opcional</FieldLabel>
-          <Text style={[s.subtitle, { fontSize: 11, marginBottom: 12 }]}>Hasta 3.</Text>
+          <Text style={[s.subtitle, { fontSize: 11, marginBottom: 12 }]}>
+            Hasta 3.
+          </Text>
           <View style={s.wrap}>
             {STYLE_OPTIONS.map((option) => (
               <Chip
@@ -631,7 +706,9 @@ export function ItemEditor({
                 selected={styleIds.includes(option.id)}
                 onPress={() => {
                   if (!styleIds.includes(option.id) && styleIds.length >= 3) {
-                    setStyleNotice('Elige hasta tres estilos. Quita uno para probar otro.');
+                    setStyleNotice(
+                      'Elige hasta tres estilos. Quita uno para probar otro.',
+                    );
                     return;
                   }
                   setStyleNotice('');
@@ -670,7 +747,10 @@ async function localPhotoDataUrl(uri: string): Promise<string> {
     return uri;
   }
   if (Platform.OS === 'web' || !uri.startsWith('file://'))
-    throw new AiClientError('image', 'Elige una foto local JPEG, PNG o WebP para analizar.');
+    throw new AiClientError(
+      'image',
+      'Elige una foto local JPEG, PNG o WebP para analizar.',
+    );
   const info = await FileSystem.getInfoAsync(uri);
   if (!info.exists || info.isDirectory)
     throw new AiClientError(
@@ -678,7 +758,10 @@ async function localPhotoDataUrl(uri: string): Promise<string> {
       'No encontramos la foto en este dispositivo. Vuelve a elegirla.',
     );
   if (info.size > MAX_IMAGE_BYTES)
-    throw new AiClientError('image', 'La foto supera 4 MiB. Elige una más pequeña para analizar.');
+    throw new AiClientError(
+      'image',
+      'La foto supera 4 MiB. Elige una más pequeña para analizar.',
+    );
   const base64 = await FileSystem.readAsStringAsync(uri, {
     encoding: FileSystem.EncodingType.Base64,
   });

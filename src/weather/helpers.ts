@@ -5,8 +5,12 @@ export const WEATHER_MAX_AGE_MS = 3 * 60 * 60_000;
 export type WeatherFreshness = 'missing' | 'fresh' | 'refresh' | 'expired';
 
 /** Both fetch age and model observation age matter; fetching old data cannot renew it. */
-export function getWeatherFreshness(settings: WeatherSettings, now: string): WeatherFreshness {
-  if (!isWeatherSettings(settings) || !settings.location || !settings.snapshot) return 'missing';
+export function getWeatherFreshness(
+  settings: WeatherSettings,
+  now: string,
+): WeatherFreshness {
+  if (!isWeatherSettings(settings) || !settings.location || !settings.snapshot)
+    return 'missing';
   const time = Date.parse(now);
   const fetchAge = time - Date.parse(settings.snapshot.fetchedAt);
   const observationAge = time - Date.parse(settings.snapshot.observedAt);
@@ -20,7 +24,10 @@ export function getWeatherFreshness(settings: WeatherSettings, now: string): Wea
   return fetchAge >= WEATHER_REFRESH_MS ? 'refresh' : 'fresh';
 }
 
-export function shouldRefreshWeather(settings: WeatherSettings, now: string): boolean {
+export function shouldRefreshWeather(
+  settings: WeatherSettings,
+  now: string,
+): boolean {
   return (
     settings.mode === 'automatic' &&
     !!settings.location &&

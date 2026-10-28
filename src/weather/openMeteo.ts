@@ -10,7 +10,8 @@ import {
 // Current data are model estimates, not an observation from a personal weather station.
 // https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/geocoding-api
 export const WEATHER_REQUEST_TIMEOUT_MS = 10_000;
-export type WeatherRequestErrorCode = 'network' | 'http' | 'invalid' | 'timeout' | 'aborted';
+export type WeatherRequestErrorCode =
+  'network' | 'http' | 'invalid' | 'timeout' | 'aborted';
 export class WeatherRequestError extends Error {
   constructor(
     public readonly code: WeatherRequestErrorCode,
@@ -22,7 +23,10 @@ export class WeatherRequestError extends Error {
 }
 
 function invalid(): never {
-  throw new WeatherRequestError('invalid', 'El servicio devolvió datos de clima incompletos.');
+  throw new WeatherRequestError(
+    'invalid',
+    'El servicio devolvió datos de clima incompletos.',
+  );
 }
 
 async function requestJson(
@@ -31,7 +35,8 @@ async function requestJson(
   timeoutMs: number,
   signal?: AbortSignal,
 ): Promise<unknown> {
-  if (signal?.aborted) throw new WeatherRequestError('aborted', 'Consulta cancelada.');
+  if (signal?.aborted)
+    throw new WeatherRequestError('aborted', 'Consulta cancelada.');
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let cancel: (() => void) | undefined;
@@ -42,7 +47,12 @@ async function requestJson(
     };
     signal?.addEventListener('abort', cancel, { once: true });
     timer = setTimeout(() => {
-      reject(new WeatherRequestError('timeout', 'El clima tardó demasiado. Vuelve a intentar.'));
+      reject(
+        new WeatherRequestError(
+          'timeout',
+          'El clima tardó demasiado. Vuelve a intentar.',
+        ),
+      );
       controller.abort();
     }, timeoutMs);
   });
@@ -56,10 +66,16 @@ async function requestJson(
             headers: { Accept: 'application/json' },
           });
         } catch {
-          throw new WeatherRequestError('network', 'No se pudo conectar con el servicio de clima.');
+          throw new WeatherRequestError(
+            'network',
+            'No se pudo conectar con el servicio de clima.',
+          );
         }
         if (!response.ok)
-          throw new WeatherRequestError('http', 'El servicio de clima no está disponible.');
+          throw new WeatherRequestError(
+            'http',
+            'El servicio de clima no está disponible.',
+          );
         try {
           return (await response.json()) as unknown;
         } catch {
@@ -74,7 +90,11 @@ async function requestJson(
   }
 }
 
-function distanceKm(location: WeatherLocation, latitude: number, longitude: number): number {
+function distanceKm(
+  location: WeatherLocation,
+  latitude: number,
+  longitude: number,
+): number {
   const radians = Math.PI / 180;
   const a =
     Math.sin(((latitude - location.latitude) * radians) / 2) ** 2 +
@@ -103,7 +123,10 @@ export function nearestLocation(
  * Search terms for a reverse-geocoded place. Official names such as «Comitán de Domínguez» may only
  * exist in the geocoder in their short form, so the part before « de »/« del » is tried after the full name.
  */
-export function placeSearchTerms(names: Array<string | null | undefined>, limit = 4): string[] {
+export function placeSearchTerms(
+  names: Array<string | null | undefined>,
+  limit = 4,
+): string[] {
   const terms: string[] = [];
   for (const raw of names) {
     const name = raw?.split(',')[0].trim();
@@ -119,29 +142,50 @@ export function placeSearchTerms(names: Array<string | null | undefined>, limit 
   return terms.slice(0, limit);
 }
 
-const RAIN_CODES = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 97, 99]);
-export function hasPrecipitation(weatherCode: number, precipitation: number): boolean {
+const RAIN_CODES = new Set([
+  51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 97, 99,
+]);
+export function hasPrecipitation(
+  weatherCode: number,
+  precipitation: number,
+): boolean {
   // precipitation includes rain, showers and snow; protect clothing for any wet conditions.
   return precipitation > 0 || RAIN_CODES.has(weatherCode);
 }
 
 /** Injectable transport/clock only for deterministic tests; production uses fixed HTTPS hosts. */
 export function createOpenMeteoClient(
-  options: { fetcher?: typeof fetch; timeoutMs?: number; now?: () => Date } = {},
+  options: {
+    fetcher?: typeof fetch;
+    timeoutMs?: number;
+    now?: () => Date;
+  } = {},
 ) {
-  const fetcher: typeof fetch = options.fetcher ?? ((input, init) => fetch(input, init));
+  const fetcher: typeof fetch =
+    options.fetcher ?? ((input, init) => fetch(input, init));
   const timeoutMs = options.timeoutMs ?? WEATHER_REQUEST_TIMEOUT_MS;
   const now = options.now ?? (() => new Date());
   return {
-    async searchLocations(query: string, signal?: AbortSignal): Promise<WeatherLocation[]> {
-      if (signal?.aborted) throw new WeatherRequestError('aborted', 'Consulta cancelada.');
+    async searchLocations(
+      query: string,
+      signal?: AbortSignal,
+    ): Promise<WeatherLocation[]> {
+      if (signal?.aborted)
+        throw new WeatherRequestError('aborted', 'Consulta cancelada.');
       const term = query.trim();
       if (term.length < 2) return [];
       if (term.length > 120)
-        throw new WeatherRequestError('invalid', 'Escribe una ciudad de hasta 120 caracteres.');
+        throw new WeatherRequestError(
+          'invalid',
+          'Escribe una ciudad de hasta 120 caracteres.',
+        );
       const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=8&language=es&format=json`;
       const raw = await requestJson(url, fetcher, timeoutMs, signal);
-      if (!isRecord(raw) || raw.error || (raw.results !== undefined && !Array.isArray(raw.results)))
+      if (
+        !isRecord(raw) ||
+        raw.error ||
+        (raw.results !== undefined && !Array.isArray(raw.results))
+      )
         return invalid();
       if (raw.results === undefined) return [];
       const locations: WeatherLocation[] = [];
@@ -159,11 +203,15 @@ export function createOpenMeteoClient(
             : {}),
         };
         if (!isWeatherLocation(location)) return invalid();
-        if (!locations.some((existing) => existing.id === location.id)) locations.push(location);
+        if (!locations.some((existing) => existing.id === location.id))
+          locations.push(location);
       }
       return locations.slice(0, 8);
     },
-    async fetchWeather(location: WeatherLocation, signal?: AbortSignal): Promise<WeatherSnapshot> {
+    async fetchWeather(
+      location: WeatherLocation,
+      signal?: AbortSignal,
+    ): Promise<WeatherSnapshot> {
       if (!isWeatherLocation(location)) return invalid();
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,apparent_temperature,precipitation,weather_code&temperature_unit=celsius&precipitation_unit=mm&timeformat=unixtime&timezone=GMT&forecast_days=1`;
       const raw = await requestJson(url, fetcher, timeoutMs, signal);

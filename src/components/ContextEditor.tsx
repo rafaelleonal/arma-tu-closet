@@ -50,18 +50,26 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
               setSettings((current) => ({
                 ...current,
                 location: place,
-                snapshot: current.location?.id === place.id ? current.snapshot : undefined,
+                snapshot:
+                  current.location?.id === place.id
+                    ? current.snapshot
+                    : undefined,
               }));
               setError('');
             }}
           />
           <Text style={[s.subtitle, { fontSize: 12, marginTop: 12 }]}>
-            Se consulta el clima actual de esa ciudad. Si el dato caduca, se usa el clima manual.
+            Se consulta el clima actual de esa ciudad. Si el dato caduca, se usa
+            el clima manual.
           </Text>
           <Text
             accessibilityRole="link"
             onPress={() => void Linking.openURL('https://open-meteo.com/')}
-            style={{ color: palette.green, textDecorationLine: 'underline', marginTop: 12 }}
+            style={{
+              color: palette.green,
+              textDecorationLine: 'underline',
+              marginTop: 12,
+            }}
           >
             Datos de Open-Meteo
           </Text>
@@ -74,14 +82,18 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
             placeholder="Ciudad"
             placeholderTextColor={palette.muted}
             value={draft.city}
-            onChangeText={(city) => setDraft((current) => ({ ...current, city }))}
+            onChangeText={(city) =>
+              setDraft((current) => ({ ...current, city }))
+            }
             maxLength={60}
             style={s.input}
           />
         </>
       )}
       <FieldLabel>
-        {automatic ? 'Temperatura manual de respaldo · °C' : 'Temperatura en °C'}
+        {automatic
+          ? 'Temperatura manual de respaldo · °C'
+          : 'Temperatura en °C'}
       </FieldLabel>
       <TextInput
         accessibilityLabel="Temperatura en grados Celsius"
@@ -97,7 +109,9 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
         <Switch
           accessibilityLabel="Hay lluvia"
           value={draft.raining}
-          onValueChange={(raining) => setDraft((current) => ({ ...current, raining }))}
+          onValueChange={(raining) =>
+            setDraft((current) => ({ ...current, raining }))
+          }
           trackColor={{ true: palette.green }}
         />
       </View>
@@ -128,7 +142,10 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
         ))}
       </View>
       {error ? (
-        <Text accessibilityRole="alert" style={{ color: palette.rust, marginTop: 20 }}>
+        <Text
+          accessibilityRole="alert"
+          style={{ color: palette.rust, marginTop: 20 }}
+        >
           {error}
         </Text>
       ) : null}
@@ -137,7 +154,12 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
         style={{ marginTop: 28 }}
         onPress={() => {
           const temp = Number(temperature.replace(',', '.'));
-          if (!temperature.trim() || !Number.isFinite(temp) || temp < -30 || temp > 55) {
+          if (
+            !temperature.trim() ||
+            !Number.isFinite(temp) ||
+            temp < -30 ||
+            temp > 55
+          ) {
             setError('Escribe una temperatura válida entre −30 y 55 °C.');
             return;
           }

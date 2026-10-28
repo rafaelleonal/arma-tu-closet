@@ -11,14 +11,21 @@ import {
 import { MAX_IMAGE_BYTES } from '../src/ai/contracts';
 
 const imageDataUrl = `data:image/png;base64,${readFileSync('tests/fixtures/photo.png').toString('base64')}`;
-const suggestion = { name: 'Camisa blanca', category: 'top', colors: ['blanco'] };
+const suggestion = {
+  name: 'Camisa blanca',
+  category: 'top',
+  colors: ['blanco'],
+};
 const apiUrl = 'http://127.0.0.1:8787/api/garment-analysis';
 const errorCode = (code: AiClientError['code']) => (error: unknown) =>
   error instanceof AiClientError && error.code === code;
 const jsonFetch =
   (body: unknown, status = 200): typeof fetch =>
   async () =>
-    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
 
 test('AI service defaults only on local web; native requires explicit configuration', () => {
   assert.equal(resolveAiApiUrl('web', '', 'localhost'), apiUrl);
@@ -27,10 +34,23 @@ test('AI service defaults only on local web; native requires explicit configurat
     resolveAiApiUrl('ios', 'http://192.168.1.4:8787/'),
     'http://192.168.1.4:8787/api/garment-analysis',
   );
-  assert.throws(() => resolveAiApiUrl('android', ''), errorCode('configuration'));
-  assert.throws(() => resolveAiApiUrl('web', '', 'example.com'), errorCode('configuration'));
-  for (const url of ['file:///tmp/server', 'https://user:secret@example.com', 'not a URL'])
-    assert.throws(() => resolveAiApiUrl('web', url), errorCode('configuration'));
+  assert.throws(
+    () => resolveAiApiUrl('android', ''),
+    errorCode('configuration'),
+  );
+  assert.throws(
+    () => resolveAiApiUrl('web', '', 'example.com'),
+    errorCode('configuration'),
+  );
+  for (const url of [
+    'file:///tmp/server',
+    'https://user:secret@example.com',
+    'not a URL',
+  ])
+    assert.throws(
+      () => resolveAiApiUrl('web', url),
+      errorCode('configuration'),
+    );
 });
 
 test('image validation rejects remote URLs, unsupported formats, malformed data and oversized bytes', () => {
@@ -56,7 +76,9 @@ test('analysis sends only the explicitly supplied image and parses a validated s
     fetchImpl: async (url, options) => {
       assert.equal(url, apiUrl);
       assert.equal(options?.method, 'POST');
-      assert.deepEqual(options?.headers, { 'Content-Type': 'application/json' });
+      assert.deepEqual(options?.headers, {
+        'Content-Type': 'application/json',
+      });
       received = JSON.parse(String(options?.body));
       return new Response(JSON.stringify({ suggestion }));
     },
@@ -99,7 +121,10 @@ test('server and network errors are actionable without a fabricated result', asy
       error.message === 'El análisis está desactivado.',
   );
   await assert.rejects(
-    analyzeGarmentPhoto(imageDataUrl, { apiUrl, fetchImpl: jsonFetch({}, 500) }),
+    analyzeGarmentPhoto(imageDataUrl, {
+      apiUrl,
+      fetchImpl: jsonFetch({}, 500),
+    }),
     errorCode('server'),
   );
   await assert.rejects(

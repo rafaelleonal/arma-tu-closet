@@ -31,7 +31,8 @@ export function useWeather(
         return;
       if (
         !force &&
-        (!shouldRefreshWeather(settings, currentTime) || Date.now() - lastAttempt.current < 300_000)
+        (!shouldRefreshWeather(settings, currentTime) ||
+          Date.now() - lastAttempt.current < 300_000)
       )
         return;
       const controller = new AbortController();
@@ -43,14 +44,23 @@ export function useWeather(
         const snapshot = await fetchWeather(location, controller.signal);
         if (controller.signal.aborted) return;
         setData((current) =>
-          current?.weather.mode === 'automatic' && current.weather.location?.id === location.id
-            ? { ...current, weather: { ...current.weather, snapshot }, dislikedOutfitIds: [] }
+          current?.weather.mode === 'automatic' &&
+          current.weather.location?.id === location.id
+            ? {
+                ...current,
+                weather: { ...current.weather, snapshot },
+                dislikedOutfitIds: [],
+              }
             : current,
         );
         setNow(new Date().toISOString());
       } catch (cause) {
         if (!controller.signal.aborted)
-          setError(cause instanceof Error ? cause.message : 'No pudimos actualizar el clima.');
+          setError(
+            cause instanceof Error
+              ? cause.message
+              : 'No pudimos actualizar el clima.',
+          );
       } finally {
         if (request.current === controller) {
           request.current = null;
@@ -78,8 +88,15 @@ export function useWeather(
       request.current?.abort();
       request.current = null;
     };
-  }, [data?.onboarded, data?.weather.mode, data?.weather.location?.id, refresh]);
+  }, [
+    data?.onboarded,
+    data?.weather.mode,
+    data?.weather.location?.id,
+    refresh,
+  ]);
 
-  const effective = data ? getEffectiveWeatherContext(data.context, data.weather, now) : null;
+  const effective = data
+    ? getEffectiveWeatherContext(data.context, data.weather, now)
+    : null;
   return { effective, loading, error, refresh: () => void refresh(true) };
 }

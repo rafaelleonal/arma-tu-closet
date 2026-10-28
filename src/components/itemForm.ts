@@ -1,6 +1,13 @@
-import { categoryLabels, colorLabels, type Category, type WardrobeItem } from '../domain';
+import {
+  categoryLabels,
+  colorLabels,
+  type Category,
+  type WardrobeItem,
+} from '../domain';
 
-export function itemFormErrors(item: Pick<WardrobeItem, 'name' | 'colors' | 'occasions'>) {
+export function itemFormErrors(
+  item: Pick<WardrobeItem, 'name' | 'colors' | 'occasions'>,
+) {
   return {
     name: item.name.trim() ? '' : 'Escribe un nombre.',
     colors: item.colors.length ? '' : 'Elige al menos un color.',
@@ -9,9 +16,14 @@ export function itemFormErrors(item: Pick<WardrobeItem, 'name' | 'colors' | 'occ
 }
 
 /** Name used when the person leaves it empty; neutral wording avoids gender agreement with the category. */
-export function suggestedItemName(category: Category, colors: string[]): string {
+export function suggestedItemName(
+  category: Category,
+  colors: string[],
+): string {
   if (!colors.length) return '';
-  const names = colors.slice(0, 2).map((color) => (colorLabels[color] ?? color).toLowerCase());
+  const names = colors
+    .slice(0, 2)
+    .map((color) => (colorLabels[color] ?? color).toLowerCase());
   return `${categoryLabels[category]} · ${names.join(' y ')}${colors.length > 2 ? ' y más' : ''}`;
 }
 

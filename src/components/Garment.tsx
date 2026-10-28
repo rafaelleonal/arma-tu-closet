@@ -46,7 +46,8 @@ function illustrationFor(item: WardrobeItem): IllustrationKind {
   switch (item.category) {
     case 'top':
       if (/sueter|sweater|sudadera|jersey/.test(name)) return 'sweater';
-      if (/camisa|blusa|shirt/.test(name) && !/camiseta|t-shirt/.test(name)) return 'shirt';
+      if (/camisa|blusa|shirt/.test(name) && !/camiseta|t-shirt/.test(name))
+        return 'shirt';
       return 'tee';
     case 'bottom':
       return 'trousers';
@@ -61,9 +62,17 @@ function illustrationFor(item: WardrobeItem): IllustrationKind {
   }
 }
 
-export function Garment({ item, size = 100 }: { item: WardrobeItem; size?: number }) {
+export function Garment({
+  item,
+  size = 100,
+}: {
+  item: WardrobeItem;
+  size?: number;
+}) {
   const { palette } = useTheme();
-  const colors = item.colors.map((color) => colorLabels[color] || color).join(', ');
+  const colors = item.colors
+    .map((color) => colorLabels[color] || color)
+    .join(', ');
   const demoPhoto = item.photoUri ? undefined : demoPhotoFor(item);
   return (
     <View
@@ -82,7 +91,12 @@ export function Garment({ item, size = 100 }: { item: WardrobeItem; size?: numbe
         <Image
           accessible={false}
           source={{ uri: item.photoUri }}
-          style={{ width: size, height: size, borderRadius: 10, backgroundColor: palette.art }}
+          style={{
+            width: size,
+            height: size,
+            borderRadius: 10,
+            backgroundColor: palette.art,
+          }}
           resizeMode="contain"
         />
       ) : demoPhoto ? (
@@ -93,7 +107,11 @@ export function Garment({ item, size = 100 }: { item: WardrobeItem; size?: numbe
           resizeMode="contain"
         />
       ) : (
-        <GarmentIllustration kind={illustrationFor(item)} size={size} ink={palette.green} />
+        <GarmentIllustration
+          kind={illustrationFor(item)}
+          size={size}
+          ink={palette.green}
+        />
       )}
       {item.colors.length ? (
         <View style={[styles.colors, { maxWidth: size }]}>

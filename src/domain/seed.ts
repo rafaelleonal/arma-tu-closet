@@ -119,7 +119,9 @@ export const seedWardrobe: WardrobeItem[] = SEED_WARDROBE.map((item) => ({
   isDemo: true,
 }));
 
-export function createDefaultContext(now = new Date().toISOString()): RecommendationContext {
+export function createDefaultContext(
+  now = new Date().toISOString(),
+): RecommendationContext {
   return {
     occasion: 'casual',
     temperatureC: 22,

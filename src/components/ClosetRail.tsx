@@ -37,15 +37,19 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
   const { selection } = useFeedback();
   const hanging = items.filter((item) => HANGING.has(item.category));
   const shelf = items.filter((item) => !HANGING.has(item.category));
-  const [selectedId, setSelectedId] = useState<string | undefined>(hanging[0]?.id ?? shelf[0]?.id);
-  const selected = items.find((item) => item.id === selectedId) ?? hanging[0] ?? shelf[0];
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    hanging[0]?.id ?? shelf[0]?.id,
+  );
+  const selected =
+    items.find((item) => item.id === selectedId) ?? hanging[0] ?? shelf[0];
   const selectedIndex = hanging.findIndex((item) => item.id === selected?.id);
   function select(item: WardrobeItem) {
     if (item.id === selected?.id) return;
     selection();
     setSelectedId(item.id);
   }
-  const railHeight = ROD_TOP + Math.max(0, ...hanging.map((item) => LENGTH[item.category])) + 12;
+  const railHeight =
+    ROD_TOP + Math.max(0, ...hanging.map((item) => LENGTH[item.category])) + 12;
 
   return (
     <View>
@@ -56,7 +60,13 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 18, minWidth: '100%' }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', height: railHeight }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                height: railHeight,
+              }}
+            >
               <Rod />
               <View style={[railStyles.cap, { left: -10 }]} />
               <View style={[railStyles.cap, { right: -10 }]} />
@@ -64,7 +74,9 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
                 <HangingGarment
                   key={item.id}
                   item={item}
-                  position={index < selectedIndex ? -1 : index > selectedIndex ? 1 : 0}
+                  position={
+                    index < selectedIndex ? -1 : index > selectedIndex ? 1 : 0
+                  }
                   onPress={() => select(item)}
                 />
               ))}
@@ -92,7 +104,11 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 14, paddingHorizontal: 4, alignItems: 'flex-end' }}
+            contentContainerStyle={{
+              gap: 14,
+              paddingHorizontal: 4,
+              alignItems: 'flex-end',
+            }}
           >
             {shelf.map((item) => (
               <ShelfItem
@@ -104,7 +120,10 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
             ))}
           </ScrollView>
           <View
-            style={[styles.shelf, { backgroundColor: palette.sand, borderColor: palette.line }]}
+            style={[
+              styles.shelf,
+              { backgroundColor: palette.sand, borderColor: palette.line },
+            ]}
           />
         </View>
       ) : null}
@@ -121,7 +140,9 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
             <Text style={[s.subtitle, { fontSize: 12, marginTop: 2 }]}>
               {[
                 categoryLabels[selected.category],
-                selected.colors.map((color) => colorLabels[color] ?? color).join(', '),
+                selected.colors
+                  .map((color) => colorLabels[color] ?? color)
+                  .join(', '),
                 selected.isDemo ? 'Ejemplo' : '',
               ]
                 .filter(Boolean)
@@ -129,7 +150,12 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
             </Text>
           </View>
           <View style={[s.row, { justifyContent: 'space-between' }]}>
-            <Text style={{ color: selected.available ? palette.ink : palette.rust, fontSize: 14 }}>
+            <Text
+              style={{
+                color: selected.available ? palette.ink : palette.rust,
+                fontSize: 14,
+              }}
+            >
               {selected.available ? 'Disponible' : 'En lavandería'}
             </Text>
             <Switch
@@ -139,7 +165,12 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
               trackColor={{ true: palette.green }}
             />
           </View>
-          <Button secondary small label="Editar prenda" onPress={() => onEdit(selected)} />
+          <Button
+            secondary
+            small
+            label="Editar prenda"
+            onPress={() => onEdit(selected)}
+          />
         </View>
       ) : null}
     </View>
@@ -190,7 +221,9 @@ export function HangingGarment({
       onPress={onPress}
       style={{ zIndex: position === 0 ? 2 : 1 }}
     >
-      <Animated.View style={{ width: slot, height: ROD_TOP + height, alignItems: 'center' }}>
+      <Animated.View
+        style={{ width: slot, height: ROD_TOP + height, alignItems: 'center' }}
+      >
         <Animated.View
           style={{
             width,
@@ -225,7 +258,11 @@ function ShelfItem({
       accessibilityLabel={`${item.name}${item.available ? '' : ', en lavandería'}`}
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={{ alignItems: 'center', minHeight: 44, opacity: item.available ? 1 : 0.4 }}
+      style={{
+        alignItems: 'center',
+        minHeight: 44,
+        opacity: item.available ? 1 : 0.4,
+      }}
     >
       <View
         style={{
@@ -248,14 +285,20 @@ const styles = StyleSheet.create({
 /** Presentation-only rail for the welcome screen: example garments turning to the front one after another. */
 export function WelcomeRail({ items }: { items: WardrobeItem[] }) {
   const { reduceMotion } = useFeedback();
-  const hanging = items.filter((item) => HANGING.has(item.category)).slice(0, 5);
+  const hanging = items
+    .filter((item) => HANGING.has(item.category))
+    .slice(0, 5);
   const [front, setFront] = useState(Math.floor(hanging.length / 2));
   useEffect(() => {
     if (reduceMotion || hanging.length < 2) return;
-    const timer = setInterval(() => setFront((current) => (current + 1) % hanging.length), 2600);
+    const timer = setInterval(
+      () => setFront((current) => (current + 1) % hanging.length),
+      2600,
+    );
     return () => clearInterval(timer);
   }, [reduceMotion, hanging.length]);
-  const height = ROD_TOP + Math.max(0, ...hanging.map((item) => LENGTH[item.category])) + 12;
+  const height =
+    ROD_TOP + Math.max(0, ...hanging.map((item) => LENGTH[item.category])) + 12;
   return (
     <RailWall height={height}>
       <View
