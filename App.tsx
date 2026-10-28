@@ -321,528 +321,533 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
           />
         </View>
       ) : null}
-      {notice ? (
-        <Pressable
-          accessibilityRole="alert"
-          onPress={() => setNotice("")}
-          style={styles.notice}
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          ref={contentScroll}
+          contentContainerStyle={styles.main}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={{ color: palette.ink, fontSize: 13, lineHeight: 19 }}>
-            {notice}
-          </Text>
-        </Pressable>
-      ) : null}
-      <ScrollView
-        ref={contentScroll}
-        contentContainerStyle={styles.main}
-        keyboardShouldPersistTaps="handled"
-      >
-        <MotionIn trigger={tab}>
-          {tab === "today" ? (
-            <>
-              <View style={styles.pageHeading}>
-                <View>
-                  {data.profile.name ? (
-                    <SectionLabel>{data.profile.name}</SectionLabel>
-                  ) : null}
-                  <Text accessibilityRole="header" style={s.title}>
-                    Hoy
+          <MotionIn trigger={tab}>
+            {tab === "today" ? (
+              <>
+                <View style={styles.pageHeading}>
+                  <View>
+                    {data.profile.name ? (
+                      <SectionLabel>{data.profile.name}</SectionLabel>
+                    ) : null}
+                    <Text accessibilityRole="header" style={s.title}>
+                      Hoy
+                    </Text>
+                  </View>
+                  <Text style={styles.date}>
+                    {new Intl.DateTimeFormat("es-MX", {
+                      day: "numeric",
+                      month: "long",
+                    }).format(new Date())}
                   </Text>
                 </View>
-                <Text style={styles.date}>
-                  {new Intl.DateTimeFormat("es-MX", {
-                    day: "numeric",
-                    month: "long",
-                  }).format(new Date())}
-                </Text>
-              </View>
-              {hasDemo ? (
-                <DemoBanner
-                  onStart={() => {
-                    update((current) => ({
-                      ...current,
-                      items: current.items.filter((item) => !item.isDemo),
-                      savedOutfits: current.savedOutfits.filter(
-                        (outfit) => !outfit.items.some((item) => item.isDemo),
-                      ),
-                    }));
-                    setTab("closet");
-                  }}
-                />
-              ) : null}
-              <View style={styles.contextCard}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Editar clima y ocasión"
-                  onPress={() => setContextOpen(true)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <View style={[s.row, { flexShrink: 1 }]}>
-                    <Text style={{ fontSize: 31, color: palette.ink }}>
-                      {context.raining ? "☂" : "☼"}
-                    </Text>
-                    <View style={{ flexShrink: 1 }}>
-                      <Text style={{ fontSize: 19, color: palette.ink }}>
-                        {Math.round(
-                          weather.effective?.source === "automatic"
-                            ? data.weather.snapshot!.temperatureC
-                            : context.temperatureC,
-                        )}
-                        °{" "}
-                        <Text style={{ fontSize: 13 }}>
-                          {weather.effective?.context.city || data.context.city}
-                        </Text>
-                      </Text>
-                      <Text style={[s.subtitle, { fontSize: 11 }]}>
-                        {weather.effective?.source === "automatic"
-                          ? `Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? "Con precipitación" : "Sin precipitación"}`
-                          : `Clima manual · ${data.context.season}`}
-                      </Text>
-                    </View>
-                  </View>
-                  <View>
-                    <Text style={{ fontSize: 13, color: palette.ink }}>
-                      {occasionLabels[data.context.occasion]}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: palette.rust,
-                        marginTop: 5,
-                      }}
-                    >
-                      Cambiar ↗
-                    </Text>
-                  </View>
-                </Pressable>
-                {data.weather.mode === "automatic" ? (
-                  <View style={{ marginTop: 12, gap: 8 }}>
-                    <Text style={[s.subtitle, { fontSize: 11 }]}>
-                      {weather.effective?.source === "automatic"
-                        ? `Actualizado ${new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit" }).format(new Date(data.weather.snapshot!.fetchedAt))}`
-                        : weather.loading
-                          ? "Consultando clima. Por ahora se usa el manual."
-                          : "Sin clima reciente. Se usa el manual de respaldo."}
-                    </Text>
-                    {weather.error ? (
-                      <Text
-                        accessibilityRole="alert"
-                        style={{ color: palette.rust, fontSize: 12 }}
-                      >
-                        {weather.error}
-                      </Text>
-                    ) : null}
-                    <View
-                      style={[
-                        s.row,
-                        { justifyContent: "space-between", flexWrap: "wrap" },
-                      ]}
-                    >
-                      <Pressable
-                        accessibilityRole="link"
-                        onPress={() =>
-                          void Linking.openURL("https://open-meteo.com/")
-                        }
-                        style={{ paddingVertical: 10 }}
-                      >
-                        <Text
-                          style={{
-                            color: palette.green,
-                            fontSize: 11,
-                            textDecorationLine: "underline",
-                          }}
-                        >
-                          Open-Meteo
-                        </Text>
-                      </Pressable>
-                      <Button
-                        small
-                        secondary
-                        label={
-                          weather.loading ? "Actualizando…" : "Actualizar clima"
-                        }
-                        disabled={weather.loading}
-                        onPress={weather.refresh}
-                      />
-                    </View>
-                  </View>
-                ) : null}
-              </View>
-              <View
-                style={[
-                  s.row,
-                  {
-                    justifyContent: "space-between",
-                    marginTop: 30,
-                    marginBottom: 14,
-                  },
-                ]}
-              >
-                <SectionLabel>Conjuntos</SectionLabel>
-                <Text style={{ color: palette.muted, fontSize: 11 }}>
-                  {recommendations.length
-                    ? `${recommendations.length} ${recommendations.length === 1 ? "opción" : "opciones"}`
-                    : ""}
-                </Text>
-              </View>
-              {recommendations.length ? (
-                <>
-                  <OutfitCard
-                    compact={data.appearance.outfitLayout === "compact"}
-                    showReasons={data.appearance.showReasons}
-                    outfit={recommendations[0]}
-                    primary
-                    saved={data.savedOutfits.some(
-                      (item) => item.id === recommendations[0].id,
-                    )}
-                    onFavorite={() => favorite(recommendations[0])}
-                    onWorn={() => worn(recommendations[0])}
-                    onItem={(item) =>
-                      setSwap({
-                        outfit: recommendations[0],
-                        category: item.category,
-                      })
-                    }
-                    onDetails={() => setSelectedOutfit(recommendations[0])}
-                  />
-                  <>
-                    {recommendations.length > 1 ? (
-                      <View
-                        style={[
-                          s.row,
-                          { justifyContent: "space-between", marginTop: 24 },
-                        ]}
-                      >
-                        <Text style={{ fontSize: 18, color: palette.ink }}>
-                          Otras opciones
-                        </Text>
-                      </View>
-                    ) : null}
-                  </>
-                  <View style={styles.alternatives}>
-                    {recommendations.slice(1).map((outfit) => (
-                      <View key={outfit.id} style={styles.alternative}>
-                        <OutfitCard
-                          compact={data.appearance.outfitLayout === "compact"}
-                          showReasons={data.appearance.showReasons}
-                          outfit={outfit}
-                          saved={data.savedOutfits.some(
-                            (item) => item.id === outfit.id,
-                          )}
-                          onFavorite={() => favorite(outfit)}
-                          onWorn={() => worn(outfit)}
-                          onDetails={() => setSelectedOutfit(outfit)}
-                        />
-                      </View>
-                    ))}
-                  </View>
-                  <Button
-                    secondary
-                    label="Otra combinación"
-                    style={{ marginTop: 16 }}
-                    onPress={() => {
+                {hasDemo ? (
+                  <DemoBanner
+                    onStart={() => {
                       update((current) => ({
                         ...current,
-                        dislikedOutfitIds: [
-                          ...new Set([
-                            ...current.dislikedOutfitIds,
-                            recommendations[0].id,
-                          ]),
-                        ],
+                        items: current.items.filter((item) => !item.isDemo),
+                        savedOutfits: current.savedOutfits.filter(
+                          (outfit) => !outfit.items.some((item) => item.isDemo),
+                        ),
                       }));
-                      setGeneration((value) => value + 1);
+                      setTab("closet");
                     }}
                   />
-                </>
-              ) : (
-                <View style={[s.panel, { paddingVertical: 35 }]}>
-                  <Text
+                ) : null}
+                <View style={styles.contextCard}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Editar clima y ocasión"
+                    onPress={() => setContextOpen(true)}
                     style={{
-                      fontSize: 28,
-                      marginBottom: 14,
-                      color: palette.ink,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      flexWrap: "wrap",
                     }}
                   >
-                    Sin conjuntos
-                  </Text>
-                  <Text style={s.subtitle}>
-                    {result.outfits.length
-                      ? "No quedan opciones en esta selección."
-                      : result.message}
-                  </Text>
-                  <Text style={[s.subtitle, { marginTop: 12 }]}>
-                    Revisa tus preferencias o agrega prendas.
-                  </Text>
-                  <View style={[s.row, { marginTop: 22, flexWrap: "wrap" }]}>
-                    <Button
-                      label="Ir a mi clóset"
-                      onPress={() => setTab("closet")}
-                    />
-                    {data.dislikedOutfitIds.length ? (
-                      <Button
-                        secondary
-                        label="Recuperar opciones"
-                        onPress={() =>
-                          update((current) => ({
-                            ...current,
-                            dislikedOutfitIds: [],
-                          }))
-                        }
-                      />
-                    ) : (
-                      <Button
-                        secondary
-                        label="Revisar mi estilo"
-                        onPress={() => setTab("style")}
-                      />
-                    )}
-                  </View>
-                </View>
-              )}
-            </>
-          ) : null}
-          {tab === "closet" ? (
-            <Closet
-              items={data.items}
-              hasDemo={hasDemo}
-              onAdd={() => setEditor("new")}
-              onEdit={setEditor}
-              onToggle={(item) =>
-                update((current) => ({
-                  ...current,
-                  items: current.items.map((value) =>
-                    value.id === item.id
-                      ? { ...value, available: !value.available }
-                      : value,
-                  ),
-                }))
-              }
-              onManual={() => setManualOpen(true)}
-              onRemoveDemo={() =>
-                update((current) => ({
-                  ...current,
-                  items: current.items.filter((item) => !item.isDemo),
-                  savedOutfits: current.savedOutfits.filter(
-                    (outfit) => !outfit.items.some((item) => item.isDemo),
-                  ),
-                }))
-              }
-              onUseDemo={() => {
-                update((current) =>
-                  current.items.length
-                    ? current
-                    : {
-                        ...current,
-                        items: seedWardrobe.map((item) => ({ ...item })),
-                      },
-                );
-                noticeOnSave.current =
-                  "Clóset de ejemplo listo. Quítalo cuando agregues tu ropa.";
-              }}
-            />
-          ) : null}
-          {tab === "style" ? (
-            <>
-              <Text accessibilityRole="header" style={s.title}>
-                Mi estilo
-              </Text>
-              <View style={[s.panel, { marginTop: 24, marginBottom: 18 }]}>
-                <Text style={styles.sectionTitle}>
-                  {data.profile.name || "Estilos"}
-                </Text>
-                <Text style={[s.subtitle, { marginBottom: 16 }]}>
-                  {data.profile.styleIds.length
-                    ? data.profile.styleIds
-                        .map(
-                          (id) =>
-                            STYLE_OPTIONS.find((style) => style.id === id)
-                              ?.label,
-                        )
-                        .join(" · ")
-                    : "Sin estilos seleccionados"}
-                </Text>
-                <Button
-                  secondary
-                  label="Editar preferencias"
-                  onPress={() => {
-                    update((current) => ({
-                      ...current,
-                      onboarding: { step: 0 },
-                    }));
-                    setPersonalizing(true);
-                  }}
-                />
-              </View>
-              <AppearanceSettings
-                value={data.appearance}
-                onChange={(appearance) =>
-                  update((current) => ({ ...current, appearance }))
-                }
-              />
-              <View style={[s.panel, { marginTop: 18 }]}>
-                <Text style={styles.sectionTitle}>Colores favoritos</Text>
-                <Text style={[s.subtitle, { marginBottom: 17, fontSize: 12 }]}>
-                  Tienen prioridad en las sugerencias.
-                </Text>
-                <View style={s.wrap}>
-                  {COLOR_OPTIONS.map((color) => (
-                    <Chip
-                      key={color}
-                      swatch={colorHex[color]}
-                      label={colorLabels[color]}
-                      selected={data.preferences.preferredColors.includes(
-                        color,
-                      )}
-                      onPress={() =>
-                        update((current) => ({
-                          ...current,
-                          preferences: {
-                            ...current.preferences,
-                            preferredColors: toggle(
-                              current.preferences.preferredColors,
-                              color,
-                            ),
-                            excludedColors:
-                              current.preferences.excludedColors.filter(
-                                (value) => value !== color,
-                              ),
-                          },
-                        }))
-                      }
-                    />
-                  ))}
-                </View>
-                <View style={s.divider} />
-                <Text style={styles.sectionTitle}>Colores a evitar</Text>
-                <Text style={[s.subtitle, { marginBottom: 17, fontSize: 12 }]}>
-                  Se excluyen de las sugerencias.
-                </Text>
-                <View style={s.wrap}>
-                  {COLOR_OPTIONS.map((color) => (
-                    <Chip
-                      key={color}
-                      swatch={colorHex[color]}
-                      label={colorLabels[color]}
-                      selected={data.preferences.excludedColors.includes(color)}
-                      onPress={() =>
-                        update((current) => ({
-                          ...current,
-                          preferences: {
-                            ...current.preferences,
-                            excludedColors: toggle(
-                              current.preferences.excludedColors,
-                              color,
-                            ),
-                            preferredColors:
-                              current.preferences.preferredColors.filter(
-                                (value) => value !== color,
-                              ),
-                          },
-                        }))
-                      }
-                    />
-                  ))}
-                </View>
-              </View>
-              <View style={[s.panel, { marginTop: 18 }]}>
-                <Text style={styles.sectionTitle}>Repetición de prendas</Text>
-                <Text style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}>
-                  Tiempo entre usos. Puede repetirse una prenda si faltan
-                  opciones.
-                </Text>
-                <View style={s.wrap}>
-                  {[0, 3, 7, 14].map((days) => (
-                    <Chip
-                      key={days}
-                      label={days ? `${days} días` : "Sin rotación"}
-                      selected={data.preferences.rotationDays === days}
-                      onPress={() =>
-                        update((current) => ({
-                          ...current,
-                          preferences: {
-                            ...current.preferences,
-                            rotationDays: days,
-                          },
-                        }))
-                      }
-                    />
-                  ))}
-                </View>
-              </View>
-              <View
-                style={[
-                  s.row,
-                  {
-                    justifyContent: "space-between",
-                    marginTop: 32,
-                    marginBottom: 15,
-                  },
-                ]}
-              >
-                <Text style={styles.sectionTitle}>Guardados</Text>
-                <Text style={s.subtitle}>{data.savedOutfits.length}</Text>
-              </View>
-              {data.savedOutfits.length ? (
-                data.savedOutfits.map((outfit) => (
-                  <Pressable
-                    key={outfit.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Ver conjunto guardado: ${outfit.items.map((item) => item.name).join(", ")}`}
-                    onPress={() => setSelectedOutfit(outfit)}
-                    style={styles.savedRow}
-                  >
-                    <View style={s.row}>
-                      {outfit.items.slice(0, 3).map((item) => (
-                        <Garment key={item.id} item={item} size={55} />
-                      ))}
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ color: palette.ink, fontSize: 13 }}>
-                        {outfit.id.startsWith("manual-")
-                          ? "Creado por ti"
-                          : "Conjunto guardado"}
+                    <View style={[s.row, { flexShrink: 1 }]}>
+                      <Text style={{ fontSize: 31, color: palette.ink }}>
+                        {context.raining ? "☂" : "☼"}
                       </Text>
-                      <Text style={[s.subtitle, { fontSize: 11 }]}>
-                        {outfit.items.length} prendas · Ver conjunto ↗
+                      <View style={{ flexShrink: 1 }}>
+                        <Text style={{ fontSize: 19, color: palette.ink }}>
+                          {Math.round(
+                            weather.effective?.source === "automatic"
+                              ? data.weather.snapshot!.temperatureC
+                              : context.temperatureC,
+                          )}
+                          °{" "}
+                          <Text style={{ fontSize: 13 }}>
+                            {weather.effective?.context.city || data.context.city}
+                          </Text>
+                        </Text>
+                        <Text style={[s.subtitle, { fontSize: 11 }]}>
+                          {weather.effective?.source === "automatic"
+                            ? `Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? "Con precipitación" : "Sin precipitación"}`
+                            : `Clima manual · ${data.context.season}`}
+                        </Text>
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 13, color: palette.ink }}>
+                        {occasionLabels[data.context.occasion]}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: palette.rust,
+                          marginTop: 5,
+                        }}
+                      >
+                        Cambiar ↗
                       </Text>
                     </View>
                   </Pressable>
-                ))
-              ) : (
-                <Text style={s.subtitle}>No hay conjuntos guardados.</Text>
-              )}
-              <View
-                style={[
-                  s.panel,
-                  { marginTop: 26, backgroundColor: palette.wash },
-                ]}
-              >
-                <Text style={styles.sectionTitle}>Almacenamiento</Text>
-                <Text style={[s.subtitle, { fontSize: 12 }]}>
-                  Los datos y fotos se guardan en este dispositivo. Borrar sus
-                  datos o desinstalar la app puede eliminarlos. Sin respaldo en
-                  la nube. Al analizar una foto, se envía a OpenAI para proponer
-                  sus atributos.
+                  {data.weather.mode === "automatic" ? (
+                    <View style={{ marginTop: 12, gap: 8 }}>
+                      <Text style={[s.subtitle, { fontSize: 11 }]}>
+                        {weather.effective?.source === "automatic"
+                          ? `Actualizado ${new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit" }).format(new Date(data.weather.snapshot!.fetchedAt))}`
+                          : weather.loading
+                            ? "Consultando clima. Por ahora se usa el manual."
+                            : "Sin clima reciente. Se usa el manual de respaldo."}
+                      </Text>
+                      {weather.error ? (
+                        <Text
+                          accessibilityRole="alert"
+                          style={{ color: palette.rust, fontSize: 12 }}
+                        >
+                          {weather.error}
+                        </Text>
+                      ) : null}
+                      <View
+                        style={[
+                          s.row,
+                          { justifyContent: "space-between", flexWrap: "wrap" },
+                        ]}
+                      >
+                        <Pressable
+                          accessibilityRole="link"
+                          onPress={() =>
+                            void Linking.openURL("https://open-meteo.com/")
+                          }
+                          style={{ paddingVertical: 10 }}
+                        >
+                          <Text
+                            style={{
+                              color: palette.green,
+                              fontSize: 11,
+                              textDecorationLine: "underline",
+                            }}
+                          >
+                            Open-Meteo
+                          </Text>
+                        </Pressable>
+                        <Button
+                          small
+                          secondary
+                          label={
+                            weather.loading ? "Actualizando…" : "Actualizar clima"
+                          }
+                          disabled={weather.loading}
+                          onPress={weather.refresh}
+                        />
+                      </View>
+                    </View>
+                  ) : null}
+                </View>
+                <View
+                  style={[
+                    s.row,
+                    {
+                      justifyContent: "space-between",
+                      marginTop: 30,
+                      marginBottom: 14,
+                    },
+                  ]}
+                >
+                  <SectionLabel>Conjuntos</SectionLabel>
+                  <Text style={{ color: palette.muted, fontSize: 11 }}>
+                    {recommendations.length
+                      ? `${recommendations.length} ${recommendations.length === 1 ? "opción" : "opciones"}`
+                      : ""}
+                  </Text>
+                </View>
+                {recommendations.length ? (
+                  <>
+                    <OutfitCard
+                      compact={data.appearance.outfitLayout === "compact"}
+                      showReasons={data.appearance.showReasons}
+                      outfit={recommendations[0]}
+                      primary
+                      saved={data.savedOutfits.some(
+                        (item) => item.id === recommendations[0].id,
+                      )}
+                      onFavorite={() => favorite(recommendations[0])}
+                      onWorn={() => worn(recommendations[0])}
+                      onItem={(item) =>
+                        setSwap({
+                          outfit: recommendations[0],
+                          category: item.category,
+                        })
+                      }
+                      onDetails={() => setSelectedOutfit(recommendations[0])}
+                    />
+                    <>
+                      {recommendations.length > 1 ? (
+                        <View
+                          style={[
+                            s.row,
+                            { justifyContent: "space-between", marginTop: 24 },
+                          ]}
+                        >
+                          <Text style={{ fontSize: 18, color: palette.ink }}>
+                            Otras opciones
+                          </Text>
+                        </View>
+                      ) : null}
+                    </>
+                    <View style={styles.alternatives}>
+                      {recommendations.slice(1).map((outfit) => (
+                        <View key={outfit.id} style={styles.alternative}>
+                          <OutfitCard
+                            compact={data.appearance.outfitLayout === "compact"}
+                            showReasons={data.appearance.showReasons}
+                            outfit={outfit}
+                            saved={data.savedOutfits.some(
+                              (item) => item.id === outfit.id,
+                            )}
+                            onFavorite={() => favorite(outfit)}
+                            onWorn={() => worn(outfit)}
+                            onDetails={() => setSelectedOutfit(outfit)}
+                          />
+                        </View>
+                      ))}
+                    </View>
+                    <Button
+                      secondary
+                      label="Otra combinación"
+                      style={{ marginTop: 16 }}
+                      onPress={() => {
+                        update((current) => ({
+                          ...current,
+                          dislikedOutfitIds: [
+                            ...new Set([
+                              ...current.dislikedOutfitIds,
+                              recommendations[0].id,
+                            ]),
+                          ],
+                        }));
+                        setGeneration((value) => value + 1);
+                      }}
+                    />
+                  </>
+                ) : (
+                  <View style={[s.panel, { paddingVertical: 35 }]}>
+                    <Text
+                      style={{
+                        fontSize: 28,
+                        marginBottom: 14,
+                        color: palette.ink,
+                      }}
+                    >
+                      Sin conjuntos
+                    </Text>
+                    <Text style={s.subtitle}>
+                      {result.outfits.length
+                        ? "No quedan opciones en esta selección."
+                        : result.message}
+                    </Text>
+                    <Text style={[s.subtitle, { marginTop: 12 }]}>
+                      Revisa tus preferencias o agrega prendas.
+                    </Text>
+                    <View style={[s.row, { marginTop: 22, flexWrap: "wrap" }]}>
+                      <Button
+                        label="Ir a mi clóset"
+                        onPress={() => setTab("closet")}
+                      />
+                      {data.dislikedOutfitIds.length ? (
+                        <Button
+                          secondary
+                          label="Recuperar opciones"
+                          onPress={() =>
+                            update((current) => ({
+                              ...current,
+                              dislikedOutfitIds: [],
+                            }))
+                          }
+                        />
+                      ) : (
+                        <Button
+                          secondary
+                          label="Revisar mi estilo"
+                          onPress={() => setTab("style")}
+                        />
+                      )}
+                    </View>
+                  </View>
+                )}
+              </>
+            ) : null}
+            {tab === "closet" ? (
+              <Closet
+                items={data.items}
+                hasDemo={hasDemo}
+                onAdd={() => setEditor("new")}
+                onEdit={setEditor}
+                onToggle={(item) =>
+                  update((current) => ({
+                    ...current,
+                    items: current.items.map((value) =>
+                      value.id === item.id
+                        ? { ...value, available: !value.available }
+                        : value,
+                    ),
+                  }))
+                }
+                onManual={() => setManualOpen(true)}
+                onRemoveDemo={() =>
+                  update((current) => ({
+                    ...current,
+                    items: current.items.filter((item) => !item.isDemo),
+                    savedOutfits: current.savedOutfits.filter(
+                      (outfit) => !outfit.items.some((item) => item.isDemo),
+                    ),
+                  }))
+                }
+                onUseDemo={() => {
+                  update((current) =>
+                    current.items.length
+                      ? current
+                      : {
+                          ...current,
+                          items: seedWardrobe.map((item) => ({ ...item })),
+                        },
+                  );
+                  noticeOnSave.current =
+                    "Clóset de ejemplo listo. Quítalo cuando agregues tu ropa.";
+                }}
+              />
+            ) : null}
+            {tab === "style" ? (
+              <>
+                <Text accessibilityRole="header" style={s.title}>
+                  Mi estilo
                 </Text>
-                <Text style={[s.subtitle, { fontSize: 12, marginTop: 10 }]}>
-                  {data.wearHistory.length}{" "}
-                  {data.wearHistory.length === 1
-                    ? "uso registrado"
-                    : "usos registrados"}{" "}
-                  · {data.items.filter((item) => !item.isDemo).length} prendas
-                  propias
-                </Text>
-              </View>
-            </>
-          ) : null}
-        </MotionIn>
-      </ScrollView>
+                <View style={[s.panel, { marginTop: 24, marginBottom: 18 }]}>
+                  <Text style={styles.sectionTitle}>
+                    {data.profile.name || "Estilos"}
+                  </Text>
+                  <Text style={[s.subtitle, { marginBottom: 16 }]}>
+                    {data.profile.styleIds.length
+                      ? data.profile.styleIds
+                          .map(
+                            (id) =>
+                              STYLE_OPTIONS.find((style) => style.id === id)
+                                ?.label,
+                          )
+                          .join(" · ")
+                      : "Sin estilos seleccionados"}
+                  </Text>
+                  <Button
+                    secondary
+                    label="Editar preferencias"
+                    onPress={() => {
+                      update((current) => ({
+                        ...current,
+                        onboarding: { step: 0 },
+                      }));
+                      setPersonalizing(true);
+                    }}
+                  />
+                </View>
+                <AppearanceSettings
+                  value={data.appearance}
+                  onChange={(appearance) =>
+                    update((current) => ({ ...current, appearance }))
+                  }
+                />
+                <View style={[s.panel, { marginTop: 18 }]}>
+                  <Text style={styles.sectionTitle}>Colores favoritos</Text>
+                  <Text style={[s.subtitle, { marginBottom: 17, fontSize: 12 }]}>
+                    Tienen prioridad en las sugerencias.
+                  </Text>
+                  <View style={s.wrap}>
+                    {COLOR_OPTIONS.map((color) => (
+                      <Chip
+                        key={color}
+                        swatch={colorHex[color]}
+                        label={colorLabels[color]}
+                        selected={data.preferences.preferredColors.includes(
+                          color,
+                        )}
+                        onPress={() =>
+                          update((current) => ({
+                            ...current,
+                            preferences: {
+                              ...current.preferences,
+                              preferredColors: toggle(
+                                current.preferences.preferredColors,
+                                color,
+                              ),
+                              excludedColors:
+                                current.preferences.excludedColors.filter(
+                                  (value) => value !== color,
+                                ),
+                            },
+                          }))
+                        }
+                      />
+                    ))}
+                  </View>
+                  <View style={s.divider} />
+                  <Text style={styles.sectionTitle}>Colores a evitar</Text>
+                  <Text style={[s.subtitle, { marginBottom: 17, fontSize: 12 }]}>
+                    Se excluyen de las sugerencias.
+                  </Text>
+                  <View style={s.wrap}>
+                    {COLOR_OPTIONS.map((color) => (
+                      <Chip
+                        key={color}
+                        swatch={colorHex[color]}
+                        label={colorLabels[color]}
+                        selected={data.preferences.excludedColors.includes(color)}
+                        onPress={() =>
+                          update((current) => ({
+                            ...current,
+                            preferences: {
+                              ...current.preferences,
+                              excludedColors: toggle(
+                                current.preferences.excludedColors,
+                                color,
+                              ),
+                              preferredColors:
+                                current.preferences.preferredColors.filter(
+                                  (value) => value !== color,
+                                ),
+                            },
+                          }))
+                        }
+                      />
+                    ))}
+                  </View>
+                </View>
+                <View style={[s.panel, { marginTop: 18 }]}>
+                  <Text style={styles.sectionTitle}>Repetición de prendas</Text>
+                  <Text style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}>
+                    Tiempo entre usos. Puede repetirse una prenda si faltan
+                    opciones.
+                  </Text>
+                  <View style={s.wrap}>
+                    {[0, 3, 7, 14].map((days) => (
+                      <Chip
+                        key={days}
+                        label={days ? `${days} días` : "Sin rotación"}
+                        selected={data.preferences.rotationDays === days}
+                        onPress={() =>
+                          update((current) => ({
+                            ...current,
+                            preferences: {
+                              ...current.preferences,
+                              rotationDays: days,
+                            },
+                          }))
+                        }
+                      />
+                    ))}
+                  </View>
+                </View>
+                <View
+                  style={[
+                    s.row,
+                    {
+                      justifyContent: "space-between",
+                      marginTop: 32,
+                      marginBottom: 15,
+                    },
+                  ]}
+                >
+                  <Text style={styles.sectionTitle}>Guardados</Text>
+                  <Text style={s.subtitle}>{data.savedOutfits.length}</Text>
+                </View>
+                {data.savedOutfits.length ? (
+                  data.savedOutfits.map((outfit) => (
+                    <Pressable
+                      key={outfit.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Ver conjunto guardado: ${outfit.items.map((item) => item.name).join(", ")}`}
+                      onPress={() => setSelectedOutfit(outfit)}
+                      style={styles.savedRow}
+                    >
+                      <View style={s.row}>
+                        {outfit.items.slice(0, 3).map((item) => (
+                          <Garment key={item.id} item={item} size={55} />
+                        ))}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: palette.ink, fontSize: 13 }}>
+                          {outfit.id.startsWith("manual-")
+                            ? "Creado por ti"
+                            : "Conjunto guardado"}
+                        </Text>
+                        <Text style={[s.subtitle, { fontSize: 11 }]}>
+                          {outfit.items.length} prendas · Ver conjunto ↗
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ))
+                ) : (
+                  <Text style={s.subtitle}>No hay conjuntos guardados.</Text>
+                )}
+                <View
+                  style={[
+                    s.panel,
+                    { marginTop: 26, backgroundColor: palette.wash },
+                  ]}
+                >
+                  <Text style={styles.sectionTitle}>Almacenamiento</Text>
+                  <Text style={[s.subtitle, { fontSize: 12 }]}>
+                    Los datos y fotos se guardan en este dispositivo. Borrar sus
+                    datos o desinstalar la app puede eliminarlos. Sin respaldo en
+                    la nube. Al analizar una foto, se envía a OpenAI para proponer
+                    sus atributos.
+                  </Text>
+                  <Text style={[s.subtitle, { fontSize: 12, marginTop: 10 }]}>
+                    {data.wearHistory.length}{" "}
+                    {data.wearHistory.length === 1
+                      ? "uso registrado"
+                      : "usos registrados"}{" "}
+                    · {data.items.filter((item) => !item.isDemo).length} prendas
+                    propias
+                  </Text>
+                </View>
+              </>
+            ) : null}
+          </MotionIn>
+        </ScrollView>
+        {/* Floats over the content so showing or hiding it never moves the buttons under a tap. */}
+        {notice ? (
+          <Pressable
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            accessibilityHint="Toca para cerrar"
+            onPress={() => setNotice("")}
+            style={styles.notice}
+          >
+            <Text style={{ color: palette.ink, fontSize: 13, lineHeight: 19 }}>
+              {notice}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
       <SafeAreaView edges={["bottom"]} style={styles.tabBar}>
         <View style={styles.tabInner}>
           {(
@@ -1446,10 +1451,21 @@ const createStyles = (palette: Palette) =>
       bottom: 4,
     },
     notice: {
+      position: "absolute",
+      left: 16,
+      right: 16,
+      bottom: 12,
       backgroundColor: palette.wash,
-      padding: 15,
-      borderBottomWidth: 1,
+      paddingVertical: 13,
+      paddingHorizontal: 16,
+      borderRadius: 14,
+      borderWidth: 1,
       borderColor: palette.line,
+      shadowColor: "#000",
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
     },
     error: {
       backgroundColor: palette.errorBg,
