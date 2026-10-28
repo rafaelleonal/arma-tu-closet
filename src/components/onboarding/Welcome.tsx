@@ -2,10 +2,10 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { seedWardrobe } from '../../domain';
-import { WelcomeRail } from '../ClosetRail';
 import { MotionIn } from '../Feedback';
 import { Button, useUI } from '../ui';
 import { OnboardingLogo } from './OnboardingChrome';
+import { WelcomeRail } from './WelcomeRail';
 
 const RAIL_IDS = [
   'demo2-tee-gray',

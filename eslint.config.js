@@ -56,15 +56,15 @@ module.exports = defineConfig([
     files: ['App.tsx', 'src/components/**', 'src/screens/**', 'src/hooks/**'],
     rules: {
       'max-lines': [
-        'warn',
+        'error',
         { max: 300, skipBlankLines: true, skipComments: true },
       ],
       'max-lines-per-function': [
-        'warn',
+        'error',
         { max: 200, skipBlankLines: true, skipComments: true },
       ],
-      complexity: ['warn', 15],
-      'max-depth': ['warn', 4],
+      complexity: ['error', 15],
+      'max-depth': ['error', 4],
       'react/no-unstable-nested-components': 'error',
     },
   },

@@ -164,41 +164,15 @@ export function CityPicker({
       ) : null}
       {searchOpen ? (
         <View style={{ marginTop: deviceLocationSupported ? 16 : 0 }}>
-          <TextInput
-            accessibilityLabel="Buscar ciudad"
-            placeholder="Nombre de la ciudad"
-            placeholderTextColor={palette.muted}
-            value={query}
-            onChangeText={resetSearch}
-            maxLength={100}
-            returnKeyType="search"
-            style={s.input}
-            onSubmitEditing={() => {
-              if (query.trim().length >= 2) void search();
-            }}
+          <CitySearch
+            query={query}
+            onQuery={resetSearch}
+            searching={searching}
+            searched={searched}
+            results={results}
+            onSearch={() => void search()}
+            onChoose={choose}
           />
-          <Button
-            secondary
-            label={searching ? 'Buscando…' : 'Buscar ciudad'}
-            disabled={searching || query.trim().length < 2}
-            onPress={() => void search()}
-            style={{ marginTop: 12 }}
-          />
-          <View style={{ gap: 8, marginTop: results.length ? 12 : 0 }}>
-            {results.map((place) => (
-              <Button
-                key={place.id}
-                secondary
-                label={placeLabel(place)}
-                onPress={() => choose(place)}
-              />
-            ))}
-          </View>
-          {searched && !results.length ? (
-            <Text style={[s.subtitle, { marginTop: 12 }]}>
-              No encontramos esa ciudad. Prueba otro nombre.
-            </Text>
-          ) : null}
         </View>
       ) : (
         <Pressable
@@ -218,6 +192,65 @@ export function CityPicker({
         </Pressable>
       )}
     </View>
+  );
+}
+
+function CitySearch({
+  query,
+  onQuery,
+  searching,
+  searched,
+  results,
+  onSearch,
+  onChoose,
+}: {
+  query: string;
+  onQuery: (text: string) => void;
+  searching: boolean;
+  searched: boolean;
+  results: WeatherLocation[];
+  onSearch: () => void;
+  onChoose: (place: WeatherLocation) => void;
+}) {
+  const { palette, s } = useUI();
+  return (
+    <>
+      <TextInput
+        accessibilityLabel="Buscar ciudad"
+        placeholder="Nombre de la ciudad"
+        placeholderTextColor={palette.muted}
+        value={query}
+        onChangeText={onQuery}
+        maxLength={100}
+        returnKeyType="search"
+        style={s.input}
+        onSubmitEditing={() => {
+          if (query.trim().length >= 2) onSearch();
+        }}
+      />
+      <Button
+        secondary
+        label={searching ? 'Buscando…' : 'Buscar ciudad'}
+        disabled={searching || query.trim().length < 2}
+        onPress={onSearch}
+        style={{ marginTop: 12 }}
+      />
+      <View style={{ gap: 8, marginTop: results.length ? 12 : 0 }}>
+        {results.map((place) => (
+          <Button
+            key={place.id}
+            secondary
+            label={placeLabel(place)}
+            onPress={() => onChoose(place)}
+          />
+        ))}
+      </View>
+      {searched && !results.length ? (
+        <Text style={[s.subtitle, { marginTop: 12 }]}>
+          No encontramos esa ciudad. Prueba otro nombre.
+        </Text>
+      ) : null}
+    </>
   );
 }
 
