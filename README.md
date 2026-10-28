@@ -12,7 +12,8 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 - Agregar prendas con lo esencial (categoría y colores; foto y nombre opcionales) y ajustar en **Más detalles** ocasiones, abrigo, lluvia y estilos. Editar también la disponibilidad.
 - Obtener hasta tres sugerencias con clima automático de Open-Meteo o clima manual, y la ocasión elegida; cambiar una prenda o pedir otra combinación.
 - Armar conjuntos por categorías, guardarlos y registrar cuándo los usaste. Guardar y usar son acciones distintas.
-- Ver **Mi clóset** como un perchero: las prendas cuelgan de perfil en un tubo y la que tocas gira de frente; calzado y accesorios van en una repisa.
+- Ver tu ropa en **Mi clóset** como cuadrícula de fotos; el clóset de ejemplo y la bienvenida usan un perchero donde la prenda elegida gira de frente.
+- En iOS 17+ con la build de desarrollo, **Quitar fondo** recorta la foto de una prenda en el teléfono y conserva la original ([ADR-006](docs/adr/0006-recorte-de-fondo-en-dispositivo.md)).
 - Conservar el clóset, preferencias, fotos y uso en el dispositivo. Puedes empezar con ropa propia o elegir una demo identificada como ejemplo, con fotos de prendas recortadas ([créditos](assets/demo/README.md)).
 
 Las ilustraciones son dibujos genéricos. Puedes analizar una foto con IA para proponer nombre, categoría y colores: revisas y confirmas la propuesta antes de incorporarla al formulario, y guardas la prenda por separado. Los demás atributos siguen siendo manuales.
@@ -55,6 +56,18 @@ pnpm web
 El servidor escucha en `127.0.0.1:8787`. En navegador local no hace falta `.env`; [.env.example](.env.example) permite indicar `EXPO_PUBLIC_AI_API_URL`. Nunca coloques una clave en una variable `EXPO_PUBLIC_`. En un dispositivo físico, `127.0.0.1` es el propio teléfono: esta versión requiere un reenvío local de puerto; no está preparada para exponer el servidor públicamente. Detalles y límites en [integraciones](docs/integraciones.md).
 
 En **Agregar prenda**, elige una foto y pulsa **Analizar foto**. La imagen solo sale del dispositivo tras esa acción. Revisa, corrige y confirma los atributos propuestos; después guarda la prenda. El alta manual sigue disponible si no hay servidor, clave o conexión.
+
+## Build de desarrollo (iOS)
+
+Expo Go no incluye el módulo de recorte. Para probar **Quitar fondo** se necesitan Xcode y CocoaPods (por ejemplo `brew install cocoapods`):
+
+```bash
+npx expo run:ios
+```
+
+El comando genera `ios/` (no se versiona), compila e instala la app en el simulador o teléfono. En Expo Go, web y Android el resto de la app funciona y el botón no aparece.
+
+En el simulador el botón aparece, pero Vision no puede ejecutar el recorte y la app muestra «No pudimos quitar el fondo de esta foto.». El recorte se prueba en un iPhone con iOS 17 o posterior. Si arrancas Metro aparte (`npx expo start --dev-client`), no uses `CI=1`: desactiva la vigilancia de archivos y la app recibe código viejo.
 
 ## Por qué está construido así
 

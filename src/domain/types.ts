@@ -30,6 +30,8 @@ export interface WardrobeItem {
   lastWornAt?: string;
   wearCount?: number;
   photoUri?: string;
+  /** Optional in v3: background-free PNG made on the device from photoUri; the original photo is kept. */
+  cutoutUri?: string;
   isDemo?: boolean;
   /** Optional explicit labels; legacy garments stay untagged. */
   styleIds?: StyleId[];

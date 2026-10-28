@@ -217,3 +217,16 @@ Mi clóset dejó la cuadrícula de tarjetas por un perchero (`src/components/Clo
 Sin verificar: VoiceOver sobre el perchero, rendimiento con muchas prendas (no está virtualizado), Android y fotos propias con fondo en el perchero.
 
 Actualización del mismo día: el perchero quedó solo para la bienvenida y el clóset de ejemplo; la ropa propia usa `ClosetGrid` (cuadrícula de fotos). Se probó y descartó un «look en el gancho» en Hoy; Hoy conserva las tarjetas. Typecheck 0 errores y 79/79 tests. Verificado después: en el simulador iPhone 15 Pro, al agregar una prenda propia sin foto Mi clóset cambia a la cuadrícula (filtros con conteo; las fotos de ejemplo se ven en sus cuadros). En web, desde un origen sin datos (`192.168.68.102:8093`), la bienvenida con el perchero animado quedaba en blanco porque `Image.resolveAssetSource` no existe en react-native-web; se corrigió en `demoPhotos.ts` y ahora las prendas giran de frente una tras otra. Sin verificar: VoiceOver sobre el perchero y la cuadrícula, Android, fotos propias reales en la cuadrícula.
+
+## 28/10/2026 — Quitar fondo en el dispositivo y build de desarrollo
+
+Se añadió el módulo local `modules/subject-cutout` (Apple Vision, iOS 17+), el campo opcional `cutoutUri` y la build de desarrollo (`expo-dev-client`, `npx expo run:ios`); decisión en [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md). El documento sigue en versión 3, sin migración.
+
+- Herramientas: CocoaPods 1.17 instalado con Homebrew (el Ruby del sistema fallaba al cargar `activesupport`) y plataforma iOS 26.5 descargada para Xcode 26.6.
+- `pnpm test`: 80/80, con un test nuevo: el recorte es opcional, conserva la foto original y se rechaza sin ella. `pnpm typecheck`: 0 errores.
+- `npx expo run:ios`: compila e instala en los simuladores iPhone 15 Pro (iOS 17.0) y iPhone 17 Pro (iOS 26.5). La bienvenida con el perchero, el onboarding y el clóset de ejemplo funcionan en la build.
+- Agregar prenda con una foto de ejemplo de Unsplash (chamarra de mezclilla con fondo negro): aparece **Quitar fondo**, así que el módulo nativo se detecta. Al pulsarlo, Vision responde «Could not create inference context» (código 9) en ambos simuladores, también forzando la CPU. La app conserva la foto original y muestra «No pudimos quitar el fondo de esta foto.». Antes mostraba el error de Vision en inglés con el prefijo de Expo.
+- Hallazgo de QA: Metro iniciado con `CI=1` no vigila archivos y sirve un bundle viejo a la app; se documentó en el README.
+- Hallazgo de UX, sin corregir: al desaparecer el aviso superior («Preferencias guardadas»), el contenido de Mi clóset sube unos 50 pt; un toque en **Agregar prenda** en ese momento cayó dos veces en **Usar clóset de ejemplo**.
+
+Sin verificar: el recorte real en un iPhone (calidad, tiempo y memoria), **Usar original** y guardar con recorte, la cuadrícula con un recorte, VoiceOver en los nuevos botones, Android (sin implementación) y la limpieza de recortes sin referencia.

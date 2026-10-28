@@ -105,6 +105,18 @@ test('v3 stores partial onboarding, styles and appearance through a semantic rou
   assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
 });
 
+test('a cutout is optional, keeps its original photo and is rejected without one', () => {
+  const data = fixture();
+  data.items[0] = { ...data.items[0], photoUri: 'file:///wardrobe/a.jpg', cutoutUri: 'file:///wardrobe/cutout-a.png' };
+  assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
+  const orphan = fixture();
+  orphan.items[0] = { ...orphan.items[0], cutoutUri: 'file:///wardrobe/cutout-a.png' };
+  assert.equal(isLocalData(orphan), false);
+  const blank = fixture();
+  blank.items[0] = { ...blank.items[0], photoUri: 'file:///wardrobe/a.jpg', cutoutUri: ' ' };
+  assert.equal(isLocalData(blank), false);
+});
+
 test('styles and themes added after v3 stay valid in the same document version', () => {
   const data = fixture();
   data.profile = { name: '', styleIds: ['girly', 'feminine', 'minimal'] };

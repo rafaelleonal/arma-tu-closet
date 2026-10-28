@@ -22,7 +22,9 @@ export function ClosetGrid({ items, onEdit }: { items: WardrobeItem[]; onEdit: (
     <View onLayout={event => setWidth(event.nativeEvent.layout.width)} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: GAP }}>
       {tile ? visible.map(item => <Pressable key={item.id} accessibilityRole="button" accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}`} onPress={() => onEdit(item)} style={({ pressed }) => ({ width: tile, opacity: pressed ? .75 : 1 })}>
         <View style={{ width: tile, height: tile, borderRadius: 14, overflow: 'hidden', backgroundColor: palette.wash, alignItems: 'center', justifyContent: 'center' }}>
-          {item.photoUri
+          {item.cutoutUri
+            ? <Image accessible={false} source={{ uri: item.cutoutUri }} style={{ width: tile * .84, height: tile * .84, opacity: item.available ? 1 : .45 }} resizeMode="contain"/>
+            : item.photoUri
             ? <Image accessible={false} source={{ uri: item.photoUri }} style={{ width: tile, height: tile, opacity: item.available ? 1 : .45 }} resizeMode="cover"/>
             : <View style={{ opacity: item.available ? 1 : .45 }}><Garment item={item} size={Math.round(tile * .62)}/></View>}
           {!item.available ? <Text style={{ position: 'absolute', bottom: 6, left: 6, fontSize: 10, color: palette.ink, backgroundColor: palette.floating, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' }}>Lavandería</Text> : null}

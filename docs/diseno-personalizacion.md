@@ -62,6 +62,8 @@ El perchero solo se usa en la bienvenida (prendas de ejemplo girando una tras ot
 
 Lo esencial va primero: foto opcional, categoría y colores. El nombre es opcional; si queda vacío se guarda «Categoría · color» (p. ej. «Capa exterior · café»), con separador para no forzar concordancia de género. Una prenda nueva empieza sin color para no guardar «Negro» por accidente.
 
+Con una foto elegida, en iOS 17+ con la build de desarrollo aparece **Quitar fondo** (se hace en el teléfono; la foto no se envía). El resultado se ve en la vista previa; **Usar original** lo descarta. La cuadrícula, Hoy y el perchero prefieren el recorte. [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md).
+
 Ocasiones, abrigo, lluvia y estilos quedan en **Más detalles**, plegado y con un resumen de los valores actuales. El abrigo inicial depende de la categoría hasta que la persona elige uno. **Disponible** solo aparece al editar: una prenda nueva se agrega disponible y el clóset ya permite cambiarlo. No se añaden campos que el recomendador no use (marca, talla, material); cada uno es fricción sin efecto en las sugerencias.
 
 ## Texto e ilustraciones

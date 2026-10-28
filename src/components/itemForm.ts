@@ -22,5 +22,5 @@ export function defaultWarmth(category: Category): WardrobeItem['warmth'] {
 
 /** Compare editable values; usage counters and the order of tags are not edits. */
 export function itemFormFingerprint(item: WardrobeItem): string {
-  return JSON.stringify([item.name.trim(), item.category, [...item.colors].sort(), [...item.occasions].sort(), [...(item.styleIds ?? [])].sort(), item.warmth, item.rainReady, item.available, item.photoUri ?? null]);
+  return JSON.stringify([item.name.trim(), item.category, [...item.colors].sort(), [...item.occasions].sort(), [...(item.styleIds ?? [])].sort(), item.warmth, item.rainReady, item.available, item.photoUri ?? null, item.cutoutUri ?? null]);
 }

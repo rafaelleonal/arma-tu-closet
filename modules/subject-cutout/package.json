@@ -1,0 +1,10 @@
+{
+  "name": "subject-cutout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local Expo module: removes a photo's background on the device with Apple Vision.",
+  "license": "UNLICENSED",
+  "author": "Arma tu outfit",
+  "homepage": "https://github.com/",
+  "main": "index.ts"
+}

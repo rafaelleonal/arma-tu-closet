@@ -12,6 +12,7 @@ import { MAX_IMAGE_BYTES, type GarmentSuggestion } from '../ai/contracts';
 import { useFeedback } from './Feedback';
 import { defaultWarmth, itemFormErrors, itemFormFingerprint, suggestedItemName } from './itemForm';
 import { GarmentSuggestionReview } from './GarmentSuggestionReview';
+import { isSubjectCutoutAvailable, removeBackground } from '../../modules/subject-cutout';
 
 const warmthLabels = ['Muy ligera', 'Ligera', 'Abrigadora', 'Muy abrigadora'] as const;
 
@@ -37,6 +38,9 @@ export function ItemEditor({ item, onSave, onClose }: { item?: WardrobeItem; onS
   const [rainReady, setRainReady] = useState(item?.rainReady || false);
   const [available, setAvailable] = useState(item?.available ?? true);
   const [photoUri, setPhotoUri] = useState(item?.photoUri);
+  const [cutoutUri, setCutoutUri] = useState(item?.cutoutUri);
+  const [cutting, setCutting] = useState(false);
+  const cutoutSupported = useRef(isSubjectCutoutAvailable()).current;
   const [photoError, setPhotoError] = useState('');
   const [busy, setBusy] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -71,6 +75,19 @@ export function ItemEditor({ item, onSave, onClose }: { item?: WardrobeItem; onS
     if (errors.occasions) { setDetailsOpen(true); scroll.current?.scrollTo({ y: fieldY.current.details, animated: !reduceMotion }); return; }
     cancelAnalysis(); onSave(draft);
   }
+  async function cutBackground() {
+    if (!photoUri) return;
+    const job = photoJob.current;
+    setCutting(true); setPhotoError('');
+    try {
+      const result = await removeBackground(photoUri);
+      if (active.current && job === photoJob.current) setCutoutUri(result.uri);
+    } catch (failure) {
+      if (active.current && job === photoJob.current) setPhotoError(failure instanceof Error ? failure.message : 'No pudimos quitar el fondo. Puedes usar la foto original.');
+    } finally {
+      if (active.current) setCutting(false);
+    }
+  }
   async function analyzePhoto() {
     if (!photoUri) return;
     cancelAnalysis();
@@ -89,7 +106,7 @@ export function ItemEditor({ item, onSave, onClose }: { item?: WardrobeItem; onS
       if (active.current && job === analysisJob.current) { setAnalyzing(false); controller.current = null; }
     }
   }
-  const draft: WardrobeItem = { ...item, id: id.current, name: name.trim() || suggestedItemName(category, colors), category, colors, occasions, styleIds, warmth, rainReady, available, photoUri, isDemo: item?.isDemo || false };
+  const draft: WardrobeItem = { ...item, id: id.current, name: name.trim() || suggestedItemName(category, colors), category, colors, occasions, styleIds, warmth, rainReady, available, photoUri, cutoutUri: photoUri ? cutoutUri : undefined, isDemo: item?.isDemo || false };
   const initialFingerprint = useRef(itemFormFingerprint(draft));
   const errors = itemFormErrors(draft);
   const detailsSummary = [occasions.map(value => occasionLabels[value]).join(', ') || 'Sin ocasión', warmthLabels[warmth], rainReady ? 'Para lluvia' : '', styleIds.length ? `${styleIds.length} ${styleIds.length === 1 ? 'estilo' : 'estilos'}` : ''].filter(Boolean).join(' · ');
@@ -111,7 +128,7 @@ export function ItemEditor({ item, onSave, onClose }: { item?: WardrobeItem; onS
       if (result.canceled) return;
       const asset = result.assets[0];
       const persisted = await persistPhoto(asset.uri, asset.base64, asset.mimeType);
-      if (active.current && job === photoJob.current) setPhotoUri(persisted);
+      if (active.current && job === photoJob.current) { setPhotoUri(persisted); setCutoutUri(undefined); }
     } catch { if (active.current && job === photoJob.current) setPhotoError('No pudimos guardar la foto. Revisa el permiso o usa una imagen más pequeña; también puedes continuar sin foto.'); }
     finally { if (active.current && job === photoJob.current) setBusy(false); }
   }
@@ -123,7 +140,11 @@ export function ItemEditor({ item, onSave, onClose }: { item?: WardrobeItem; onS
     {photoError ? <Text accessibilityRole="alert" style={{ color: palette.rust, fontSize: 12, lineHeight: 19, marginTop: 12 }}>{photoError}</Text> : null}
     {permissionBlocked && Platform.OS !== 'web' ? <Button secondary small label="Abrir Ajustes" style={{ marginTop: 8 }} onPress={() => void Linking.openSettings().catch(() => setPhotoError('Abre Ajustes y activa Cámara para esta app.'))}/> : null}
     {photoUri ? <>
-      <Button secondary small label="Quitar foto" onPress={() => { cancelAnalysis(); photoJob.current++; setPhotoUri(undefined); setBusy(false); }} style={{ marginTop: 8 }}/>
+      <Button secondary small label="Quitar foto" onPress={() => { cancelAnalysis(); photoJob.current++; setPhotoUri(undefined); setCutoutUri(undefined); setBusy(false); }} style={{ marginTop: 8 }}/>
+      {cutoutSupported ? <View style={{ marginTop: 14 }}>
+        {cutoutUri ? <View style={[s.row, { justifyContent: 'space-between' }]}><Text style={[s.subtitle, { fontSize: 12, flex: 1 }]}>Se mostrará sin fondo. La foto original se conserva.</Text><Button secondary small label="Usar original" onPress={() => setCutoutUri(undefined)}/></View>
+          : <><Button secondary small label={cutting ? 'Quitando fondo…' : 'Quitar fondo'} disabled={cutting || busy} onPress={() => void cutBackground()}/><Text style={[s.subtitle, { fontSize: 11, marginTop: 6 }]}>Se hace en este teléfono; la foto no se envía.</Text></>}
+      </View> : null}
       <View style={{ marginTop: 18 }}><Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>Se enviará esta foto a OpenAI para proponer nombre, categoría y colores. Es opcional; puedes completar los datos a mano.</Text><Button secondary label={analyzing ? 'Analizando…' : analysisError ? 'Reintentar análisis' : suggestion ? 'Analizar de nuevo' : 'Analizar foto'} disabled={busy || analyzing} onPress={() => void analyzePhoto()}/>{analyzing ? <><Text accessibilityLiveRegion="polite" style={[s.subtitle, { fontSize: 11, marginTop: 10 }]}>Puedes seguir editando a mano. El análisis no cambiará el formulario.</Text><Button secondary small label="Cancelar análisis" onPress={cancelAnalysis} style={{ marginTop: 8 }}/></> : null}{analysisError ? <Text accessibilityRole="alert" style={{ color: palette.rust, fontSize: 12, lineHeight: 19, marginTop: 12 }}>{analysisError}</Text> : null}{analysisNotice ? <Text accessibilityLiveRegion="polite" style={[s.subtitle, { fontSize: 12, marginTop: 12 }]}>{analysisNotice}</Text> : null}</View>
       {suggestion ? <GarmentSuggestionReview suggestion={suggestion} onDismiss={cancelAnalysis} onApply={confirmed => { setName(confirmed.name); chooseCategory(confirmed.category); setColors([...confirmed.colors]); setSuggestion(null); setAnalysisNotice('Datos aplicados. Revisa los demás campos y guarda la prenda.'); }}/>: null}
     </> : null}

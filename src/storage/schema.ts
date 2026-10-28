@@ -63,6 +63,7 @@ function wardrobeItem(value: unknown): value is WardrobeItem {
     && (value.lastWornAt === undefined || date(value.lastWornAt))
     && (value.wearCount === undefined || finite(value.wearCount) && Number.isInteger(value.wearCount) && value.wearCount >= 0)
     && (value.photoUri === undefined || nonempty(value.photoUri))
+    && (value.cutoutUri === undefined || nonempty(value.cutoutUri) && nonempty(value.photoUri))
     && (value.isDemo === undefined || typeof value.isDemo === 'boolean')
     && (value.styleIds === undefined || styles(value.styleIds));
 }

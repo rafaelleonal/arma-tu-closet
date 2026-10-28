@@ -9,6 +9,7 @@ Estos ADRs documentan las decisiones estructurales ya implementadas en el protot
 | [003](0003-recomendador-local.md) | Recomendador local determinista con contexto explícito | Aceptada para el prototipo |
 | [004](0004-servicios-externos-opcionales.md) | Clima automático y análisis opcional con confirmación | Aceptada para el prototipo local; «No pedir GPS» sustituido por ADR-005 |
 | [005](0005-ubicacion-para-elegir-ciudad.md) | Ubicación aproximada, solo al pulsar, para elegir la ciudad del clima | Aceptada para el prototipo local |
+| [006](0006-recorte-de-fondo-en-dispositivo.md) | Recorte de fondo en el dispositivo con un módulo local y build de desarrollo | Aceptada para el prototipo local (iOS) |
 
 ## Cuándo crear un ADR
 

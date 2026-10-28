@@ -13,7 +13,7 @@ export const ROD_TOP = 16;
 const MAX_WIDTH = 210;
 
 export function sourceFor(item: WardrobeItem): ImageSourcePropType | undefined {
-  return item.photoUri ? { uri: item.photoUri } : demoPhotoFor(item);
+  return item.cutoutUri ? { uri: item.cutoutUri } : item.photoUri ? { uri: item.photoUri } : demoPhotoFor(item);
 }
 
 /** Width for a garment drawn at `height`; user photos load asynchronously, so they assume a portrait ratio. */

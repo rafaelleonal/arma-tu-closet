@@ -43,7 +43,9 @@ export function Garment({ item, size = 100 }: { item: WardrobeItem; size?: numbe
   const colors = item.colors.map(color => colorLabels[color] || color).join(', ');
   const demoPhoto = item.photoUri ? undefined : demoPhotoFor(item);
   return <View accessible accessibilityLabel={`${item.photoUri ? 'Foto' : demoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`} style={styles.art}>
-    {item.photoUri
+    {item.cutoutUri
+      ? <Image accessible={false} source={{ uri: item.cutoutUri }} style={{ width: size, height: size }} resizeMode="contain"/>
+      : item.photoUri
       ? <Image accessible={false} source={{ uri: item.photoUri }} style={{ width: size, height: size, borderRadius: 10, backgroundColor: palette.art }} resizeMode="contain"/>
       : demoPhoto ? <Image accessible={false} source={demoPhoto} style={{ width: size, height: size }} resizeMode="contain"/>
       : <GarmentIllustration kind={illustrationFor(item)} size={size} ink={palette.green}/>}
