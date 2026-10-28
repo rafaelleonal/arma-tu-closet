@@ -124,7 +124,7 @@ export function nearestLocation(
  * exist in the geocoder in their short form, so the part before « de »/« del » is tried after the full name.
  */
 export function placeSearchTerms(
-  names: Array<string | null | undefined>,
+  names: (string | null | undefined)[],
   limit = 4,
 ): string[] {
   const terms: string[] = [];

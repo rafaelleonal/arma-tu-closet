@@ -69,7 +69,7 @@ export function ItemEditor({
   const { reduceMotion } = useFeedback();
   const scroll = useRef<ScrollViewInstance>(null);
   const fieldY = useRef({ colors: 0, details: 0 });
-  const id = useRef(item?.id || `item-${Date.now()}`);
+  const [id] = useState(() => item?.id || `item-${Date.now()}`);
   const [submitted, setSubmitted] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
   const [permissionBlocked, setPermissionBlocked] = useState(false);
@@ -92,7 +92,7 @@ export function ItemEditor({
   const [photoUri, setPhotoUri] = useState(item?.photoUri);
   const [cutoutUri, setCutoutUri] = useState(item?.cutoutUri);
   const [cutting, setCutting] = useState(false);
-  const cutoutSupported = useRef(isSubjectCutoutAvailable()).current;
+  const [cutoutSupported] = useState(isSubjectCutoutAvailable);
   const [photoError, setPhotoError] = useState('');
   const [busy, setBusy] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -106,9 +106,8 @@ export function ItemEditor({
   useEffect(() => {
     active.current = true;
     return () => {
+      // Pending jobs check `active` before touching state.
       active.current = false;
-      analysisJob.current++;
-      photoJob.current++;
       controller.current?.abort();
     };
   }, []);
@@ -217,7 +216,7 @@ export function ItemEditor({
   }
   const draft: WardrobeItem = {
     ...item,
-    id: id.current,
+    id,
     name: name.trim() || suggestedItemName(category, colors),
     category,
     colors,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -187,7 +187,7 @@ export function HangingGarment({
   onPress: () => void;
 }) {
   const { reduceMotion } = useFeedback();
-  const progress = useRef(new Animated.Value(position)).current;
+  const [progress] = useState(() => new Animated.Value(position));
   useEffect(() => {
     progress.stopAnimation();
     if (reduceMotion) {

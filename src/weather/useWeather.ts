@@ -9,7 +9,10 @@ export function useWeather(
   setData: React.Dispatch<React.SetStateAction<LocalData | null>>,
 ) {
   const latest = useRef(data);
-  latest.current = data;
+  // Declared before the refresh effect so it reads the data of this render.
+  useEffect(() => {
+    latest.current = data;
+  }, [data]);
   const request = useRef<AbortController | null>(null);
   const lastAttempt = useRef(0);
   const [loading, setLoading] = useState(false);
@@ -72,11 +75,9 @@ export function useWeather(
   );
 
   useEffect(() => {
-    request.current?.abort();
-    request.current = null;
     lastAttempt.current = 0;
-    setLoading(false);
-    setError('');
+    // First sync with the clock and Open-Meteo; the interval and AppState keep it current.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
     const timer = setInterval(() => void refresh(), 60_000);
     const listener = AppState.addEventListener('change', (state) => {
@@ -85,8 +86,11 @@ export function useWeather(
     return () => {
       clearInterval(timer);
       listener.remove();
+      // Reset here so a new city or mode starts without the previous request's state.
       request.current?.abort();
       request.current = null;
+      setLoading(false);
+      setError('');
     };
   }, [
     data?.onboarded,

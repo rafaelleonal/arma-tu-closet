@@ -27,11 +27,11 @@ export const STYLE_IDS = [
   'feminine',
 ] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
-export const STYLE_OPTIONS: ReadonlyArray<{
+export const STYLE_OPTIONS: readonly {
   id: StyleId;
   label: string;
   description: string;
-}> = [
+}[] = [
   {
     id: 'minimal',
     label: 'Minimal',

@@ -65,7 +65,7 @@ test('empty own wardrobe is valid and never replaced with demonstration garments
 });
 
 test('malformed nested data is rejected before the UI can hydrate it', () => {
-  const badCases: Array<(data: any) => void> = [
+  const badCases: ((data: any) => void)[] = [
     (data) => {
       data.version = 4;
     },

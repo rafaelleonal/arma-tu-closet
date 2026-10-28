@@ -18,11 +18,11 @@ export interface Palette {
   swatchBorder: string;
 }
 
-export const THEME_OPTIONS: Array<{
+export const THEME_OPTIONS: {
   id: ThemeId;
   name: string;
   description: string;
-}> = [
+}[] = [
   { id: 'linen', name: 'Lino', description: 'Cálido y natural' },
   { id: 'paper', name: 'Papel', description: 'Claro y esencial' },
   { id: 'midnight', name: 'Medianoche', description: 'Oscuro y sereno' },

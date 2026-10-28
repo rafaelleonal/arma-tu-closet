@@ -332,11 +332,8 @@ export function generateRecommendations(
     bases.flatMap((base) => shoes.map((shoe) => [...base, shoe])),
     context,
   ).slice(0, 96);
-  const layers: Array<WardrobeItem | undefined> = [
-    undefined,
-    ...pool('layer', 4),
-  ];
-  const accessories: Array<WardrobeItem | undefined> = [
+  const layers: (WardrobeItem | undefined)[] = [undefined, ...pool('layer', 4)];
+  const accessories: (WardrobeItem | undefined)[] = [
     undefined,
     ...pool('accessory', 2),
   ];

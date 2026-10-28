@@ -105,6 +105,7 @@ El dominio recibe prendas y contexto explícito; no depende de React, almacenami
 ```bash
 pnpm typecheck
 pnpm test
+pnpm lint
 pnpm format:check
 pnpm export:web
 # Para incluir los tres destinos:

@@ -33,7 +33,9 @@ export function FeedbackProvider({
   // Avoid moving content before the accessibility preference has loaded.
   const [reduceMotion, setReduceMotion] = useState(true);
   const enabledRef = useRef(enabled);
-  enabledRef.current = enabled;
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
   useEffect(() => {
     let active = true;
     let changed = false;
@@ -91,7 +93,7 @@ export function MotionPressable({
   ...props
 }: PressableProps) {
   const { reduceMotion } = useFeedback();
-  const scale = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
   useEffect(() => {
     scale.stopAnimation();
     scale.setValue(1);
@@ -147,7 +149,7 @@ export function MotionIn({
   children: React.ReactNode;
 }) {
   const { reduceMotion } = useFeedback();
-  const progress = useRef(new Animated.Value(1)).current;
+  const [progress] = useState(() => new Animated.Value(1));
   useEffect(() => {
     progress.stopAnimation();
     if (reduceMotion) {

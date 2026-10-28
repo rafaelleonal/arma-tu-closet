@@ -66,8 +66,7 @@ export default function App() {
   const [data, setData] = useState<LocalData | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [loadError, setLoadError] = useState('');
-  async function hydrate() {
-    setLoadError('');
+  async function load() {
     try {
       setData((await readLocalData()) || freshData());
       setHydrated(true);
@@ -77,8 +76,12 @@ export default function App() {
       );
     }
   }
+  async function hydrate() {
+    setLoadError('');
+    await load();
+  }
   useEffect(() => {
-    void hydrate();
+    void load();
   }, []);
   return (
     <SafeAreaProvider>
@@ -165,6 +168,9 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
       styleIds: data?.profile.styleIds ?? [],
       now: new Date().toISOString(),
     }),
+    // weather.effective is rebuilt on every render: data.weather and its source capture the
+    // changes that matter, and items/generation take a new `now` for rotation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       data?.context,
       data?.weather,
