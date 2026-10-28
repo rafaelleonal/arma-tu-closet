@@ -85,7 +85,9 @@ La personalización toma a Revolut como referencia y la claridad de la experienc
 ## Organización
 
 ```text
-App.tsx                 Pantallas principales, estado y coordinación
+App.tsx                 Proveedores y elección entre carga, onboarding y pestañas
+src/screens/            Hoy, Mi clóset, Mi estilo y las hojas que abren
+src/hooks/              Carga, guardado con avisos y sugerencias del día
 src/components/         Onboarding, formularios, conjuntos y controles
 src/domain/             Tipos y reglas puras de recomendaciones
 src/storage/            Esquema, migración, escritura local y fotos

@@ -13,7 +13,7 @@ Expo Go permite empezar a probar; una development build permite controlar el bin
 ## Límites del diseño
 
 - **Dominio:** tipos serializables y reglas puras en `src/domain`. Recibe prendas y contexto explícito; devuelve conjuntos, motivos y advertencias. No consulta red, UI ni almacenamiento.
-- **Aplicación:** las pantallas permiten cambiar el contexto, agregar prendas, elegir combinaciones y confirmar uso. Guardar un conjunto no cuenta como haberlo usado.
+- **Aplicación:** las pantallas permiten cambiar el contexto, agregar prendas, elegir combinaciones y confirmar uso. Guardar un conjunto no cuenta como haberlo usado. `App.tsx` solo elige entre carga, onboarding y pestañas; cada pestaña vive en `src/screens/`, y la carga, el guardado y las sugerencias en `src/hooks/`. Las pantallas reciben el documento y una función `update`; no hay estado global. ESLint comprueba estos límites y el tamaño de cada pieza ([ADR-007](adr/0007-estructura-del-front-y-reglas-de-lint.md)).
 - **Persistencia:** almacenamiento local con carga inicial antes de escribir. Una instalación nueva empieza sin prendas. Los datos de ejemplo se incorporan solo al elegir la demo; no deben reemplazar un clóset existente o vacío.
 - **Fotos:** se seleccionan con permisos del sistema. Las referencias temporales del selector requieren persistencia adecuada a la plataforma. Una acción explícita puede enviarlas al servidor local y a OpenAI para proponer nombre, categoría y colores. La persona revisa antes de aplicar y guarda por separado.
 - **Contexto:** temperatura y lluvia manuales o contexto derivado de Open-Meteo para la ciudad seleccionada. La caché caduca a las tres horas y el respaldo manual se conserva. Una estación del año no sustituye la temperatura real.

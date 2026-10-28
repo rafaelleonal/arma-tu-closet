@@ -42,7 +42,7 @@ pnpm export:web
 npx expo export --platform all
 ```
 
-El formato del código lo define Prettier ([.prettierrc.json](.prettierrc.json)): ejecuta `pnpm format` antes de entregar. Markdown y `assets/` quedan fuera para conservar su formato manual. `pnpm lint` usa ESLint con la configuración de Expo ([eslint.config.js](eslint.config.js)) y `eslint-config-prettier`, que apaga las reglas de estilo para no chocar con Prettier. Si desactivas una regla en una línea, deja un comentario con el motivo. No hay CI configurada. No reportes comprobaciones que no existen o que no ejecutaste. Si una prueba no puede ejecutarse, deja el motivo y el alcance sin verificar. Evita repetir todas las comprobaciones si no cambió código desde el último resultado pertinente.
+El formato del código lo define Prettier ([.prettierrc.json](.prettierrc.json)): ejecuta `pnpm format` antes de entregar. Markdown y `assets/` quedan fuera para conservar su formato manual. `pnpm lint` usa ESLint con la configuración de Expo ([eslint.config.js](eslint.config.js)) y `eslint-config-prettier`, que apaga las reglas de estilo para no chocar con Prettier. Además falla si un import cruza los límites de arquitectura o si un archivo del front supera 300 líneas, una función 200 o la complejidad 15 ([ADR-007](docs/adr/0007-estructura-del-front-y-reglas-de-lint.md)). Si desactivas una regla en una línea, deja un comentario con el motivo. No hay CI configurada. No reportes comprobaciones que no existen o que no ejecutaste. Si una prueba no puede ejecutarse, deja el motivo y el alcance sin verificar. Evita repetir todas las comprobaciones si no cambió código desde el último resultado pertinente.
 
 ## Recorrido manual de referencia
 

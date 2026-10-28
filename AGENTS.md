@@ -21,14 +21,17 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 |---|---|
 | `src/domain/` | Funciones puras, tipos serializables y contexto explícito. Sin React, red, permisos, almacenamiento ni reloj interno para puntuar. |
 | `src/storage/` | Validación, migración, escritura y persistencia de fotos por plataforma. |
-| `src/components/` y `App.tsx` | Interacción, estado de presentación y coordinación de acciones. Evita duplicar reglas de dominio. |
+| `App.tsx` | Proveedores y elección entre carga, onboarding y pestañas. |
+| `src/screens/` | Una pantalla por pestaña, las hojas que abren y las acciones sobre el documento local. |
+| `src/hooks/` | Carga, guardado con avisos y sugerencias del día. |
+| `src/components/` | Piezas de interfaz reutilizables; las que tienen varias partes usan una carpeta propia. Evita duplicar reglas de dominio. |
 | `src/weather/` y `src/ai/` | Adaptadores de red y validación. La IA solo devuelve propuestas; no guarda prendas. |
 | `server/` | Clave y llamada al proveedor; límites de origen, tamaño, tiempo y uso. Solo loopback en este prototipo. |
 | `src/theme/` | Roles de color de la interfaz. No decide preferencias de vestuario. |
 | `assets/garments/` | Ilustraciones incluidas en la app y registro de su generación. |
 | `assets/demo/` | Fotos recortadas del clóset de ejemplo, con autor, enlace y licencia de cada una. |
 
-Mantén la separación al extraer partes de `App.tsx`; no crees una nueva arquitectura completa para una corrección puntual.
+`pnpm lint` hace cumplir estos límites ([ADR-007](docs/adr/0007-estructura-del-front-y-reglas-de-lint.md)): los imports entre capas y, en el front, 300 líneas por archivo, 200 por función y complejidad 15. Si una pieza no cabe, divídela por responsabilidad en lugar de desactivar la regla; un `eslint-disable` lleva un comentario con el motivo. No crees una nueva arquitectura completa para una corrección puntual.
 
 ## Reglas que se deben conservar
 
