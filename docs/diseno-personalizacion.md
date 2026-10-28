@@ -52,6 +52,12 @@ La persona que ya tiene clóset abre «Mi estilo → Editar preferencias» y edi
 
 Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportación web no prueban reinicio nativo, cámara, contraste visual ni que la persona entienda sus elecciones. Para el piloto, observar si completa el flujo sin ayuda y puede explicar qué cambió; no medir éxito solo por finalizar cuatro pantallas.
 
+## Mi clóset como perchero
+
+Inspirado en el perchero del portafolio de Batch Merch (Inspora, «portfolio website»): fondo claro con puntos, un tubo cromado y prendas colgadas de canto. La prenda elegida gira de frente (`rotateY` con perspectiva, 320 ms, sin animación con Reducir movimiento) y debajo aparece su nombre, categoría, colores, «Ejemplo» si aplica, el interruptor de disponibilidad y **Editar prenda**. Arriba, capas, prendas completas y abajo cuelgan del tubo con un largo aproximado por categoría; calzado y accesorios van en una repisa.
+
+El perchero solo se usa en la bienvenida (prendas de ejemplo girando una tras otra) y mientras el clóset tiene únicamente prendas de ejemplo. En cuanto hay ropa propia, Mi clóset cambia a una cuadrícula de fotos cuadradas de 3 columnas con filtros por categoría, que admite fotos con cualquier fondo. El efecto del perchero depende de fotos sin fondo. El clóset de ejemplo usa fotos de Unsplash recortadas con Apple Vision ([créditos](../assets/demo/README.md)). Una prenda propia sin foto usa su dibujo con un gancho dibujado; una foto propia con fondo se ve, pero no tan limpia: recortarla en el teléfono requiere un módulo nativo y una build de desarrollo. El clóset vacío ofrece **Usar clóset de ejemplo** como elección explícita.
+
 ## Agregar prenda
 
 Lo esencial va primero: foto opcional, categoría y colores. El nombre es opcional; si queda vacío se guarda «Categoría · color» (p. ej. «Capa exterior · café»), con separador para no forzar concordancia de género. Una prenda nueva empieza sin color para no guardar «Negro» por accidente.

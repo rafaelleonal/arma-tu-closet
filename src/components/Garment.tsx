@@ -3,6 +3,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { colorLabels, type WardrobeItem } from '../domain';
 import { useTheme } from '../theme/ThemeProvider';
 import { colorHex } from './ui';
+import { demoPhotoFor } from './demoPhotos';
 
 const illustrations = {
   tee: require('../../assets/garments/tee.png'),
@@ -40,9 +41,11 @@ function illustrationFor(item: WardrobeItem): IllustrationKind {
 export function Garment({ item, size = 100 }: { item: WardrobeItem; size?: number }) {
   const { palette } = useTheme();
   const colors = item.colors.map(color => colorLabels[color] || color).join(', ');
-  return <View accessible accessibilityLabel={`${item.photoUri ? 'Foto' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`} style={styles.art}>
+  const demoPhoto = item.photoUri ? undefined : demoPhotoFor(item);
+  return <View accessible accessibilityLabel={`${item.photoUri ? 'Foto' : demoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`} style={styles.art}>
     {item.photoUri
       ? <Image accessible={false} source={{ uri: item.photoUri }} style={{ width: size, height: size, borderRadius: 10, backgroundColor: palette.art }} resizeMode="contain"/>
+      : demoPhoto ? <Image accessible={false} source={demoPhoto} style={{ width: size, height: size }} resizeMode="contain"/>
       : <GarmentIllustration kind={illustrationFor(item)} size={size} ink={palette.green}/>}
     {item.colors.length ? <View style={[styles.colors, { maxWidth: size }]}>{item.colors.map(color => <View key={color} style={[styles.swatch, { backgroundColor: colorHex[color] || palette.muted, borderColor: palette.swatchBorder }]}/>)}</View> : null}
   </View>;

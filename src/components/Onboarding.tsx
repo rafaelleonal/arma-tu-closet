@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLOR_OPTIONS, colorLabels, OCCASIONS, occasionLabels, STYLE_OPTIONS, type StyleId } from '../domain';
+import { COLOR_OPTIONS, colorLabels, OCCASIONS, occasionLabels, seedWardrobe, STYLE_OPTIONS, type StyleId } from '../domain';
 import type { LocalData } from '../storage/schema';
 import { MotionIn, useFeedback } from './Feedback';
 import { AppearanceSettings } from './AppearanceSettings';
 import { CityPicker } from './CityPicker';
-import { GarmentIllustration } from './Garment';
+import { WelcomeRail } from './ClosetRail';
 import { Button, Chip, colorHex, FieldLabel, useUI } from './ui';
 
 export type PersonalizationPatch = Partial<Pick<LocalData, 'profile' | 'preferences' | 'appearance' | 'context' | 'onboarding' | 'weather'>>;
@@ -52,9 +52,7 @@ export function Onboarding({ data, mode, onChange, onFinish, onClose }: Onboardi
     <View style={{ flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center', paddingHorizontal: 24, paddingTop: 10, paddingBottom: 18 }}>
       <Text style={{ fontSize: 37, lineHeight: 44, fontWeight: '700', letterSpacing: -4, color: palette.ink, paddingRight: 6, alignSelf: 'flex-start' }}>a.</Text>
       <View style={{ flex: 1, justifyContent: 'center' }}><MotionIn trigger="welcome">
-        <View accessible={false} style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end', backgroundColor: palette.art, borderRadius: 28, paddingVertical: 30, paddingHorizontal: 12 }}>
-          <GarmentIllustration kind="shirt" size={96} ink={palette.ink}/><GarmentIllustration kind="trousers" size={96} ink={palette.ink}/><GarmentIllustration kind="sneakers" size={80} ink={palette.ink}/>
-        </View>
+        <WelcomeRail items={seedWardrobe.filter(item => ['demo2-tee-gray', 'demo2-shirt-denim', 'demo2-tee-white', 'demo2-jacket-denim', 'demo2-sweater-navy'].includes(item.id))}/>
         <Text accessibilityRole="header" style={{ fontSize: 44, lineHeight: 48, fontWeight: '600', letterSpacing: -2, color: palette.ink, marginTop: 40 }}>Arma tu outfit</Text>
         <Text style={[s.subtitle, { fontSize: 16, lineHeight: 24, marginTop: 14 }]}>Conjuntos con la ropa de tu clóset, según el clima y la ocasión del día.</Text>
       </MotionIn></View>

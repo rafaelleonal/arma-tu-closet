@@ -204,3 +204,16 @@ Se añadieron los temas de color Chicle (`bubblegum`, rosa juguetón) y Malva (`
 - Simulador iPhone 15 Pro, Expo Go: vistas previas de ambos temas en Mi estilo; Chicle y Malva aplicados en Mi estilo y Hoy (tarjeta de clima, botones, pestañas e interruptores); Malva también en la hoja Agregar prenda.
 
 Sin verificar: onboarding y Chicle en hojas, y revisión con VoiceOver.
+
+## 27/10/2026 — Perchero en Mi clóset y fotos de ejemplo
+
+Mi clóset dejó la cuadrícula de tarjetas por un perchero (`src/components/ClosetRail.tsx`): prendas colgadas de canto que giran de frente al tocarlas, repisa para calzado y accesorios y panel con disponibilidad y edición. Se quitaron los filtros por categoría de esa pantalla. El clóset de ejemplo cambió a 10 prendas con fotos recortadas de Unsplash (identificadores `demo2-…`, créditos en `assets/demo/README.md`). Los ejemplos guardados antes conservan sus dibujos. El clóset vacío ofrece **Usar clóset de ejemplo**. Sin cambio de esquema.
+
+- Recorte de fondo: macOS con `VNGenerateForegroundInstanceMaskRequest` (Apple Vision). 8 de 10 fotos de prendas quedaron limpias; se descartaron tenis con logo (Nike, Puma, Common Projects) y una foto donde el recorte incluyó una bolsa.
+- `pnpm test`: 79/79. `pnpm typecheck`: 0 errores.
+- Simulador iPhone 15 Pro, Expo Go, tema Malva: clóset de ejemplo desde el estado vacío, giro de la prenda elegida, selección de calzado en la repisa, panel con disponibilidad y Hoy con las fotos en la sugerencia.
+- Navegador `127.0.0.1:8093` con el clóset de ejemplo anterior: el perchero usa dibujos con gancho dibujado.
+
+Sin verificar: VoiceOver sobre el perchero, rendimiento con muchas prendas (no está virtualizado), Android y fotos propias con fondo en el perchero.
+
+Actualización del mismo día: el perchero quedó solo para la bienvenida y el clóset de ejemplo; la ropa propia usa `ClosetGrid` (cuadrícula de fotos). Se probó y descartó un «look en el gancho» en Hoy; Hoy conserva las tarjetas. Typecheck 0 errores y 79/79 tests. Verificado después: en el simulador iPhone 15 Pro, al agregar una prenda propia sin foto Mi clóset cambia a la cuadrícula (filtros con conteo; las fotos de ejemplo se ven en sus cuadros). En web, desde un origen sin datos (`192.168.68.102:8093`), la bienvenida con el perchero animado quedaba en blanco porque `Image.resolveAssetSource` no existe en react-native-web; se corrigió en `demoPhotos.ts` y ahora las prendas giran de frente una tras otra. Sin verificar: VoiceOver sobre el perchero y la cuadrícula, Android, fotos propias reales en la cuadrícula.

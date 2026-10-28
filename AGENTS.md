@@ -26,6 +26,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 | `server/` | Clave y llamada al proveedor; límites de origen, tamaño, tiempo y uso. Solo loopback en este prototipo. |
 | `src/theme/` | Roles de color de la interfaz. No decide preferencias de vestuario. |
 | `assets/garments/` | Ilustraciones incluidas en la app y registro de su generación. |
+| `assets/demo/` | Fotos recortadas del clóset de ejemplo, con autor, enlace y licencia de cada una. |
 
 Mantén la separación al extraer partes de `App.tsx`; no crees una nueva arquitectura completa para una corrección puntual.
 

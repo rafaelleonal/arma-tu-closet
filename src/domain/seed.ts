@@ -2,18 +2,16 @@ import type { RecommendationContext, WardrobeItem } from './types';
 
 /** Example garments only. The app can remove these and start with an empty wardrobe. */
 export const SEED_WARDROBE: WardrobeItem[] = [
-  { id: 'demo-top-black', name: 'Playera negra', category: 'top', colors: ['negro'], occasions: ['casual', 'outing', 'sport'], warmth: 0, rainReady: false, available: true, styleIds: ['minimal', 'street', 'relaxed'] },
-  { id: 'demo-top-white', name: 'Camisa blanca', category: 'top', colors: ['blanco'], occasions: ['casual', 'work', 'formal', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['minimal', 'classic'] },
-  { id: 'demo-top-green', name: 'Suéter verde', category: 'top', colors: ['verde'], occasions: ['casual', 'work', 'outing'], warmth: 3, rainReady: false, available: true, styleIds: ['relaxed', 'creative'] },
-  { id: 'demo-bottom-blue', name: 'Jeans azules', category: 'bottom', colors: ['azul'], occasions: ['casual', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['street', 'relaxed'] },
-  { id: 'demo-bottom-black', name: 'Pantalón negro', category: 'bottom', colors: ['negro'], occasions: ['casual', 'work', 'formal', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['minimal', 'classic'] },
-  { id: 'demo-bottom-gray', name: 'Pantalón deportivo gris', category: 'bottom', colors: ['gris'], occasions: ['sport', 'casual'], warmth: 1, rainReady: false, available: true, styleIds: ['sport', 'relaxed'] },
-  { id: 'demo-onepiece-black', name: 'Vestido negro', category: 'one-piece', colors: ['negro'], occasions: ['casual', 'work', 'formal', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['minimal', 'classic'] },
-  { id: 'demo-shoes-white', name: 'Tenis blancos', category: 'shoes', colors: ['blanco'], occasions: ['casual', 'sport', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['street', 'sport', 'relaxed'] },
-  { id: 'demo-shoes-black', name: 'Botines negros', category: 'shoes', colors: ['negro'], occasions: ['casual', 'work', 'formal', 'outing'], warmth: 2, rainReady: true, available: true, styleIds: ['classic', 'creative'] },
-  { id: 'demo-layer-beige', name: 'Chamarra beige', category: 'layer', colors: ['beige'], occasions: ['casual', 'work', 'outing'], warmth: 2, rainReady: true, available: true, styleIds: ['relaxed', 'street'] },
-  { id: 'demo-layer-black', name: 'Saco negro', category: 'layer', colors: ['negro'], occasions: ['work', 'formal', 'outing'], warmth: 2, rainReady: false, available: true, styleIds: ['classic', 'minimal'] },
-  { id: 'demo-accessory-gray', name: 'Bufanda gris', category: 'accessory', colors: ['gris'], occasions: ['casual', 'work', 'outing'], warmth: 2, rainReady: false, available: true, styleIds: ['classic', 'relaxed'] },
+  { id: 'demo2-tee-white', name: 'Playera blanca', category: 'top', colors: ['blanco'], occasions: ['casual', 'outing', 'sport'], warmth: 0, rainReady: false, available: true, styleIds: ['minimal', 'relaxed', 'street'] },
+  { id: 'demo2-tee-gray', name: 'Playera gris', category: 'top', colors: ['gris'], occasions: ['casual', 'outing', 'sport'], warmth: 0, rainReady: false, available: true, styleIds: ['relaxed', 'sport', 'minimal'] },
+  { id: 'demo2-shirt-denim', name: 'Camisa de mezclilla', category: 'top', colors: ['azul'], occasions: ['casual', 'work', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['classic', 'street'] },
+  { id: 'demo2-sweater-navy', name: 'Suéter azul marino', category: 'top', colors: ['azul'], occasions: ['casual', 'work', 'outing'], warmth: 3, rainReady: false, available: true, styleIds: ['classic', 'relaxed'] },
+  { id: 'demo2-top-black', name: 'Top negro', category: 'top', colors: ['negro'], occasions: ['casual', 'outing', 'formal'], warmth: 0, rainReady: false, available: true, styleIds: ['minimal', 'feminine'] },
+  { id: 'demo2-jacket-denim', name: 'Chamarra de mezclilla', category: 'layer', colors: ['azul', 'cafe'], occasions: ['casual', 'outing'], warmth: 2, rainReady: false, available: true, styleIds: ['street', 'relaxed'] },
+  { id: 'demo2-jeans-blue', name: 'Jeans azules', category: 'bottom', colors: ['azul'], occasions: ['casual', 'work', 'outing'], warmth: 1, rainReady: false, available: true, styleIds: ['street', 'relaxed', 'classic'] },
+  { id: 'demo2-dress-white', name: 'Vestido blanco', category: 'one-piece', colors: ['blanco'], occasions: ['casual', 'outing', 'formal'], warmth: 0, rainReady: false, available: true, styleIds: ['feminine', 'girly', 'minimal'] },
+  { id: 'demo2-shoes-red', name: 'Zapatos rojos', category: 'shoes', colors: ['rojo'], occasions: ['casual', 'work', 'outing', 'formal'], warmth: 1, rainReady: false, available: true, styleIds: ['creative', 'classic', 'feminine'] },
+  { id: 'demo2-boots-brown', name: 'Botines café', category: 'shoes', colors: ['cafe'], occasions: ['casual', 'work', 'outing'], warmth: 2, rainReady: true, available: true, styleIds: ['classic', 'street'] },
 ];
 
 export const seedWardrobe: WardrobeItem[] = SEED_WARDROBE.map(item => ({ ...item, isDemo: true }));
