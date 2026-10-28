@@ -37,11 +37,13 @@ export type PersonalizationPatch = Partial<
     | 'weather'
   >
 >;
+export type OnboardingEntry = 'own' | 'demo' | 'keep';
+
 export interface OnboardingProps {
   data: LocalData;
   mode: 'initial' | 'edit';
   onChange: (patch: PersonalizationPatch) => void;
-  onFinish: (entry: 'own' | 'demo' | 'keep') => void;
+  onFinish: (entry: OnboardingEntry) => void;
   onClose?: () => void;
 }
 const stepNames = ['Tu estilo', 'Colores', 'Tu rutina', 'Apariencia'];

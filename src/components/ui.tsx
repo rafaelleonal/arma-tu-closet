@@ -178,4 +178,18 @@ const createStyles = (palette: Palette) =>
       borderColor: palette.line,
     },
     divider: { height: 1, backgroundColor: palette.line, marginVertical: 22 },
+    pageHeading: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: 16,
+      marginBottom: 20,
+    },
+    sectionTitle: {
+      fontSize: 19,
+      color: palette.ink,
+      letterSpacing: -0.4,
+      marginBottom: 8,
+    },
   });
