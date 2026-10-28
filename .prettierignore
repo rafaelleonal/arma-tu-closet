@@ -1,0 +1,12 @@
+# Generated or vendored
+node_modules/
+.expo/
+dist/
+/ios/
+/android/
+pnpm-lock.yaml
+.vscode/
+
+# Prose and data keep their manual layout
+*.md
+assets/

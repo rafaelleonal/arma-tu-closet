@@ -3,14 +3,27 @@ export type Category = (typeof CATEGORIES)[number];
 export type OutfitSlot = Category;
 export const OCCASIONS = ['casual', 'work', 'formal', 'sport', 'outing'] as const;
 export type Occasion = (typeof OCCASIONS)[number];
-export const STYLE_IDS = ['minimal', 'classic', 'street', 'relaxed', 'creative', 'sport', 'girly', 'feminine'] as const;
+export const STYLE_IDS = [
+  'minimal',
+  'classic',
+  'street',
+  'relaxed',
+  'creative',
+  'sport',
+  'girly',
+  'feminine',
+] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 export const STYLE_OPTIONS: ReadonlyArray<{ id: StyleId; label: string; description: string }> = [
   { id: 'minimal', label: 'Minimal', description: 'Líneas simples y combinaciones discretas.' },
   { id: 'classic', label: 'Clásico', description: 'Prendas de siempre y detalles sobrios.' },
   { id: 'street', label: 'Urbano', description: 'Inspiración de calle y contrastes casuales.' },
   { id: 'relaxed', label: 'Relajado', description: 'Comodidad y un aire despreocupado.' },
-  { id: 'creative', label: 'Creativo', description: 'Colores, mezclas y detalles con personalidad.' },
+  {
+    id: 'creative',
+    label: 'Creativo',
+    description: 'Colores, mezclas y detalles con personalidad.',
+  },
   { id: 'sport', label: 'Deportivo', description: 'Prendas con inspiración deportiva.' },
   { id: 'girly', label: 'Girly', description: 'Tonos suaves, moños y detalles juguetones.' },
   { id: 'feminine', label: 'Femenino', description: 'Siluetas definidas y detalles delicados.' },
@@ -98,9 +111,25 @@ export const OCCASION_LABELS: Record<Occasion, string> = {
 };
 
 export const COLOR_OPTIONS = [
-  'negro', 'blanco', 'gris', 'beige', 'azul', 'verde', 'cafe', 'rojo', 'rosa', 'amarillo', 'morado', 'naranja',
+  'negro',
+  'blanco',
+  'gris',
+  'beige',
+  'azul',
+  'verde',
+  'cafe',
+  'rojo',
+  'rosa',
+  'amarillo',
+  'morado',
+  'naranja',
 ];
 
 export const categoryLabels = CATEGORY_LABELS;
 export const occasionLabels = OCCASION_LABELS;
-export const colorLabels: Record<string, string> = Object.fromEntries(COLOR_OPTIONS.map(color => [color, color === 'cafe' ? 'Café' : color.charAt(0).toUpperCase() + color.slice(1)]));
+export const colorLabels: Record<string, string> = Object.fromEntries(
+  COLOR_OPTIONS.map((color) => [
+    color,
+    color === 'cafe' ? 'Café' : color.charAt(0).toUpperCase() + color.slice(1),
+  ]),
+);

@@ -11,7 +11,7 @@ export function itemFormErrors(item: Pick<WardrobeItem, 'name' | 'colors' | 'occ
 /** Name used when the person leaves it empty; neutral wording avoids gender agreement with the category. */
 export function suggestedItemName(category: Category, colors: string[]): string {
   if (!colors.length) return '';
-  const names = colors.slice(0, 2).map(color => (colorLabels[color] ?? color).toLowerCase());
+  const names = colors.slice(0, 2).map((color) => (colorLabels[color] ?? color).toLowerCase());
   return `${categoryLabels[category]} · ${names.join(' y ')}${colors.length > 2 ? ' y más' : ''}`;
 }
 
@@ -22,5 +22,16 @@ export function defaultWarmth(category: Category): WardrobeItem['warmth'] {
 
 /** Compare editable values; usage counters and the order of tags are not edits. */
 export function itemFormFingerprint(item: WardrobeItem): string {
-  return JSON.stringify([item.name.trim(), item.category, [...item.colors].sort(), [...item.occasions].sort(), [...(item.styleIds ?? [])].sort(), item.warmth, item.rainReady, item.available, item.photoUri ?? null, item.cutoutUri ?? null]);
+  return JSON.stringify([
+    item.name.trim(),
+    item.category,
+    [...item.colors].sort(),
+    [...item.occasions].sort(),
+    [...(item.styleIds ?? [])].sort(),
+    item.warmth,
+    item.rainReady,
+    item.available,
+    item.photoUri ?? null,
+    item.cutoutUri ?? null,
+  ]);
 }

@@ -24,6 +24,10 @@ export function demoPhotoFor(item: WardrobeItem): ImageSourcePropType | undefine
 export function photoAspect(source: ImageSourcePropType | undefined): number | undefined {
   if (!source) return undefined;
   // Native resolves bundled assets by id; react-native-web has no resolveAssetSource but its require() already carries the size.
-  const resolved = (typeof source === 'object' && !Array.isArray(source) ? source : Image.resolveAssetSource?.(source as number)) as { width?: number; height?: number } | undefined;
+  const resolved = (
+    typeof source === 'object' && !Array.isArray(source)
+      ? source
+      : Image.resolveAssetSource?.(source as number)
+  ) as { width?: number; height?: number } | undefined;
   return resolved?.width && resolved?.height ? resolved.width / resolved.height : undefined;
 }

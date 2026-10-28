@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "export:web": "expo export --platform web",
-    "server": "node --env-file-if-exists=.env.server --import tsx server/index.ts"
+    "server": "node --env-file-if-exists=.env.server --import tsx server/index.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.101",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "@types/react": "~19.3.0",
+    "prettier": "3.9.10",
     "tsx": "^4.20.0",
     "typescript": "~6.0.3"
   }

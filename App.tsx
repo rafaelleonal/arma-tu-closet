@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -8,8 +8,8 @@ import {
   Text,
   View,
   type ScrollViewInstance,
-} from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   COLOR_OPTIONS,
   STYLE_OPTIONS,
@@ -24,56 +24,43 @@ import {
   type Context,
   type Outfit,
   type WardrobeItem,
-} from "./src/domain";
-import {
-  Button,
-  Chip,
-  colorHex,
-  useUI,
-  SectionLabel,
-} from "./src/components/ui";
-import { Garment } from "./src/components/Garment";
-import { Sheet } from "./src/components/Sheet";
-import { ItemEditor } from "./src/components/ItemEditor";
-import { ManualBuilder } from "./src/components/ManualBuilder";
+} from './src/domain';
+import { Button, Chip, colorHex, useUI, SectionLabel } from './src/components/ui';
+import { Garment } from './src/components/Garment';
+import { Sheet } from './src/components/Sheet';
+import { ItemEditor } from './src/components/ItemEditor';
+import { ManualBuilder } from './src/components/ManualBuilder';
 import {
   readLocalData,
   writeLocalData,
   createLocalData,
   type LocalData,
-} from "./src/storage/local";
-import { ThemeProvider, type Palette } from "./src/theme/ThemeProvider";
-import {
-  Onboarding,
-  type PersonalizationPatch,
-} from "./src/components/Onboarding";
-import { AppearanceSettings } from "./src/components/AppearanceSettings";
-import { ContextEditor } from "./src/components/ContextEditor";
-import { ClosetRail } from "./src/components/ClosetRail";
-import { ClosetGrid } from "./src/components/ClosetGrid";
-import { useWeather } from "./src/weather/useWeather";
+} from './src/storage/local';
+import { ThemeProvider, type Palette } from './src/theme/ThemeProvider';
+import { Onboarding, type PersonalizationPatch } from './src/components/Onboarding';
+import { AppearanceSettings } from './src/components/AppearanceSettings';
+import { ContextEditor } from './src/components/ContextEditor';
+import { ClosetRail } from './src/components/ClosetRail';
+import { ClosetGrid } from './src/components/ClosetGrid';
+import { useWeather } from './src/weather/useWeather';
 
-import {
-  FeedbackProvider,
-  MotionIn,
-  useFeedback,
-} from "./src/components/Feedback";
+import { FeedbackProvider, MotionIn, useFeedback } from './src/components/Feedback';
 
-type Tab = "today" | "closet" | "style";
+type Tab = 'today' | 'closet' | 'style';
 const freshData = createLocalData;
 
 export default function App() {
   const [data, setData] = useState<LocalData | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [loadError, setLoadError] = useState("");
+  const [loadError, setLoadError] = useState('');
   async function hydrate() {
-    setLoadError("");
+    setLoadError('');
     try {
       setData((await readLocalData()) || freshData());
       setHydrated(true);
     } catch {
       setLoadError(
-        "No pudimos abrir tus datos locales. No los reemplazamos. Intenta de nuevo; si persiste, conserva los datos del navegador o la app para poder recuperarlos.",
+        'No pudimos abrir tus datos locales. No los reemplazamos. Intenta de nuevo; si persiste, conserva los datos del navegador o la app para poder recuperarlos.',
       );
     }
   }
@@ -82,7 +69,7 @@ export default function App() {
   }, []);
   return (
     <SafeAreaProvider>
-      <ThemeProvider themeId={data?.appearance.themeId ?? "linen"}>
+      <ThemeProvider themeId={data?.appearance.themeId ?? 'linen'}>
         <FeedbackProvider enabled={data?.appearance.hapticsEnabled !== false}>
           <Main
             data={data}
@@ -112,13 +99,13 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
   const { success } = feedback;
   const weather = useWeather(data, setData);
   const [personalizing, setPersonalizing] = useState(false);
-  const [saveError, setSaveError] = useState("");
-  const [tab, setTab] = useState<Tab>("today");
+  const [saveError, setSaveError] = useState('');
+  const [tab, setTab] = useState<Tab>('today');
   const contentScroll = useRef<ScrollViewInstance>(null);
   useEffect(() => {
     contentScroll.current?.scrollTo({ y: 0, animated: false });
   }, [tab]);
-  const [editor, setEditor] = useState<WardrobeItem | "new" | null>(null);
+  const [editor, setEditor] = useState<WardrobeItem | 'new' | null>(null);
   const [contextOpen, setContextOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
@@ -126,8 +113,8 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
     outfit: Outfit;
     category: Category;
   } | null>(null);
-  const [notice, setNotice] = useState("");
-  const noticeOnSave = useRef("");
+  const [notice, setNotice] = useState('');
+  const noticeOnSave = useRef('');
   const writeRevision = useRef(0);
   const [generation, setGeneration] = useState(0);
   useEffect(() => {
@@ -137,9 +124,9 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
     void writeLocalData(data)
       .then(() => {
         if (revision !== writeRevision.current) return;
-        setSaveError("");
+        setSaveError('');
         if (message && noticeOnSave.current === message) {
-          noticeOnSave.current = "";
+          noticeOnSave.current = '';
           setNotice(message);
           success();
         }
@@ -149,13 +136,13 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
           setSaveError(
             error instanceof Error
               ? `${error.message} Los últimos cambios siguen en esta pantalla. Reintenta antes de cerrarla.`
-              : "No se guardaron los últimos cambios. Revisa el espacio disponible y vuelve a intentar. Mantén esta pantalla abierta.",
+              : 'No se guardaron los últimos cambios. Revisa el espacio disponible y vuelve a intentar. Mantén esta pantalla abierta.',
           );
       });
   }, [data, hydrated, success]);
   useEffect(() => {
     if (!notice) return;
-    const timer = setTimeout(() => setNotice(""), 6500);
+    const timer = setTimeout(() => setNotice(''), 6500);
     return () => clearTimeout(timer);
   }, [notice]);
   const context = useMemo<Context>(
@@ -192,27 +179,23 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
         ? current.savedOutfits.filter((item) => item.id !== outfit.id)
         : [outfit, ...current.savedOutfits],
     }));
-    noticeOnSave.current = saved
-      ? "Quitado de guardados."
-      : "Conjunto guardado.";
+    noticeOnSave.current = saved ? 'Quitado de guardados.' : 'Conjunto guardado.';
   }
   function worn(outfit: Outfit) {
     if (!data) return;
     const now = new Date().toISOString();
     const wear = recordOutfitWorn(data.items, outfit, now);
-    if (wear.status !== "recorded") {
+    if (wear.status !== 'recorded') {
       setSelectedOutfit(null);
       setNotice(wear.message);
       return;
     }
     const today = localDay(now);
     if (
-      data.wearHistory.some(
-        (entry) => entry.id === outfit.id && localDay(entry.date) === today,
-      )
+      data.wearHistory.some((entry) => entry.id === outfit.id && localDay(entry.date) === today)
     ) {
       setSelectedOutfit(null);
-      setNotice("Este conjunto ya está registrado como usado hoy.");
+      setNotice('Este conjunto ya está registrado como usado hoy.');
       return;
     }
     update((current) => ({
@@ -228,7 +211,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
       ].slice(0, 365),
     }));
     setSelectedOutfit(null);
-    noticeOnSave.current = "Uso registrado.";
+    noticeOnSave.current = 'Uso registrado.';
   }
   if (!hydrated || !data)
     return (
@@ -238,7 +221,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
           <>
             <Text
               accessibilityRole="alert"
-              style={[s.subtitle, { textAlign: "center", marginVertical: 24 }]}
+              style={[s.subtitle, { textAlign: 'center', marginVertical: 24 }]}
             >
               {loadError}
             </Text>
@@ -254,23 +237,15 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
       <View style={{ flex: 1, backgroundColor: palette.paper }}>
         {saveError ? (
           <View style={styles.error}>
-            <Text
-              accessibilityRole="alert"
-              style={{ color: palette.rust, flex: 1, fontSize: 12 }}
-            >
+            <Text accessibilityRole="alert" style={{ color: palette.rust, flex: 1, fontSize: 12 }}>
               {saveError}
             </Text>
-            <Button
-              secondary
-              small
-              label="Reintentar"
-              onPress={() => setData({ ...data })}
-            />
+            <Button secondary small label="Reintentar" onPress={() => setData({ ...data })} />
           </View>
         ) : null}
         <Onboarding
           data={data}
-          mode={data.onboarded ? "edit" : "initial"}
+          mode={data.onboarded ? 'edit' : 'initial'}
           onChange={(patch: PersonalizationPatch) =>
             update((current) => ({ ...current, ...patch }))
           }
@@ -281,22 +256,20 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
               onboarded: true,
               onboarding: { step: 0 },
               items:
-                current.onboarded || entry !== "demo"
+                current.onboarded || entry !== 'demo'
                   ? current.items
                   : seedWardrobe.map((item) => ({ ...item })),
             }));
             setPersonalizing(false);
-            setTab(
-              entry === "own" ? "closet" : entry === "keep" ? "style" : "today",
-            );
-            noticeOnSave.current = "Preferencias guardadas.";
+            setTab(entry === 'own' ? 'closet' : entry === 'keep' ? 'style' : 'today');
+            noticeOnSave.current = 'Preferencias guardadas.';
           }}
         />
       </View>
     );
   const hasDemo = data.items.some((item) => item.isDemo);
   return (
-    <SafeAreaView style={styles.root} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View style={s.row}>
           <Text style={styles.logo}>a.</Text>
@@ -307,18 +280,10 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
       </View>
       {saveError ? (
         <View style={styles.error}>
-          <Text
-            accessibilityRole="alert"
-            style={{ color: palette.rust, flex: 1, fontSize: 12 }}
-          >
+          <Text accessibilityRole="alert" style={{ color: palette.rust, flex: 1, fontSize: 12 }}>
             {saveError}
           </Text>
-          <Button
-            secondary
-            small
-            label="Reintentar"
-            onPress={() => setData({ ...data })}
-          />
+          <Button secondary small label="Reintentar" onPress={() => setData({ ...data })} />
         </View>
       ) : null}
       <View style={{ flex: 1 }}>
@@ -328,21 +293,19 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
           keyboardShouldPersistTaps="handled"
         >
           <MotionIn trigger={tab}>
-            {tab === "today" ? (
+            {tab === 'today' ? (
               <>
                 <View style={styles.pageHeading}>
                   <View>
-                    {data.profile.name ? (
-                      <SectionLabel>{data.profile.name}</SectionLabel>
-                    ) : null}
+                    {data.profile.name ? <SectionLabel>{data.profile.name}</SectionLabel> : null}
                     <Text accessibilityRole="header" style={s.title}>
                       Hoy
                     </Text>
                   </View>
                   <Text style={styles.date}>
-                    {new Intl.DateTimeFormat("es-MX", {
-                      day: "numeric",
-                      month: "long",
+                    {new Intl.DateTimeFormat('es-MX', {
+                      day: 'numeric',
+                      month: 'long',
                     }).format(new Date())}
                   </Text>
                 </View>
@@ -356,7 +319,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                           (outfit) => !outfit.items.some((item) => item.isDemo),
                         ),
                       }));
-                      setTab("closet");
+                      setTab('closet');
                     }}
                   />
                 ) : null}
@@ -366,32 +329,32 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                     accessibilityLabel="Editar clima y ocasión"
                     onPress={() => setContextOpen(true)}
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                       gap: 12,
-                      flexWrap: "wrap",
+                      flexWrap: 'wrap',
                     }}
                   >
                     <View style={[s.row, { flexShrink: 1 }]}>
                       <Text style={{ fontSize: 31, color: palette.ink }}>
-                        {context.raining ? "☂" : "☼"}
+                        {context.raining ? '☂' : '☼'}
                       </Text>
                       <View style={{ flexShrink: 1 }}>
                         <Text style={{ fontSize: 19, color: palette.ink }}>
                           {Math.round(
-                            weather.effective?.source === "automatic"
+                            weather.effective?.source === 'automatic'
                               ? data.weather.snapshot!.temperatureC
                               : context.temperatureC,
                           )}
-                          °{" "}
+                          °{' '}
                           <Text style={{ fontSize: 13 }}>
                             {weather.effective?.context.city || data.context.city}
                           </Text>
                         </Text>
                         <Text style={[s.subtitle, { fontSize: 11 }]}>
-                          {weather.effective?.source === "automatic"
-                            ? `Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? "Con precipitación" : "Sin precipitación"}`
+                          {weather.effective?.source === 'automatic'
+                            ? `Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? 'Con precipitación' : 'Sin precipitación'}`
                             : `Clima manual · ${data.context.season}`}
                         </Text>
                       </View>
@@ -411,14 +374,14 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                       </Text>
                     </View>
                   </Pressable>
-                  {data.weather.mode === "automatic" ? (
+                  {data.weather.mode === 'automatic' ? (
                     <View style={{ marginTop: 12, gap: 8 }}>
                       <Text style={[s.subtitle, { fontSize: 11 }]}>
-                        {weather.effective?.source === "automatic"
-                          ? `Actualizado ${new Intl.DateTimeFormat("es-MX", { hour: "2-digit", minute: "2-digit" }).format(new Date(data.weather.snapshot!.fetchedAt))}`
+                        {weather.effective?.source === 'automatic'
+                          ? `Actualizado ${new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit' }).format(new Date(data.weather.snapshot!.fetchedAt))}`
                           : weather.loading
-                            ? "Consultando clima. Por ahora se usa el manual."
-                            : "Sin clima reciente. Se usa el manual de respaldo."}
+                            ? 'Consultando clima. Por ahora se usa el manual.'
+                            : 'Sin clima reciente. Se usa el manual de respaldo.'}
                       </Text>
                       {weather.error ? (
                         <Text
@@ -428,24 +391,17 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                           {weather.error}
                         </Text>
                       ) : null}
-                      <View
-                        style={[
-                          s.row,
-                          { justifyContent: "space-between", flexWrap: "wrap" },
-                        ]}
-                      >
+                      <View style={[s.row, { justifyContent: 'space-between', flexWrap: 'wrap' }]}>
                         <Pressable
                           accessibilityRole="link"
-                          onPress={() =>
-                            void Linking.openURL("https://open-meteo.com/")
-                          }
+                          onPress={() => void Linking.openURL('https://open-meteo.com/')}
                           style={{ paddingVertical: 10 }}
                         >
                           <Text
                             style={{
                               color: palette.green,
                               fontSize: 11,
-                              textDecorationLine: "underline",
+                              textDecorationLine: 'underline',
                             }}
                           >
                             Open-Meteo
@@ -454,9 +410,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                         <Button
                           small
                           secondary
-                          label={
-                            weather.loading ? "Actualizando…" : "Actualizar clima"
-                          }
+                          label={weather.loading ? 'Actualizando…' : 'Actualizar clima'}
                           disabled={weather.loading}
                           onPress={weather.refresh}
                         />
@@ -468,7 +422,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                   style={[
                     s.row,
                     {
-                      justifyContent: "space-between",
+                      justifyContent: 'space-between',
                       marginTop: 30,
                       marginBottom: 14,
                     },
@@ -477,20 +431,18 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                   <SectionLabel>Conjuntos</SectionLabel>
                   <Text style={{ color: palette.muted, fontSize: 11 }}>
                     {recommendations.length
-                      ? `${recommendations.length} ${recommendations.length === 1 ? "opción" : "opciones"}`
-                      : ""}
+                      ? `${recommendations.length} ${recommendations.length === 1 ? 'opción' : 'opciones'}`
+                      : ''}
                   </Text>
                 </View>
                 {recommendations.length ? (
                   <>
                     <OutfitCard
-                      compact={data.appearance.outfitLayout === "compact"}
+                      compact={data.appearance.outfitLayout === 'compact'}
                       showReasons={data.appearance.showReasons}
                       outfit={recommendations[0]}
                       primary
-                      saved={data.savedOutfits.some(
-                        (item) => item.id === recommendations[0].id,
-                      )}
+                      saved={data.savedOutfits.some((item) => item.id === recommendations[0].id)}
                       onFavorite={() => favorite(recommendations[0])}
                       onWorn={() => worn(recommendations[0])}
                       onItem={(item) =>
@@ -503,15 +455,8 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                     />
                     <>
                       {recommendations.length > 1 ? (
-                        <View
-                          style={[
-                            s.row,
-                            { justifyContent: "space-between", marginTop: 24 },
-                          ]}
-                        >
-                          <Text style={{ fontSize: 18, color: palette.ink }}>
-                            Otras opciones
-                          </Text>
+                        <View style={[s.row, { justifyContent: 'space-between', marginTop: 24 }]}>
+                          <Text style={{ fontSize: 18, color: palette.ink }}>Otras opciones</Text>
                         </View>
                       ) : null}
                     </>
@@ -519,12 +464,10 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                       {recommendations.slice(1).map((outfit) => (
                         <View key={outfit.id} style={styles.alternative}>
                           <OutfitCard
-                            compact={data.appearance.outfitLayout === "compact"}
+                            compact={data.appearance.outfitLayout === 'compact'}
                             showReasons={data.appearance.showReasons}
                             outfit={outfit}
-                            saved={data.savedOutfits.some(
-                              (item) => item.id === outfit.id,
-                            )}
+                            saved={data.savedOutfits.some((item) => item.id === outfit.id)}
                             onFavorite={() => favorite(outfit)}
                             onWorn={() => worn(outfit)}
                             onDetails={() => setSelectedOutfit(outfit)}
@@ -540,10 +483,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                         update((current) => ({
                           ...current,
                           dislikedOutfitIds: [
-                            ...new Set([
-                              ...current.dislikedOutfitIds,
-                              recommendations[0].id,
-                            ]),
+                            ...new Set([...current.dislikedOutfitIds, recommendations[0].id]),
                           ],
                         }));
                         setGeneration((value) => value + 1);
@@ -563,17 +503,14 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                     </Text>
                     <Text style={s.subtitle}>
                       {result.outfits.length
-                        ? "No quedan opciones en esta selección."
+                        ? 'No quedan opciones en esta selección.'
                         : result.message}
                     </Text>
                     <Text style={[s.subtitle, { marginTop: 12 }]}>
                       Revisa tus preferencias o agrega prendas.
                     </Text>
-                    <View style={[s.row, { marginTop: 22, flexWrap: "wrap" }]}>
-                      <Button
-                        label="Ir a mi clóset"
-                        onPress={() => setTab("closet")}
-                      />
+                    <View style={[s.row, { marginTop: 22, flexWrap: 'wrap' }]}>
+                      <Button label="Ir a mi clóset" onPress={() => setTab('closet')} />
                       {data.dislikedOutfitIds.length ? (
                         <Button
                           secondary
@@ -589,7 +526,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                         <Button
                           secondary
                           label="Revisar mi estilo"
-                          onPress={() => setTab("style")}
+                          onPress={() => setTab('style')}
                         />
                       )}
                     </View>
@@ -597,19 +534,17 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 )}
               </>
             ) : null}
-            {tab === "closet" ? (
+            {tab === 'closet' ? (
               <Closet
                 items={data.items}
                 hasDemo={hasDemo}
-                onAdd={() => setEditor("new")}
+                onAdd={() => setEditor('new')}
                 onEdit={setEditor}
                 onToggle={(item) =>
                   update((current) => ({
                     ...current,
                     items: current.items.map((value) =>
-                      value.id === item.id
-                        ? { ...value, available: !value.available }
-                        : value,
+                      value.id === item.id ? { ...value, available: !value.available } : value,
                     ),
                   }))
                 }
@@ -633,29 +568,23 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                         },
                   );
                   noticeOnSave.current =
-                    "Clóset de ejemplo listo. Quítalo cuando agregues tu ropa.";
+                    'Clóset de ejemplo listo. Quítalo cuando agregues tu ropa.';
                 }}
               />
             ) : null}
-            {tab === "style" ? (
+            {tab === 'style' ? (
               <>
                 <Text accessibilityRole="header" style={s.title}>
                   Mi estilo
                 </Text>
                 <View style={[s.panel, { marginTop: 24, marginBottom: 18 }]}>
-                  <Text style={styles.sectionTitle}>
-                    {data.profile.name || "Estilos"}
-                  </Text>
+                  <Text style={styles.sectionTitle}>{data.profile.name || 'Estilos'}</Text>
                   <Text style={[s.subtitle, { marginBottom: 16 }]}>
                     {data.profile.styleIds.length
                       ? data.profile.styleIds
-                          .map(
-                            (id) =>
-                              STYLE_OPTIONS.find((style) => style.id === id)
-                                ?.label,
-                          )
-                          .join(" · ")
-                      : "Sin estilos seleccionados"}
+                          .map((id) => STYLE_OPTIONS.find((style) => style.id === id)?.label)
+                          .join(' · ')
+                      : 'Sin estilos seleccionados'}
                   </Text>
                   <Button
                     secondary
@@ -671,9 +600,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 </View>
                 <AppearanceSettings
                   value={data.appearance}
-                  onChange={(appearance) =>
-                    update((current) => ({ ...current, appearance }))
-                  }
+                  onChange={(appearance) => update((current) => ({ ...current, appearance }))}
                 />
                 <View style={[s.panel, { marginTop: 18 }]}>
                   <Text style={styles.sectionTitle}>Colores favoritos</Text>
@@ -686,22 +613,16 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                         key={color}
                         swatch={colorHex[color]}
                         label={colorLabels[color]}
-                        selected={data.preferences.preferredColors.includes(
-                          color,
-                        )}
+                        selected={data.preferences.preferredColors.includes(color)}
                         onPress={() =>
                           update((current) => ({
                             ...current,
                             preferences: {
                               ...current.preferences,
-                              preferredColors: toggle(
-                                current.preferences.preferredColors,
-                                color,
+                              preferredColors: toggle(current.preferences.preferredColors, color),
+                              excludedColors: current.preferences.excludedColors.filter(
+                                (value) => value !== color,
                               ),
-                              excludedColors:
-                                current.preferences.excludedColors.filter(
-                                  (value) => value !== color,
-                                ),
                             },
                           }))
                         }
@@ -725,14 +646,10 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                             ...current,
                             preferences: {
                               ...current.preferences,
-                              excludedColors: toggle(
-                                current.preferences.excludedColors,
-                                color,
+                              excludedColors: toggle(current.preferences.excludedColors, color),
+                              preferredColors: current.preferences.preferredColors.filter(
+                                (value) => value !== color,
                               ),
-                              preferredColors:
-                                current.preferences.preferredColors.filter(
-                                  (value) => value !== color,
-                                ),
                             },
                           }))
                         }
@@ -743,14 +660,13 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 <View style={[s.panel, { marginTop: 18 }]}>
                   <Text style={styles.sectionTitle}>Repetición de prendas</Text>
                   <Text style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}>
-                    Tiempo entre usos. Puede repetirse una prenda si faltan
-                    opciones.
+                    Tiempo entre usos. Puede repetirse una prenda si faltan opciones.
                   </Text>
                   <View style={s.wrap}>
                     {[0, 3, 7, 14].map((days) => (
                       <Chip
                         key={days}
-                        label={days ? `${days} días` : "Sin rotación"}
+                        label={days ? `${days} días` : 'Sin rotación'}
                         selected={data.preferences.rotationDays === days}
                         onPress={() =>
                           update((current) => ({
@@ -769,7 +685,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                   style={[
                     s.row,
                     {
-                      justifyContent: "space-between",
+                      justifyContent: 'space-between',
                       marginTop: 32,
                       marginBottom: 15,
                     },
@@ -783,7 +699,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                     <Pressable
                       key={outfit.id}
                       accessibilityRole="button"
-                      accessibilityLabel={`Ver conjunto guardado: ${outfit.items.map((item) => item.name).join(", ")}`}
+                      accessibilityLabel={`Ver conjunto guardado: ${outfit.items.map((item) => item.name).join(', ')}`}
                       onPress={() => setSelectedOutfit(outfit)}
                       style={styles.savedRow}
                     >
@@ -794,9 +710,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: palette.ink, fontSize: 13 }}>
-                          {outfit.id.startsWith("manual-")
-                            ? "Creado por ti"
-                            : "Conjunto guardado"}
+                          {outfit.id.startsWith('manual-') ? 'Creado por ti' : 'Conjunto guardado'}
                         </Text>
                         <Text style={[s.subtitle, { fontSize: 11 }]}>
                           {outfit.items.length} prendas · Ver conjunto ↗
@@ -807,26 +721,17 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 ) : (
                   <Text style={s.subtitle}>No hay conjuntos guardados.</Text>
                 )}
-                <View
-                  style={[
-                    s.panel,
-                    { marginTop: 26, backgroundColor: palette.wash },
-                  ]}
-                >
+                <View style={[s.panel, { marginTop: 26, backgroundColor: palette.wash }]}>
                   <Text style={styles.sectionTitle}>Almacenamiento</Text>
                   <Text style={[s.subtitle, { fontSize: 12 }]}>
-                    Los datos y fotos se guardan en este dispositivo. Borrar sus
-                    datos o desinstalar la app puede eliminarlos. Sin respaldo en
-                    la nube. Al analizar una foto, se envía a OpenAI para proponer
-                    sus atributos.
+                    Los datos y fotos se guardan en este dispositivo. Borrar sus datos o desinstalar
+                    la app puede eliminarlos. Sin respaldo en la nube. Al analizar una foto, se
+                    envía a OpenAI para proponer sus atributos.
                   </Text>
                   <Text style={[s.subtitle, { fontSize: 12, marginTop: 10 }]}>
-                    {data.wearHistory.length}{" "}
-                    {data.wearHistory.length === 1
-                      ? "uso registrado"
-                      : "usos registrados"}{" "}
-                    · {data.items.filter((item) => !item.isDemo).length} prendas
-                    propias
+                    {data.wearHistory.length}{' '}
+                    {data.wearHistory.length === 1 ? 'uso registrado' : 'usos registrados'} ·{' '}
+                    {data.items.filter((item) => !item.isDemo).length} prendas propias
                   </Text>
                 </View>
               </>
@@ -839,22 +744,20 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
             accessibilityRole="alert"
             accessibilityLiveRegion="polite"
             accessibilityHint="Toca para cerrar"
-            onPress={() => setNotice("")}
+            onPress={() => setNotice('')}
             style={styles.notice}
           >
-            <Text style={{ color: palette.ink, fontSize: 13, lineHeight: 19 }}>
-              {notice}
-            </Text>
+            <Text style={{ color: palette.ink, fontSize: 13, lineHeight: 19 }}>{notice}</Text>
           </Pressable>
         ) : null}
       </View>
-      <SafeAreaView edges={["bottom"]} style={styles.tabBar}>
+      <SafeAreaView edges={['bottom']} style={styles.tabBar}>
         <View style={styles.tabInner}>
           {(
             [
-              { id: "today", icon: "☼", label: "Hoy" },
-              { id: "closet", icon: "▥", label: "Mi clóset" },
-              { id: "style", icon: "◌", label: "Mi estilo" },
+              { id: 'today', icon: '☼', label: 'Hoy' },
+              { id: 'closet', icon: '▥', label: 'Mi clóset' },
+              { id: 'style', icon: '◌', label: 'Mi estilo' },
             ] as const
           ).map((value) => (
             <Pressable
@@ -866,7 +769,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 if (tab !== value.id) {
                   feedback.selection();
                   setTab(value.id);
-                  setNotice("");
+                  setNotice('');
                 }
               }}
               style={styles.tab}
@@ -883,7 +786,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 style={{
                   fontSize: 11,
                   color: tab === value.id ? palette.ink : palette.muted,
-                  fontWeight: tab === value.id ? "700" : "400",
+                  fontWeight: tab === value.id ? '700' : '400',
                 }}
               >
                 {value.label}
@@ -895,19 +798,17 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
       </SafeAreaView>
       {editor ? (
         <ItemEditor
-          item={editor === "new" ? undefined : editor}
+          item={editor === 'new' ? undefined : editor}
           onClose={() => setEditor(null)}
           onSave={(item) => {
             update((current) => ({
               ...current,
               items: current.items.some((value) => value.id === item.id)
-                ? current.items.map((value) =>
-                    value.id === item.id ? item : value,
-                  )
+                ? current.items.map((value) => (value.id === item.id ? item : value))
                 : [item, ...current.items],
             }));
             setEditor(null);
-            noticeOnSave.current = "Prenda guardada.";
+            noticeOnSave.current = 'Prenda guardada.';
           }}
         />
       ) : null}
@@ -923,8 +824,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                 settings.location?.id === current.weather.location?.id &&
                 latest &&
                 (!settings.snapshot ||
-                  Date.parse(latest.fetchedAt) >
-                    Date.parse(settings.snapshot.fetchedAt))
+                  Date.parse(latest.fetchedAt) > Date.parse(settings.snapshot.fetchedAt))
                   ? latest
                   : settings.snapshot;
               return {
@@ -948,8 +848,8 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
               savedOutfits: [outfit, ...current.savedOutfits],
             }));
             setManualOpen(false);
-            setTab("style");
-            noticeOnSave.current = "Conjunto guardado.";
+            setTab('style');
+            noticeOnSave.current = 'Conjunto guardado.';
           }}
         />
       ) : null}
@@ -957,26 +857,20 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
         <Sheet title="Conjunto" onClose={() => setSelectedOutfit(null)}>
           {data.savedOutfits.some((item) => item.id === selectedOutfit.id) ? (
             <Text style={[s.subtitle, { fontSize: 12, marginBottom: 14 }]}>
-              Guardado con los detalles originales. Revisa disponibilidad y
-              clima antes de usarlo.
+              Guardado con los detalles originales. Revisa disponibilidad y clima antes de usarlo.
             </Text>
           ) : null}
           {saveError ? (
-            <Text
-              accessibilityRole="alert"
-              style={{ color: palette.rust, marginBottom: 14 }}
-            >
+            <Text accessibilityRole="alert" style={{ color: palette.rust, marginBottom: 14 }}>
               {saveError}
             </Text>
           ) : null}
           <OutfitCard
-            compact={data.appearance.outfitLayout === "compact"}
+            compact={data.appearance.outfitLayout === 'compact'}
             showReasons={data.appearance.showReasons}
             outfit={selectedOutfit}
             primary
-            saved={data.savedOutfits.some(
-              (item) => item.id === selectedOutfit.id,
-            )}
+            saved={data.savedOutfits.some((item) => item.id === selectedOutfit.id)}
             onFavorite={() => favorite(selectedOutfit)}
             onWorn={() => worn(selectedOutfit)}
             onItem={(item) => {
@@ -987,10 +881,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
         </Sheet>
       ) : null}
       {swap ? (
-        <Sheet
-          title={`Cambiar · ${categoryLabels[swap.category]}`}
-          onClose={() => setSwap(null)}
-        >
+        <Sheet title={`Cambiar · ${categoryLabels[swap.category]}`} onClose={() => setSwap(null)}>
           <Text style={s.subtitle}>
             Prendas disponibles de esta categoría, sin los colores excluidos.
           </Text>
@@ -999,9 +890,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
               item.category === swap.category &&
               item.available &&
               !swap.outfit.items.some((current) => current.id === item.id) &&
-              !item.colors.some((color) =>
-                data.preferences.excludedColors.includes(color),
-              ),
+              !item.colors.some((color) => data.preferences.excludedColors.includes(color)),
           ) ? (
             <Text style={[s.subtitle, { marginTop: 20 }]}>
               No hay otra prenda disponible. Agrega una en Mi clóset.
@@ -1012,13 +901,9 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
               .filter(
                 (item) =>
                   item.category === swap.category &&
-                  !swap.outfit.items.some(
-                    (current) => current.id === item.id,
-                  ) &&
+                  !swap.outfit.items.some((current) => current.id === item.id) &&
                   item.available &&
-                  !item.colors.some((color) =>
-                    data.preferences.excludedColors.includes(color),
-                  ),
+                  !item.colors.some((color) => data.preferences.excludedColors.includes(color)),
               )
               .map((item) => (
                 <Pressable
@@ -1034,7 +919,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                       context,
                     );
                     setNotice(change.message);
-                    if (change.status === "swapped") {
+                    if (change.status === 'swapped') {
                       setSwap(null);
                       setSelectedOutfit(change.outfit);
                     }
@@ -1042,9 +927,7 @@ function Main({ data, setData, hydrated, loadError, hydrate }: MainProps) {
                   style={styles.swapItem}
                 >
                   <Garment item={item} size={110} />
-                  <Text
-                    style={{ color: palette.ink, fontSize: 12, marginTop: 10 }}
-                  >
+                  <Text style={{ color: palette.ink, fontSize: 12, marginTop: 10 }}>
                     {item.name}
                   </Text>
                 </Pressable>
@@ -1082,21 +965,16 @@ function OutfitCard({
   return (
     <View style={[styles.outfitCard, !primary && { borderRadius: 20 }]}>
       <View
-        style={[
-          styles.outfitArt,
-          primary && !compact ? { minHeight: 255 } : { minHeight: 150 },
-        ]}
+        style={[styles.outfitArt, primary && !compact ? { minHeight: 255 } : { minHeight: 150 }]}
       >
         <View style={styles.garmentLine}>
           {outfit.items.map((item) => (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={
-                onItem ? `Cambiar ${item.name}` : `Ver ${item.name}`
-              }
+              accessibilityLabel={onItem ? `Cambiar ${item.name}` : `Ver ${item.name}`}
               key={item.id}
               onPress={() => (onItem ? onItem(item) : onDetails?.())}
-              style={{ alignItems: "center", paddingHorizontal: 0 }}
+              style={{ alignItems: 'center', paddingHorizontal: 0 }}
             >
               <Garment item={item} size={primary && !compact ? 88 : 64} />
               {primary ? (
@@ -1105,7 +983,7 @@ function OutfitCard({
                   style={{
                     maxWidth: 88,
                     minHeight: 32,
-                    textAlign: "center",
+                    textAlign: 'center',
                     fontSize: 10,
                     color: palette.muted,
                     marginTop: 9,
@@ -1124,53 +1002,39 @@ function OutfitCard({
         ) : null}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={
-            saved ? "Quitar conjunto de guardados" : "Guardar conjunto"
-          }
+          accessibilityLabel={saved ? 'Quitar conjunto de guardados' : 'Guardar conjunto'}
           accessibilityState={{ selected: saved }}
           aria-pressed={saved}
           onPress={onFavorite}
           style={styles.heart}
         >
-          <Text
-            style={{ fontSize: 23, color: saved ? palette.rust : palette.ink }}
-          >
-            {saved ? "♥" : "♡"}
+          <Text style={{ fontSize: 23, color: saved ? palette.rust : palette.ink }}>
+            {saved ? '♥' : '♡'}
           </Text>
         </Pressable>
       </View>
       <View style={{ padding: primary ? 22 : 17 }}>
-        {(showReasons ? outfit.reasons.slice(0, primary ? 3 : 1) : []).map(
-          (reason) => (
-            <Text
-              key={reason}
-              style={[
-                s.subtitle,
-                { fontSize: primary ? 12 : 11, lineHeight: 20 },
-              ]}
-            >
-              · {reason}
-            </Text>
-          ),
-        )}
-        {(primary ? outfit.warnings : outfit.warnings.slice(0, 1)).map(
-          (warning) => (
-            <Text
-              key={warning}
-              style={{
-                color: palette.rust,
-                fontSize: 11,
-                lineHeight: 19,
-                marginTop: 5,
-              }}
-            >
-              {warning}
-            </Text>
-          ),
-        )}
+        {(showReasons ? outfit.reasons.slice(0, primary ? 3 : 1) : []).map((reason) => (
+          <Text key={reason} style={[s.subtitle, { fontSize: primary ? 12 : 11, lineHeight: 20 }]}>
+            · {reason}
+          </Text>
+        ))}
+        {(primary ? outfit.warnings : outfit.warnings.slice(0, 1)).map((warning) => (
+          <Text
+            key={warning}
+            style={{
+              color: palette.rust,
+              fontSize: 11,
+              lineHeight: 19,
+              marginTop: 5,
+            }}
+          >
+            {warning}
+          </Text>
+        ))}
         <View style={[s.row, { marginTop: 20 }]}>
           <Button
-            label={primary ? "Lo usé hoy" : "Ver conjunto"}
+            label={primary ? 'Lo usé hoy' : 'Ver conjunto'}
             onPress={primary ? onWorn : () => onDetails?.()}
             small={!primary}
             style={{ flex: 1 }}
@@ -1178,7 +1042,7 @@ function OutfitCard({
           {primary ? (
             <Button
               secondary
-              label={saved ? "Guardado" : "Guardar"}
+              label={saved ? 'Guardado' : 'Guardar'}
               onPress={onFavorite}
               style={{ flex: 1 }}
             />
@@ -1194,19 +1058,11 @@ function DemoBanner({ onStart }: { onStart: () => void }) {
   const styles = useMemo(() => createStyles(palette), [palette]);
   return (
     <View style={styles.demo}>
-      <Text
-        style={{ color: palette.green, flex: 1, fontSize: 11, lineHeight: 17 }}
-      >
+      <Text style={{ color: palette.green, flex: 1, fontSize: 11, lineHeight: 17 }}>
         CLÓSET DE EJEMPLO
       </Text>
-      <Pressable
-        accessibilityRole="button"
-        onPress={onStart}
-        style={{ padding: 10 }}
-      >
-        <Text style={{ fontSize: 11, color: palette.rust, fontWeight: "600" }}>
-          Usar mi ropa
-        </Text>
+      <Pressable accessibilityRole="button" onPress={onStart} style={{ padding: 10 }}>
+        <Text style={{ fontSize: 11, color: palette.rust, fontWeight: '600' }}>Usar mi ropa</Text>
       </Pressable>
     </View>
   );
@@ -1241,8 +1097,7 @@ function Closet({
             Mi clóset
           </Text>
           <Text style={[s.subtitle, { marginTop: 8 }]}>
-            {items.length} prendas ·{" "}
-            {items.filter((item) => item.available).length} disponibles
+            {items.length} prendas · {items.filter((item) => item.available).length} disponibles
           </Text>
         </View>
         <Button label="+ Agregar prenda" onPress={onAdd} small />
@@ -1256,8 +1111,8 @@ function Closet({
         <View style={[s.panel, { paddingVertical: 35 }]}>
           <Text style={styles.sectionTitle}>Agrega tus prendas</Text>
           <Text style={[s.subtitle, { marginBottom: 24 }]}>
-            Para un conjunto necesitas una parte de arriba, una de abajo y
-            calzado; o una prenda completa y calzado.
+            Para un conjunto necesitas una parte de arriba, una de abajo y calzado; o una prenda
+            completa y calzado.
           </Text>
           <Button label="Agregar prenda" onPress={onAdd} />
           <Button
@@ -1273,12 +1128,7 @@ function Closet({
       ) : (
         <ClosetGrid items={items} onEdit={onEdit} />
       )}
-      <Button
-        secondary
-        label="Armar conjunto"
-        onPress={onManual}
-        style={{ marginTop: 24 }}
-      />
+      <Button secondary label="Armar conjunto" onPress={onManual} style={{ marginTop: 24 }} />
     </>
   );
 }
@@ -1289,9 +1139,7 @@ function localDay(value: string) {
 }
 
 function toggle(values: string[], value: string) {
-  return values.includes(value)
-    ? values.filter((item) => item !== value)
-    : [...values, value];
+  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
 
 const createStyles = (palette: Palette) =>
@@ -1300,14 +1148,14 @@ const createStyles = (palette: Palette) =>
     loading: {
       flex: 1,
       backgroundColor: palette.paper,
-      justifyContent: "center",
+      justifyContent: 'center',
       padding: 36,
-      alignItems: "center",
+      alignItems: 'center',
     },
     logo: {
       fontSize: 48,
       lineHeight: 55,
-      fontWeight: "700",
+      fontWeight: '700',
       letterSpacing: -5,
       color: palette.ink,
       paddingRight: 6,
@@ -1317,21 +1165,21 @@ const createStyles = (palette: Palette) =>
       paddingVertical: 14,
       borderBottomWidth: 1,
       borderColor: palette.line,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       gap: 8,
     },
     brand: {
       color: palette.ink,
       fontSize: 13,
       letterSpacing: -0.2,
-      fontWeight: "600",
+      fontWeight: '600',
     },
     brandSub: { color: palette.muted, fontSize: 9, marginTop: 3 },
     localBadge: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 6,
       flexShrink: 1,
     },
@@ -1345,15 +1193,15 @@ const createStyles = (palette: Palette) =>
       padding: 24,
       paddingTop: 32,
       paddingBottom: 50,
-      width: "100%",
+      width: '100%',
       maxWidth: 880,
-      alignSelf: "center",
+      alignSelf: 'center',
     },
     pageHeading: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      flexWrap: "wrap",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      alignItems: 'center',
       gap: 16,
       marginBottom: 20,
     },
@@ -1371,8 +1219,8 @@ const createStyles = (palette: Palette) =>
       paddingLeft: 14,
       paddingRight: 4,
       paddingVertical: 4,
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       borderRadius: 10,
       gap: 6,
     },
@@ -1381,44 +1229,44 @@ const createStyles = (palette: Palette) =>
       borderColor: palette.line,
       backgroundColor: palette.white,
       borderRadius: 24,
-      overflow: "hidden",
+      overflow: 'hidden',
     },
     outfitArt: {
       backgroundColor: palette.art,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       padding: 22,
       paddingTop: 50,
     },
-    outfitTag: { position: "absolute", top: 19, left: 20 },
+    outfitTag: { position: 'absolute', top: 19, left: 20 },
     garmentLine: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      alignItems: "center",
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      alignItems: 'center',
       gap: 8,
     },
     heart: {
-      position: "absolute",
+      position: 'absolute',
       top: 10,
       right: 10,
       width: 44,
       height: 44,
       borderRadius: 22,
       backgroundColor: palette.floating,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     alternatives: {
-      flexDirection: "row",
-      flexWrap: "wrap",
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 14,
       marginTop: 16,
     },
     alternative: { flexGrow: 1, flexBasis: 280, minWidth: 0 },
     footnote: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 14,
       paddingVertical: 26,
     },
@@ -1428,15 +1276,15 @@ const createStyles = (palette: Palette) =>
       backgroundColor: palette.paper,
     },
     tabInner: {
-      flexDirection: "row",
+      flexDirection: 'row',
       maxWidth: 560,
-      alignSelf: "center",
-      width: "100%",
+      alignSelf: 'center',
+      width: '100%',
     },
     tab: {
       flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       paddingTop: 10,
       paddingBottom: 12,
       gap: 4,
@@ -1447,11 +1295,11 @@ const createStyles = (palette: Palette) =>
       height: 4,
       borderRadius: 2,
       backgroundColor: palette.rust,
-      position: "absolute",
+      position: 'absolute',
       bottom: 4,
     },
     notice: {
-      position: "absolute",
+      position: 'absolute',
       left: 16,
       right: 16,
       bottom: 12,
@@ -1461,7 +1309,7 @@ const createStyles = (palette: Palette) =>
       borderRadius: 14,
       borderWidth: 1,
       borderColor: palette.line,
-      shadowColor: "#000",
+      shadowColor: '#000',
       shadowOpacity: 0.12,
       shadowRadius: 12,
       shadowOffset: { width: 0, height: 4 },
@@ -1469,29 +1317,29 @@ const createStyles = (palette: Palette) =>
     },
     error: {
       backgroundColor: palette.errorBg,
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 12,
-      alignItems: "center",
+      alignItems: 'center',
       padding: 14,
     },
     onboarding: {
       maxWidth: 560,
-      width: "100%",
-      alignSelf: "center",
+      width: '100%',
+      alignSelf: 'center',
       padding: 30,
       flexGrow: 1,
-      justifyContent: "center",
+      justifyContent: 'center',
       paddingBottom: 50,
     },
     introArt: {
-      flexDirection: "row",
-      justifyContent: "center",
-      flexWrap: "wrap",
+      flexDirection: 'row',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
       borderRadius: 28,
       backgroundColor: palette.wash,
       padding: 18,
       marginVertical: 26,
-      overflow: "hidden",
+      overflow: 'hidden',
     },
     sectionTitle: {
       fontSize: 19,
@@ -1500,8 +1348,8 @@ const createStyles = (palette: Palette) =>
       marginBottom: 8,
     },
     savedRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 15,
       padding: 16,
       backgroundColor: palette.white,
@@ -1509,7 +1357,7 @@ const createStyles = (palette: Palette) =>
       borderWidth: 1,
       borderColor: palette.line,
       marginBottom: 10,
-      flexWrap: "wrap",
+      flexWrap: 'wrap',
     },
     swapItem: {
       backgroundColor: palette.white,
