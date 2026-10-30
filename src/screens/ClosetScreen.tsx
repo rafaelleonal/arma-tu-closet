@@ -24,6 +24,7 @@ export function ClosetScreen({
   onDemoReady: () => void;
 }) {
   const { s } = useUI();
+  const available = items.filter((item) => item.available).length;
   const toggle = (item: WardrobeItem) =>
     update((current) => ({
       ...current,
@@ -41,8 +42,8 @@ export function ClosetScreen({
             Mi clóset
           </Text>
           <Text style={[s.subtitle, { marginTop: 8 }]}>
-            {items.length} prendas ·{' '}
-            {items.filter((item) => item.available).length} disponibles
+            {items.length} {items.length === 1 ? 'prenda' : 'prendas'} ·{' '}
+            {available} {available === 1 ? 'disponible' : 'disponibles'}
           </Text>
         </View>
         <Button label="+ Agregar prenda" onPress={onAdd} small />

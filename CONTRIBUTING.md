@@ -55,6 +55,7 @@ Usa un clóset de QA y fotos sintéticas. En web, un origen separado permite con
 5. Cambiar una pieza, guardar y registrar uso. Guardar no aumenta usos; repetir el registro del mismo conjunto el mismo día no lo duplica en la UI.
 6. Revisar el comportamiento con un clóset insuficiente y con un guardado cuya prenda dejó de estar disponible.
 7. Revisar los temas, explicaciones desactivadas y tamaños estrechos. Probar foto, teclado, áreas seguras y permisos en teléfono cuando el cambio los afecte.
+8. En desarrollo, Mi clóset muestra un selector de datos de prueba ([qaCloset.ts](src/domain/qaCloset.ts)): peor caso, vacío, una prenda, 400 prendas y ejemplo editado. En web se elige también con `?closet=worst`. Esas prendas son de solo lectura y nunca se escriben en el documento local.
 
 Selecciona los pasos que cubran el cambio. Guarda capturas útiles en `docs/evidence/`, sin datos personales, y distingue viewport web de teléfono real. Registra evidencia nueva en `docs/evaluacion.md` con fecha y entorno; conserva los resultados anteriores como históricos.
 

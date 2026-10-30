@@ -1,5 +1,5 @@
-import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { colorLabels, type WardrobeItem } from '../domain';
 import { useTheme } from '../theme/ThemeProvider';
 import { colorHex } from './ui';
@@ -62,6 +62,27 @@ function illustrationFor(item: WardrobeItem): IllustrationKind {
   }
 }
 
+/**
+ * The garment's own images that can still be shown. A file that fails to load (deleted, or saved
+ * on another device) falls back to the next one: cut-out, then photo, then the drawing.
+ */
+export function useGarmentImages(item: WardrobeItem) {
+  const [failed, setFailed] = useState<readonly string[]>([]);
+  const usable = (uri?: string) =>
+    uri && !failed.includes(uri) ? uri : undefined;
+  return {
+    cutoutUri: usable(item.cutoutUri),
+    photoUri: usable(item.photoUri),
+    fail: (uri: string) => () =>
+      setFailed((current) =>
+        current.includes(uri) ? current : [...current, uri],
+      ),
+  };
+}
+
+const SWATCH_SLOT = 13;
+const MORE_WIDTH = 18;
+
 export function Garment({
   item,
   size = 100,
@@ -70,27 +91,36 @@ export function Garment({
   size?: number;
 }) {
   const { palette } = useTheme();
+  const { cutoutUri, photoUri, fail } = useGarmentImages(item);
   const colors = item.colors
     .map((color) => colorLabels[color] || color)
     .join(', ');
   const demoPhoto = item.photoUri ? undefined : demoPhotoFor(item);
+  // One row of swatches; the rest are counted, and the label still names every color.
+  const fits = Math.floor((size + 4) / SWATCH_SLOT);
+  const shown =
+    item.colors.length > fits
+      ? Math.max(1, Math.floor((size + 4 - MORE_WIDTH) / SWATCH_SLOT))
+      : item.colors.length;
   return (
     <View
       accessible
-      accessibilityLabel={`${item.photoUri ? 'Foto' : demoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`}
+      accessibilityLabel={`${cutoutUri || photoUri ? 'Foto' : demoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`}
       style={styles.art}
     >
-      {item.cutoutUri ? (
+      {cutoutUri ? (
         <Image
           accessible={false}
-          source={{ uri: item.cutoutUri }}
+          source={{ uri: cutoutUri }}
+          onError={fail(cutoutUri)}
           style={{ width: size, height: size }}
           resizeMode="contain"
         />
-      ) : item.photoUri ? (
+      ) : photoUri ? (
         <Image
           accessible={false}
-          source={{ uri: item.photoUri }}
+          source={{ uri: photoUri }}
+          onError={fail(photoUri)}
           style={{
             width: size,
             height: size,
@@ -115,7 +145,7 @@ export function Garment({
       )}
       {item.colors.length ? (
         <View style={[styles.colors, { maxWidth: size }]}>
-          {item.colors.map((color) => (
+          {item.colors.slice(0, shown).map((color) => (
             <View
               key={color}
               style={[
@@ -127,6 +157,11 @@ export function Garment({
               ]}
             />
           ))}
+          {shown < item.colors.length ? (
+            <Text style={[styles.more, { color: palette.muted }]}>
+              +{item.colors.length - shown}
+            </Text>
+          ) : null}
         </View>
       ) : null}
     </View>
@@ -137,10 +172,11 @@ const styles = StyleSheet.create({
   art: { alignItems: 'center', justifyContent: 'center' },
   colors: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
     marginTop: 7,
   },
   swatch: { width: 9, height: 9, borderRadius: 5, borderWidth: 1 },
+  more: { fontSize: 9, lineHeight: 10, fontWeight: '600' },
 });

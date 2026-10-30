@@ -241,3 +241,12 @@ Sin verificar: el recorte real en un iPhone (calidad, tiempo y memoria), **Usar 
 - Simulador iPhone 17 Pro (iOS 26.5) con la build de desarrollo y Metro sirviendo el código nuevo: en Hoy, cambiar los zapatos por botines, **Guardar** dentro de la hoja (muestra «Guardado con los detalles originales») y **Lo usé hoy** (cierra la hoja y las sugerencias rotan). En Mi clóset: perchero; **Agregar prenda** con la foto de ejemplo de la chamarra elegida de la galería («Guardando foto…» mientras abre el selector); **Quitar fondo** muestra «No pudimos quitar el fondo de esta foto.», como se espera en el simulador; cambiar a Capa exterior ajusta el abrigo a Abrigadora y el nombre sugerido; al guardar, la prenda aparece con foto en la cuadrícula y el aviso flota sobre el contenido. Al editarla, un cambio y la X muestran **¿Descartar cambios?**, y descartar cierra sin guardar. **Editar preferencias** recorre los cuatro pasos, muestra Vibración en el último y **Listo** vuelve a Mi estilo con «Preferencias guardadas.». Tras cerrar y abrir la app siguen las 11 prendas y la foto. Los toques en este simulador llegan con retraso: un segundo toque en **Guardar** quitó el conjunto de guardados, que es el comportamiento esperado del botón.
 
 Sin verificar tras la separación: Android, cámara, **Analizar foto** con el servidor local, recorte real en un iPhone, VoiceOver y anchos de 320/390 px.
+
+## 30/10/2026 — Peor caso en Mi clóset
+
+- Selector solo de desarrollo en Mi clóset ([qaCloset.ts](../src/domain/qaCloset.ts), `?closet=` en web): peor caso, vacío, una prenda, 400 prendas y ejemplo editado. Las prendas de prueba no se escriben; el documento del origen de QA siguió con 0 prendas.
+- Encontrado y corregido: una foto o recorte que ya no carga dejaba el mosaico vacío (ahora cae al recorte, la foto o el dibujo, y la etiqueta dice «Ilustración genérica»); «1 prendas · 1 disponibles»; con 12 colores se cortaban 4 muestras a 320 px (ahora una fila y «+N»); nombres parecidos perdían el final en una línea (ahora dos).
+- Pendiente de decisión: encabezado que cambia de una a dos líneas según el conteo, conteo y **Armar conjunto** en el clóset vacío, nombre sin límite en el esquema y cuadrícula sin virtualizar (unos 0.75 s para 400 prendas en navegador de escritorio, modo desarrollo).
+- Navegador (Metro web, puerto 8093) a 320 px, 375 px y escritorio. `pnpm typecheck`, `pnpm lint` y `pnpm format:check` sin errores; `pnpm test` **80/80**.
+
+Sin verificar: tema Medianoche, texto ampliado de iOS, VoiceOver, iPhone y Android.

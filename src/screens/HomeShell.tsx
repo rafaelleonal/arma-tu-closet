@@ -28,6 +28,7 @@ import {
   SwapSheet,
   type SwapTarget,
 } from '../components/OutfitSheets';
+import { QaClosetToggle, useQaCloset } from '../components/QaClosetToggle';
 import { useUI } from '../components/ui';
 import { createOutfitActions } from './actions';
 import { ClosetScreen } from './ClosetScreen';
@@ -58,6 +59,7 @@ export function HomeShell(props: HomeShellProps) {
   const [manualOpen, setManualOpen] = useState(false);
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
   const [swap, setSwap] = useState<SwapTarget | null>(null);
+  const qa = useQaCloset();
   const actions = createOutfitActions(data, update, autosave, () =>
     setSelectedOutfit(null),
   );
@@ -93,10 +95,11 @@ export function HomeShell(props: HomeShellProps) {
             ) : null}
             {tab === 'closet' ? (
               <ClosetScreen
-                items={data.items}
-                update={update}
+                items={qa.items ?? data.items}
+                // A test closet is read-only, so nothing it shows reaches the local document.
+                update={qa.items ? () => {} : update}
                 onAdd={() => setEditor('new')}
-                onEdit={setEditor}
+                onEdit={qa.items ? () => {} : setEditor}
                 onManual={() => setManualOpen(true)}
                 onDemoReady={() =>
                   autosave.noticeAfterSave(
@@ -119,6 +122,9 @@ export function HomeShell(props: HomeShellProps) {
           message={autosave.notice}
           onClose={() => autosave.setNotice('')}
         />
+        {qa.enabled && tab === 'closet' ? (
+          <QaClosetToggle mode={qa.mode} onChange={qa.setMode} />
+        ) : null}
       </View>
       <TabBar
         tab={tab}

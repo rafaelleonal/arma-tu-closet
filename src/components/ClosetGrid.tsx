@@ -6,7 +6,7 @@ import {
   type Category,
   type WardrobeItem,
 } from '../domain';
-import { Garment } from './Garment';
+import { Garment, useGarmentImages } from './Garment';
 import { Chip, useUI } from './ui';
 
 const GAP = 10;
@@ -19,7 +19,7 @@ export function ClosetGrid({
   items: WardrobeItem[];
   onEdit: (item: WardrobeItem) => void;
 }) {
-  const { palette, s } = useUI();
+  const { s } = useUI();
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [width, setWidth] = useState(0);
   const present = CATEGORIES.filter((value) =>
@@ -57,80 +57,12 @@ export function ClosetGrid({
       >
         {tile
           ? visible.map((item) => (
-              <Pressable
+              <GridTile
                 key={item.id}
-                accessibilityRole="button"
-                accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}`}
+                item={item}
+                size={tile}
                 onPress={() => onEdit(item)}
-                style={({ pressed }) => ({
-                  width: tile,
-                  opacity: pressed ? 0.75 : 1,
-                })}
-              >
-                <View
-                  style={{
-                    width: tile,
-                    height: tile,
-                    borderRadius: 14,
-                    overflow: 'hidden',
-                    backgroundColor: palette.wash,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {item.cutoutUri ? (
-                    <Image
-                      accessible={false}
-                      source={{ uri: item.cutoutUri }}
-                      style={{
-                        width: tile * 0.84,
-                        height: tile * 0.84,
-                        opacity: item.available ? 1 : 0.45,
-                      }}
-                      resizeMode="contain"
-                    />
-                  ) : item.photoUri ? (
-                    <Image
-                      accessible={false}
-                      source={{ uri: item.photoUri }}
-                      style={{
-                        width: tile,
-                        height: tile,
-                        opacity: item.available ? 1 : 0.45,
-                      }}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={{ opacity: item.available ? 1 : 0.45 }}>
-                      <Garment item={item} size={Math.round(tile * 0.62)} />
-                    </View>
-                  )}
-                  {!item.available ? (
-                    <Text
-                      style={{
-                        position: 'absolute',
-                        bottom: 6,
-                        left: 6,
-                        fontSize: 10,
-                        color: palette.ink,
-                        backgroundColor: palette.floating,
-                        borderRadius: 8,
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      Lavandería
-                    </Text>
-                  ) : null}
-                </View>
-                <Text
-                  numberOfLines={1}
-                  style={{ fontSize: 12, color: palette.ink, marginTop: 6 }}
-                >
-                  {item.name}
-                </Text>
-              </Pressable>
+              />
             ))
           : null}
       </View>
@@ -138,5 +70,93 @@ export function ClosetGrid({
         <Text style={s.subtitle}>No tienes prendas en esta categoría.</Text>
       ) : null}
     </View>
+  );
+}
+
+function GridTile({
+  item,
+  size,
+  onPress,
+}: {
+  item: WardrobeItem;
+  size: number;
+  onPress: () => void;
+}) {
+  const { palette } = useUI();
+  const { cutoutUri, photoUri, fail } = useGarmentImages(item);
+  const opacity = item.available ? 1 : 0.45;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}`}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: size,
+        opacity: pressed ? 0.75 : 1,
+      })}
+    >
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius: 14,
+          overflow: 'hidden',
+          backgroundColor: palette.wash,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {cutoutUri ? (
+          <Image
+            accessible={false}
+            source={{ uri: cutoutUri }}
+            onError={fail(cutoutUri)}
+            style={{ width: size * 0.84, height: size * 0.84, opacity }}
+            resizeMode="contain"
+          />
+        ) : photoUri ? (
+          <Image
+            accessible={false}
+            source={{ uri: photoUri }}
+            onError={fail(photoUri)}
+            style={{ width: size, height: size, opacity }}
+            resizeMode="cover"
+          />
+        ) : (
+          // Also the fallback when a photo file no longer loads, so the drawing skips that file.
+          <View style={{ opacity }}>
+            <Garment
+              item={{ ...item, photoUri: undefined, cutoutUri: undefined }}
+              size={Math.round(size * 0.62)}
+            />
+          </View>
+        )}
+        {!item.available ? (
+          <Text
+            style={{
+              position: 'absolute',
+              bottom: 6,
+              left: 6,
+              fontSize: 10,
+              color: palette.ink,
+              backgroundColor: palette.floating,
+              borderRadius: 8,
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+              overflow: 'hidden',
+            }}
+          >
+            Lavandería
+          </Text>
+        ) : null}
+      </View>
+      {/* Two lines: similar names often differ only at the end. */}
+      <Text
+        numberOfLines={2}
+        style={{ fontSize: 12, color: palette.ink, marginTop: 6 }}
+      >
+        {item.name}
+      </Text>
+    </Pressable>
   );
 }
