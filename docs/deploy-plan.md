@@ -1,6 +1,6 @@
 # Plan de despliegue y distribución
 
-23/10/2026 · Plan, no despliegue realizado. No hay proyecto EAS vinculado, backend público, cuentas de tiendas ni binarios firmados creados por esta entrega.
+23/10/2026 · Plan, no despliegue realizado. Desde el 30/10/2026 el repositorio tiene [eas.json](../eas.json) y variantes de identificador; todavía no hay proyecto EAS vinculado, backend público, cuentas de tiendas ni binarios firmados.
 
 ## Dónde alojar cada parte
 
@@ -21,7 +21,20 @@ EAS construye binarios y permite distribuirlos; las Edge Functions tienen un run
 - **Staging:** proyecto Supabase separado, claves y cuotas pequeñas, usuarios de prueba, fotos sintéticas, build de prueba y canal de actualización propio.
 - **Producción:** proyecto y credenciales independientes, dominio, contactos reales y políticas de datos aprobadas. Las variables `EXPO_PUBLIC_` son públicas dentro del bundle; no alojan secretos.
 
-Antes de vincular EAS, elegir propietario del producto e identificadores definitivos. Hoy falta `ios.bundleIdentifier`; Android usa `com.armatuoutfit.prototype`. Reservar identificadores de desarrollo distintos y acordar los de tiendas antes de la primera subida. Añadir icono, splash, permisos, `scheme`, versiones y perfiles `development`, `preview`, `production` en `eas.json` al ejecutar esta fase. Registrar credenciales y recuperación en un gestor seguro, no en el repositorio.
+Antes de vincular EAS, elegir propietario del producto. El identificador definitivo de tiendas es `com.armatuoutfit.prototype` en iOS y Android ([app.json](../app.json)), decidido el 30/10/2026; en Android no se puede cambiar después de la primera subida y aparece en la URL de la ficha de Play. Registrar credenciales y recuperación en un gestor seguro, no en el repositorio.
+
+Configuración preparada el 30/10/2026:
+
+| Perfil de `eas.json` | Uso | Identificador y nombre |
+|---|---|---|
+| `development` | Build con dev client, distribución interna | `….dev`, «Arma tu outfit (dev)» |
+| `development-simulator` | Igual, para el simulador de iOS | `….dev` |
+| `preview` | Build de release instalable sin Metro; APK en Android | `….preview`, «Arma tu outfit (prueba)» |
+| `production` | Binario para tiendas; número de build incrementado por EAS (`appVersionSource: remote`) | Identificador de `app.json` |
+
+[app.config.js](../app.config.js) aplica el sufijo según `APP_VARIANT`, que solo fijan los perfiles de EAS; `expo run` local conserva el identificador de `app.json`. `eas submit --profile production` envía Android a la pista interna como `draft`. `ios.config.usesNonExemptEncryption: false` declara que la app solo usa el cifrado estándar del sistema (HTTPS); revisarlo si se añade cifrado propio.
+
+Pendiente antes de la primera subida: icono, splash, `scheme`, política de privacidad pública y decidir qué hace **Analizar foto** en la build de tienda. Sin `EXPO_PUBLIC_AI_API_URL` muestra que el análisis no está configurado; `.env*` está ignorado, así que una build de EAS no incluye la URL local. Google exige subir el primer AAB a mano en Play Console; las siguientes pueden usar `eas submit`. `expo-doctor` (30/10/2026) pasa 19/20: cinco paquetes tienen parches de SDK 58 pendientes (`npx expo install --check`).
 
 ## Camino de distribución
 
