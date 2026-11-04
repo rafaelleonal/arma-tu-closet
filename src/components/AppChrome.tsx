@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Palette } from '../theme/ThemeProvider';
+import { AppLogo } from './AppLogo';
 import { useFeedback } from './Feedback';
 import { Button, useUI } from './ui';
 
@@ -13,19 +14,13 @@ const TABS = [
   { id: 'style', icon: '◌', label: 'Mi estilo' },
 ] as const;
 
-export function Logo() {
-  const { palette } = useUI();
-  const styles = useMemo(() => createStyles(palette), [palette]);
-  return <Text style={styles.logo}>a.</Text>;
-}
-
 export function AppHeader() {
   const { palette, s } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
   return (
     <View style={styles.header}>
       <View style={s.row}>
-        <Logo />
+        <AppLogo size={34} />
         <Text style={styles.brand}>arma tu outfit</Text>
       </View>
     </View>
@@ -161,14 +156,6 @@ export function DemoBanner({ onStart }: { onStart: () => void }) {
 
 const createStyles = (palette: Palette) =>
   StyleSheet.create({
-    logo: {
-      fontSize: 48,
-      lineHeight: 55,
-      fontWeight: '700',
-      letterSpacing: -5,
-      color: palette.ink,
-      paddingRight: 6,
-    },
     header: {
       paddingHorizontal: 24,
       paddingVertical: 14,

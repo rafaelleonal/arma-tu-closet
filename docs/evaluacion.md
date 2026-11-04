@@ -250,3 +250,21 @@ Sin verificar tras la separación: Android, cámara, **Analizar foto** con el se
 - Navegador (Metro web, puerto 8093) a 320 px, 375 px y escritorio. `pnpm typecheck`, `pnpm lint` y `pnpm format:check` sin errores; `pnpm test` **80/80**.
 
 Sin verificar: tema Medianoche, texto ampliado de iOS, VoiceOver, iPhone y Android.
+
+## Combinar una prenda elegida
+
+En navegador, con un clóset de prueba separado, se verificó elegir Playera blanca, ver dos propuestas, cambiar calzado conservando la playera, guardar y registrar uso. Al marcar los jeans como no disponibles, el flujo pidió una parte de abajo y volvió a la misma playera con propuestas al guardar una pieza nueva. Después de recargar se comprobó la entrada desde la cuadrícula del clóset mixto. [Captura](evidence/combinar-prenda-web.png).
+
+La suite registró 83 pruebas aprobadas. Las regresiones cubren las seis categorías, el límite de candidatas, colores excluidos, disponibilidad y una prenda completa incompatible. Queda pendiente la prueba de este flujo en dispositivo físico.
+
+En el simulador iPhone 15 Pro con iOS 17.5 y Expo Go se abrió Mi clóset, se eligió Playera blanca y se confirmaron dos propuestas. Cambiar zapatos rojos por botines café mantuvo la playera y dejó una sola opción al coincidir ambos conjuntos. [Captura de iOS](evidence/combinar-prenda-ios.png).
+
+## Quiero usarla más
+
+En iPhone 15 Pro simulado con iOS 17.5 y Expo Go, se marcó Playera blanca y se guardó. Hoy ofreció «Volver a usar · Playera blanca» aunque la prenda no aparecía en las tres opciones generales. El acceso abrió dos conjuntos con la playera fija. Al registrar el uso, apareció «Uso registrado» y se retiró el acceso de Hoy. El flujo en un teléfono físico queda pendiente.
+
+## Elección de conjunto con IA
+
+`pnpm test` aprobó 87 pruebas. El servidor simulado aceptó un índice válido, rechazó un índice fuera de la lista y rechazó una solicitud con una foto antes de invocar al proveedor. En iPhone 15 Pro simulado con iOS 17.5 y Expo Go, tocar «Elegir con IA» promovió el conjunto con camisa de mezclilla en lugar del vestido blanco usando una respuesta simulada. TypeScript y lint pasaron. Queda pendiente comparar la calidad de un modelo real y probarlo en teléfono físico.
+
+Se revisó visualmente el gancho en el simulador de iPhone 15 Pro con iOS 17.5 en [Lino](evidence/gancho-lino-ios.png) y [Medianoche](evidence/gancho-medianoche-ios.png). Ambos trazos conservan contraste de al menos 5.9:1 sobre el fondo principal en los seis temas. La configuración de Expo apunta al PNG opaco de 1024 × 1024 y el proyecto nativo local de iOS tiene una copia del recurso. La prueba del icono en la pantalla de inicio requiere instalar una nueva build.

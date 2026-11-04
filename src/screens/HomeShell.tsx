@@ -21,7 +21,6 @@ import {
 } from '../components/AppChrome';
 import { ContextEditor } from '../components/ContextEditor';
 import { MotionIn } from '../components/Feedback';
-import { ItemEditor } from '../components/ItemEditor';
 import { ManualBuilder } from '../components/ManualBuilder';
 import {
   OutfitSheet,
@@ -31,6 +30,7 @@ import {
 import { QaClosetToggle, useQaCloset } from '../components/QaClosetToggle';
 import { useUI } from '../components/ui';
 import { createOutfitActions } from './actions';
+import { ClosetSheets } from './ClosetSheets';
 import { ClosetScreen } from './ClosetScreen';
 import { StyleScreen } from './StyleScreen';
 import { TodayScreen } from './TodayScreen';
@@ -58,11 +58,13 @@ export function HomeShell(props: HomeShellProps) {
   const [contextOpen, setContextOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
+  const [combineItemId, setCombineItemId] = useState<string | null>(null);
   const [swap, setSwap] = useState<SwapTarget | null>(null);
   const qa = useQaCloset();
-  const actions = createOutfitActions(data, update, autosave, () =>
-    setSelectedOutfit(null),
-  );
+  const actions = createOutfitActions(data, update, autosave, () => {
+    setSelectedOutfit(null);
+    setCombineItemId(null);
+  });
   return (
     <SafeAreaView
       style={[styles.root, { backgroundColor: palette.paper }]}
@@ -91,6 +93,7 @@ export function HomeShell(props: HomeShellProps) {
                 onEditContext={() => setContextOpen(true)}
                 onSwap={setSwap}
                 onDetails={setSelectedOutfit}
+                onCombine={setCombineItemId}
               />
             ) : null}
             {tab === 'closet' ? (
@@ -133,24 +136,17 @@ export function HomeShell(props: HomeShellProps) {
           autosave.setNotice('');
         }}
       />
-      {editor ? (
-        <ItemEditor
-          item={editor === 'new' ? undefined : editor}
-          onClose={() => setEditor(null)}
-          onSave={(item) => {
-            update((current) => ({
-              ...current,
-              items: current.items.some((value) => value.id === item.id)
-                ? current.items.map((value) =>
-                    value.id === item.id ? item : value,
-                  )
-                : [item, ...current.items],
-            }));
-            setEditor(null);
-            autosave.noticeAfterSave('Prenda guardada.');
-          }}
-        />
-      ) : null}
+      <ClosetSheets
+        data={data}
+        update={update}
+        autosave={autosave}
+        context={recs.context}
+        actions={actions}
+        editor={editor}
+        setEditor={setEditor}
+        combineItemId={combineItemId}
+        setCombineItemId={setCombineItemId}
+      />
       {contextOpen ? (
         <ContextEditor
           value={data.context}

@@ -18,6 +18,12 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 
 Las ilustraciones son dibujos genéricos. Puedes analizar una foto con IA para proponer nombre, categoría y colores: revisas y confirmas la propuesta antes de incorporarla al formulario, y guardas la prenda por separado. Los demás atributos siguen siendo manuales.
 
+Desde **Mi clóset**, abre una prenda guardada y toca **Combinar esta prenda**. La app propone hasta dos conjuntos con esa pieza fija y el contexto de Hoy. Puedes cambiar las demás prendas, guardar o registrar el uso. Si falta una categoría, puedes agregar una prenda y volver a la misma selección.
+
+Marca **Quiero usarla más** al editar una prenda. Si encaja con el contexto y la rotación, Hoy puede mostrar un acceso para volver a combinarla.
+
+En desarrollo, **Elegir con IA** puede priorizar una opción de Hoy entre conjuntos que ya encajan con el contexto. El proxy local admite OpenRouter con Claude Sonnet 5.5 para comparar esa elección con el orden local. [Configuración para iOS](docs/integraciones.md#elección-de-conjunto-en-hoy) · [Criterios](docs/recomendaciones.md#elección-opcional-con-ia).
+
 ## Empezar
 
 Entorno usado en la validación del 27/10/2026: **Node.js 24.12.0 y pnpm 10.33.2**. Es la combinación comprobada, no una declaración de versión mínima. El clóset y Open-Meteo funcionan sin claves. El análisis opcional necesita un servidor local y una clave de OpenAI que nunca se incluye en Expo.
@@ -93,7 +99,7 @@ src/domain/             Tipos y reglas puras de recomendaciones
 src/storage/            Esquema, migración, escritura local y fotos
 src/weather/            Cliente Open-Meteo, caché y contexto derivado
 src/ai/                 Contrato y cliente de análisis de prendas
-server/                 Proxy local de OpenAI sin persistencia de fotos
+server/                 Proxy local de IA sin persistencia de fotos
 src/theme/              Paletas y proveedor de apariencia
 assets/garments/         Ilustraciones locales y prompts
 tests/                 Pruebas de dominio, esquema y contraste
@@ -124,7 +130,7 @@ Límites actuales que afectan el uso:
 - El esquema v3 migra v1/v2 y conserva la clave `@arma-tu-outfit/v1` para migrar datos existentes; un documento inválido no se reemplaza por la demo.
 - En web, el JSON completo —incluidas fotos— tiene un límite interno de 2 millones de caracteres; no equivale a la cuota garantizada del navegador. En móvil, las fotos se copian al directorio de documentos de la app. Los archivos que quedan sin referencias aún no se limpian automáticamente.
 - No hay deshacer uso ni edición del historial. Los guardados conservan una instantánea; registrar uso revalida las prendas actuales. El compositor elige categorías, no es un lienzo para arrastrar prendas.
-- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA solo asiste en nombre, categoría y colores de una prenda. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
+- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA asiste en nombre, categoría y colores de una prenda. En desarrollo también puede elegir entre conjuntos válidos. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
 
 ## Documentación y próximos pasos
 

@@ -10,6 +10,12 @@ import {
 } from './analysis';
 import { MAX_BODY_BYTES, parseImageRequest, RequestError } from './image';
 
+import {
+  outfitChoiceInput,
+  outfitChoiceOutput,
+} from '../src/ai/outfitChoiceContract';
+import type { OutfitChooser } from './outfitChoice';
+
 export const ALLOWED_ORIGINS = [
   'http://localhost:8081',
   'http://127.0.0.1:8081',
@@ -19,6 +25,7 @@ export const ALLOWED_ORIGINS = [
 
 export interface ServerOptions {
   analyze?: GarmentAnalyzer;
+  chooseOutfit?: OutfitChooser;
   limits?: Partial<{
     concurrent: number;
     perMinute: number;
@@ -32,6 +39,7 @@ export interface ServerOptions {
 /** Loopback prototype only: Origin/Host checks are not production authentication. */
 export function createGarmentServer({
   analyze,
+  chooseOutfit,
   limits: overrides,
   now = Date.now,
 }: ServerOptions = {}) {
@@ -55,6 +63,8 @@ export function createGarmentServer({
   server.keepAliveTimeout = 5_000;
 
   async function handle(request: IncomingMessage, response: ServerResponse) {
+    const path = request.url?.split('?')[0];
+    const choosing = path === '/api/outfit-choice';
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('Vary', 'Origin');
@@ -83,10 +93,13 @@ export function createGarmentServer({
       )
         throw new RequestError(403, 'Este origen no está permitido.');
       if (origin) response.setHeader('Access-Control-Allow-Origin', origin);
-      const path = request.url?.split('?')[0];
       if (request.method === 'GET' && path === '/health')
-        return send(response, 200, { status: 'ok', configured: !!analyze });
-      if (path !== '/api/garment-analysis')
+        return send(response, 200, {
+          status: 'ok',
+          configured: !!analyze,
+          outfitChoiceConfigured: !!chooseOutfit,
+        });
+      if (path !== '/api/garment-analysis' && !choosing)
         throw new RequestError(404, 'Ruta no encontrada.');
       if (request.method === 'OPTIONS') {
         if (!origin)
@@ -99,10 +112,12 @@ export function createGarmentServer({
         response.setHeader('Allow', 'POST, OPTIONS');
         throw new RequestError(405, 'Usa POST para analizar una foto.');
       }
-      if (!analyze)
+      if (choosing ? !chooseOutfit : !analyze)
         throw new RequestError(
           503,
-          'El análisis con IA aún no está activado. Puedes completar los datos a mano.',
+          choosing
+            ? 'La elección con IA aún no está activada.'
+            : 'El análisis con IA aún no está activado. Puedes completar los datos a mano.',
         );
       if (
         !/^application\/json(?:\s*;\s*charset=utf-8)?$/i.test(
@@ -112,7 +127,11 @@ export function createGarmentServer({
       ) {
         throw new RequestError(415, 'Envía la foto como JSON sin compresión.');
       }
-      const body = await readBody(request, limits.bodyTimeoutMs);
+      const body = await readBody(
+        request,
+        limits.bodyTimeoutMs,
+        choosing ? 16_384 : MAX_BODY_BYTES,
+      );
       let input: unknown;
       try {
         input = JSON.parse(body);
@@ -122,7 +141,9 @@ export function createGarmentServer({
           'El cuerpo de la solicitud no es JSON válido.',
         );
       }
-      const image = parseImageRequest(input);
+      const run: (signal: AbortSignal) => Promise<unknown> = choosing
+        ? prepareOutfitChoice(input, chooseOutfit!)
+        : prepareAnalysis(input, analyze!);
       if (now() - windowStart >= 60_000) {
         windowStart = now();
         minuteRequests = 0;
@@ -160,7 +181,9 @@ export function createGarmentServer({
           controller.abort(
             new RequestError(
               504,
-              'El análisis tardó demasiado. Intenta de nuevo o continúa a mano.',
+              choosing
+                ? 'La elección con IA tardó demasiado. Puedes usar las sugerencias de Hoy.'
+                : 'El análisis tardó demasiado. Intenta de nuevo o continúa a mano.',
             ),
           ),
         limits.providerTimeoutMs,
@@ -172,7 +195,7 @@ export function createGarmentServer({
       response.on('close', onClose);
       try {
         const analysis = Promise.resolve()
-          .then(() => analyze(image, controller.signal))
+          .then(() => run(controller.signal))
           .finally(() => {
             active--;
           });
@@ -185,12 +208,7 @@ export function createGarmentServer({
             },
           ),
         );
-        const result = parseAnalysisResult(
-          await Promise.race([analysis, aborted]),
-        );
-        if (result.status !== 'ok')
-          throw new RequestError(422, rejectionMessages[result.status]);
-        send(response, 200, { suggestion: result.suggestion });
+        send(response, 200, await Promise.race([analysis, aborted]));
       } finally {
         clearTimeout(timer);
         response.removeListener('close', onClose);
@@ -201,8 +219,9 @@ export function createGarmentServer({
         send(response, error.status, { error: error.message });
       else
         send(response, 502, {
-          error:
-            'No se pudo analizar la foto. Intenta de nuevo o completa los datos a mano.',
+          error: choosing
+            ? 'No se pudo elegir con IA. Puedes usar las sugerencias de Hoy.'
+            : 'No se pudo analizar la foto. Intenta de nuevo o completa los datos a mano.',
         });
     }
   }
@@ -222,10 +241,11 @@ function send(response: ServerResponse, status: number, body?: unknown) {
 function readBody(
   request: IncomingMessage,
   timeoutMs: number,
+  maxBytes: number,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const length = request.headers['content-length'];
-    if (length && (!/^\d+$/.test(length) || Number(length) > MAX_BODY_BYTES)) {
+    if (length && (!/^\d+$/.test(length) || Number(length) > maxBytes)) {
       request.resume();
       reject(
         new RequestError(
@@ -269,7 +289,7 @@ function readBody(
       );
     const onData = (chunk: Buffer) => {
       size += chunk.length;
-      if (size > MAX_BODY_BYTES)
+      if (size > maxBytes)
         fail(
           new RequestError(
             413,
@@ -287,4 +307,28 @@ function readBody(
     request.once('error', fail);
     request.once('aborted', onAborted);
   });
+}
+
+function prepareAnalysis(input: unknown, analyze: GarmentAnalyzer) {
+  const image = parseImageRequest(input);
+  return async (signal: AbortSignal) => {
+    const result = parseAnalysisResult(await analyze(image, signal));
+    if (result.status !== 'ok')
+      throw new RequestError(422, rejectionMessages[result.status]);
+    return { suggestion: result.suggestion };
+  };
+}
+
+function prepareOutfitChoice(input: unknown, choose: OutfitChooser) {
+  const parsed = outfitChoiceInput.safeParse(input);
+  if (!parsed.success)
+    throw new RequestError(400, 'Las opciones de conjunto no son válidas.');
+  const data = parsed.data;
+  return async (signal: AbortSignal) => {
+    const result = outfitChoiceOutput.safeParse(await choose(data, signal));
+    if (!result.success || result.data.index >= data.candidates.length) {
+      throw new RequestError(502, 'La IA eligió una opción fuera de la lista.');
+    }
+    return result.data;
+  };
 }

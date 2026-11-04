@@ -5,6 +5,7 @@ import {
   createDefaultContext,
   generateRecommendations,
   isValidOutfit,
+  pickWearMoreItem,
   recordOutfitWorn,
   seedWardrobe,
   swapOutfitItem,
@@ -433,5 +434,127 @@ test('demo styles are explicit known labels and duplicate tags do not boost scor
     generateRecommendations(duplicated, context({ styleIds: ['minimal'] }))
       .outfits[0].score,
     score,
+  );
+});
+
+test('pinned recommendations retain the selected garment in every category', () => {
+  const wardrobe = [
+    ...minimal(),
+    item('dress', 'one-piece'),
+    item('coat', 'layer'),
+    item('belt', 'accessory'),
+  ];
+  for (const pinned of wardrobe) {
+    const result = generateRecommendations(wardrobe, context(), {
+      pinnedItemId: pinned.id,
+      limit: 2,
+    });
+    assert.equal(result.status, 'ready', pinned.id);
+    assert.ok(result.outfits.length > 0 && result.outfits.length <= 2);
+    for (const outfit of result.outfits) {
+      assert.ok(isValidOutfit(outfit.items));
+      assert.ok(
+        outfit.items.some((piece) => piece.id === pinned.id),
+        pinned.id,
+      );
+    }
+  }
+});
+
+test('pinning survives pool limits and respects availability and excluded colors', () => {
+  const wardrobe = [
+    ...minimal(),
+    ...Array.from({ length: 30 }, (_, index) => item(`extra-${index}`, 'top')),
+    item('zz-pin', 'top', { colors: ['Rójo'] }),
+  ];
+  const options = { pinnedItemId: 'zz-pin' };
+  const result = generateRecommendations(wardrobe, context(), options);
+  assert.equal(result.status, 'ready');
+  assert.ok(
+    result.outfits.every((outfit) =>
+      outfit.items.some((piece) => piece.id === 'zz-pin'),
+    ),
+  );
+  assert.deepEqual(
+    generateRecommendations(
+      wardrobe,
+      context({ excludedColors: ['rojo'] }),
+      options,
+    ).outfits,
+    [],
+  );
+  const unavailable = wardrobe.map((piece) =>
+    piece.id === 'zz-pin' ? { ...piece, available: false } : piece,
+  );
+  assert.deepEqual(
+    generateRecommendations(unavailable, context(), options).outfits,
+    [],
+  );
+  assert.deepEqual(
+    generateRecommendations(minimal(), context(), options).outfits,
+    [],
+  );
+});
+
+test('an incompatible dress does not satisfy the missing bottom for a pinned top', () => {
+  const result = generateRecommendations(
+    [item('top', 'top'), item('dress', 'one-piece'), item('shoes', 'shoes')],
+    context(),
+    { pinnedItemId: 'top' },
+  );
+  assert.equal(result.status, 'insufficient');
+  assert.match(result.message, /una parte de abajo/);
+  assert.deepEqual(result.outfits, []);
+});
+
+test('Hoy surfaces one marked garment only when the outfit fits the context and cooldown', () => {
+  const wardrobe = minimal().map((piece) => ({
+    ...piece,
+    wearMore: piece.category !== 'shoes',
+  }));
+  const today = context();
+  const { outfits } = generateRecommendations(wardrobe, today);
+  assert.equal(pickWearMoreItem(outfits, today)?.id, 'bottom');
+  const wornToday = outfits.map((outfit) => ({
+    ...outfit,
+    items: outfit.items.map((piece) =>
+      piece.id === 'bottom' ? { ...piece, lastWornAt: NOW } : piece,
+    ),
+  }));
+  assert.equal(pickWearMoreItem(wornToday, today)?.id, 'top');
+  assert.equal(
+    pickWearMoreItem(wornToday, context({ raining: true })),
+    undefined,
+  );
+  assert.equal(
+    pickWearMoreItem(wornToday, context({ excludedColors: ['negro'] })),
+    undefined,
+  );
+  assert.equal(
+    pickWearMoreItem(wornToday, context({ temperatureC: -10 })),
+    undefined,
+  );
+  assert.equal(
+    pickWearMoreItem(outfits, context({ occasion: 'work' })),
+    undefined,
+  );
+  assert.equal(
+    pickWearMoreItem(generateRecommendations(minimal(), today).outfits, today),
+    undefined,
+  );
+});
+
+test('wear-more can find a valid pinned outfit outside the visible shortlist', () => {
+  const wardrobe = [...minimal(), item('marked', 'top', { wearMore: true })];
+  const today = context();
+  const visible = generateRecommendations(minimal(), today).outfits;
+  assert.equal(pickWearMoreItem(visible, today, wardrobe)?.id, 'marked');
+  const pinned = generateRecommendations(wardrobe, today, {
+    pinnedItemId: 'marked',
+    limit: 1,
+  }).outfits[0];
+  assert.equal(
+    pickWearMoreItem(visible, today, wardrobe, [pinned.id]),
+    undefined,
   );
 });

@@ -11,6 +11,7 @@ Estos ADRs documentan las decisiones estructurales ya implementadas en el protot
 | [005](0005-ubicacion-para-elegir-ciudad.md) | Ubicación aproximada, solo al pulsar, para elegir la ciudad del clima | Aceptada para el prototipo local |
 | [006](0006-recorte-de-fondo-en-dispositivo.md) | Recorte de fondo en el dispositivo con un módulo local y build de desarrollo | Aceptada para el prototipo local (iOS) |
 | [007](0007-estructura-del-front-y-reglas-de-lint.md) | Pantallas, hooks y componentes separados; límites de arquitectura y tamaño con ESLint | Aceptada para el prototipo |
+| [008](0008-eleccion-opcional-con-ia.md) | Elección opcional entre conjuntos locales válidos | Aceptada para evaluación en desarrollo |
 
 ## Cuándo crear un ADR
 

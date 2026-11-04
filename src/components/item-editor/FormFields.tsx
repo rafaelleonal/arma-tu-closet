@@ -168,3 +168,24 @@ export function AvailabilityField({
     </View>
   );
 }
+
+export function WearMoreField({
+  value,
+  onChange,
+}: {
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  const { palette, s } = useUI();
+  return (
+    <View style={[s.row, { justifyContent: 'space-between', marginTop: 16 }]}>
+      <Text style={{ color: palette.ink, flex: 1 }}>Quiero usarla más</Text>
+      <Switch
+        accessibilityLabel="Quiero usarla más"
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: palette.green }}
+      />
+    </View>
+  );
+}

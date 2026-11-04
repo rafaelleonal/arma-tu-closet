@@ -442,3 +442,15 @@ test('v3 without haptics stays readable and an explicit opt-out survives a round
     /no es compatible/,
   );
 });
+
+test('wear-more marker round trips in v3 and stays optional on existing garments', () => {
+  const data = fixture();
+  data.items[0].wearMore = true;
+  const restored = parseLocalData(serializeLocalData(data));
+  assert.equal(restored.items[0].wearMore, true);
+  assert.equal(restored.items[1].wearMore, undefined);
+  assert.equal(
+    isLocalData({ ...data, items: [{ ...data.items[0], wearMore: 'true' }] }),
+    false,
+  );
+});

@@ -276,11 +276,25 @@ export function isValidOutfit(items: WardrobeItem[]): boolean {
     : counts.get('top') === 1 && counts.get('bottom') === 1;
 }
 
+function missingForPinned(
+  pinned: WardrobeItem,
+  tops: WardrobeItem[],
+  bottoms: WardrobeItem[],
+  onePieces: WardrobeItem[],
+  shoes: WardrobeItem[],
+): string[] {
+  const missing = shoes.length ? [] : ['calzado'];
+  if (pinned.category === 'one-piece' || onePieces.length) return missing;
+  if (!tops.length) missing.push('una parte de arriba');
+  if (!bottoms.length) missing.push('una parte de abajo');
+  return missing;
+}
+
 /** Bounded candidate pools and beam ranking keep large local wardrobes responsive. */
 export function generateRecommendations(
   wardrobe: WardrobeItem[],
   context: RecommendationContext,
-  options: { limit?: number } = {},
+  options: { limit?: number; pinnedItemId?: string } = {},
 ): RecommendationResult {
   if (!wardrobe.length)
     return {
@@ -290,20 +304,49 @@ export function generateRecommendations(
     };
   // Deduplicate IDs defensively after restoring local JSON or importing garments.
   const unique = [...new Map(wardrobe.map((item) => [item.id, item])).values()];
+  const pinned = unique.find((item) => item.id === options.pinnedItemId);
+  if (
+    options.pinnedItemId !== undefined &&
+    (!pinned || !isItemEligible(pinned, context))
+  ) {
+    return {
+      status: 'insufficient',
+      outfits: [],
+      message: !pinned
+        ? 'La prenda ya no está en tu clóset.'
+        : !pinned.available
+          ? 'Marca esta prenda como disponible para combinarla.'
+          : 'Esta prenda tiene un color excluido. Puedes cambiarlo en tus preferencias.',
+    };
+  }
   const eligible = unique.filter((item) => isItemEligible(item, context));
   const pool = (category: Category, cap: number) =>
-    eligible
-      .filter((item) => item.category === category)
-      .sort(
-        (a, b) =>
-          itemPriority(b, context) - itemPriority(a, context) ||
-          lexical(a.id, b.id),
-      )
-      .slice(0, cap);
+    pinned?.category === category
+      ? [pinned]
+      : eligible
+          .filter((item) => item.category === category)
+          .sort(
+            (a, b) =>
+              itemPriority(b, context) - itemPriority(a, context) ||
+              lexical(a.id, b.id),
+          )
+          .slice(0, cap);
   const tops = pool('top', 24);
   const bottoms = pool('bottom', 24);
-  const onePieces = pool('one-piece', 24);
+  const onePieces =
+    pinned?.category === 'top' || pinned?.category === 'bottom'
+      ? []
+      : pool('one-piece', 24);
   const shoes = pool('shoes', 16);
+  if (pinned) {
+    const missing = missingForPinned(pinned, tops, bottoms, onePieces, shoes);
+    if (missing.length)
+      return {
+        status: 'insufficient',
+        outfits: [],
+        message: `Para combinar esta prenda, agrega ${missing.join(' y ')} o revisa la disponibilidad y los colores excluidos.`,
+      };
+  }
   if (
     !shoes.length ||
     (!onePieces.length && (!tops.length || !bottoms.length))
@@ -323,7 +366,9 @@ export function generateRecommendations(
   }
   const bases = rankSets(
     [
-      ...tops.flatMap((top) => bottoms.map((bottom) => [top, bottom])),
+      ...(pinned?.category === 'one-piece'
+        ? []
+        : tops.flatMap((top) => bottoms.map((bottom) => [top, bottom]))),
       ...onePieces.map((item) => [item]),
     ],
     context,
@@ -332,11 +377,12 @@ export function generateRecommendations(
     bases.flatMap((base) => shoes.map((shoe) => [...base, shoe])),
     context,
   ).slice(0, 96);
-  const layers: (WardrobeItem | undefined)[] = [undefined, ...pool('layer', 4)];
-  const accessories: (WardrobeItem | undefined)[] = [
-    undefined,
-    ...pool('accessory', 2),
-  ];
+  const layers: (WardrobeItem | undefined)[] =
+    pinned?.category === 'layer' ? [pinned] : [undefined, ...pool('layer', 4)];
+  const accessories: (WardrobeItem | undefined)[] =
+    pinned?.category === 'accessory'
+      ? [pinned]
+      : [undefined, ...pool('accessory', 2)];
   const candidates = rankSets(
     dressed.flatMap((base) =>
       layers.flatMap((layer) =>
@@ -393,6 +439,80 @@ export function generateRecommendations(
         ? 'Una combinación con las prendas que tienes.'
         : `${selected.length} combinaciones con las prendas que tienes.`,
   };
+}
+
+export function fitsOutfitContext(
+  outfit: Outfit,
+  context: RecommendationContext,
+): boolean {
+  return (
+    outfit.items.every(
+      (item) =>
+        isItemEligible(item, context) &&
+        item.occasions.includes(context.occasion),
+    ) &&
+    Math.abs(bodyWarmth(outfit.items) - targetWarmth(context)) <= 0.8 &&
+    (!context.raining ||
+      outfit.items.some((item) => item.category === 'shoes' && item.rainReady))
+  );
+}
+
+function readyToWearMore(
+  item: WardrobeItem,
+  context: RecommendationContext,
+): boolean {
+  return (
+    item.wearMore === true &&
+    ageDays(item, context.now) >= Math.max(1, context.rotationDays)
+  );
+}
+
+function leastRecentFirst(
+  a: WardrobeItem,
+  b: WardrobeItem,
+  context: RecommendationContext,
+): number {
+  return (
+    ageDays(b, context.now) - ageDays(a, context.now) || lexical(a.id, b.id)
+  );
+}
+
+/** Reuses ranked outfits first, then tries up to three marked garments directly. */
+export function pickWearMoreItem(
+  recommendations: Outfit[],
+  context: RecommendationContext,
+  wardrobe: WardrobeItem[] = [],
+  dismissedIds: string[] = [],
+): WardrobeItem | undefined {
+  for (const outfit of recommendations) {
+    if (!fitsOutfitContext(outfit, context)) continue;
+    const marked = outfit.items
+      .filter((item) => readyToWearMore(item, context))
+      .sort((a, b) => leastRecentFirst(a, b, context));
+    if (marked.length) return marked[0];
+  }
+  const candidates = wardrobe
+    .filter(
+      (item) =>
+        readyToWearMore(item, context) &&
+        isItemEligible(item, context) &&
+        item.occasions.includes(context.occasion),
+    )
+    .sort((a, b) => leastRecentFirst(a, b, context))
+    .slice(0, 3);
+  for (const item of candidates) {
+    const [outfit] = generateRecommendations(wardrobe, context, {
+      pinnedItemId: item.id,
+      limit: 1,
+    }).outfits;
+    if (
+      outfit &&
+      !dismissedIds.includes(outfit.id) &&
+      fitsOutfitContext(outfit, context)
+    )
+      return item;
+  }
+  return undefined;
 }
 
 function currentItems(

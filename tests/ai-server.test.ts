@@ -144,6 +144,7 @@ test('unconfigured server stays available and returns actionable 503 without a p
     {
       status: 'ok',
       configured: false,
+      outfitChoiceConfigured: false,
     },
   );
   const result = await call(server);
@@ -463,4 +464,69 @@ test('AI SDK adapter uses Responses, explicit model, inline image, strict output
     success,
   );
   assert.equal(calls, 1);
+});
+
+test('outfit choice sends bounded attributes and only accepts a candidate index', async (t) => {
+  const { createOpenRouterOutfitChooser } =
+    await import('../server/outfitChoice');
+  const { buildOutfitChoice } = await import('../src/ai/outfitChoiceContract');
+  const { generateRecommendations, seedWardrobe, createDefaultContext } =
+    await import('../src/domain');
+  const context = createDefaultContext('2026-10-23T16:00:00.000Z');
+  const { outfits } = generateRecommendations(seedWardrobe, context, {
+    limit: 2,
+  });
+  const payload = buildOutfitChoice(outfits, context);
+  let attempts = 0;
+  const server = await setup(t, {
+    chooseOutfit: createOpenRouterOutfitChooser(
+      'test-key',
+      undefined,
+      async (url, init) => {
+        assert.equal(url, 'https://openrouter.ai/api/v1/chat/completions');
+        assert.equal(init?.method, 'POST');
+        assert.equal(
+          new Headers(init?.headers).get('Authorization'),
+          'Bearer test-key',
+        );
+        assert.ok(init?.signal instanceof AbortSignal);
+        const body = JSON.parse(String(init?.body));
+        assert.equal(body.model, 'anthropic/claude-sonnet-5.5');
+        assert.equal(body.response_format.type, 'json_schema');
+        assert.equal(body.provider.require_parameters, true);
+        assert.equal(body.provider.data_collection, 'deny');
+        assert.deepEqual(JSON.parse(body.messages[1].content), payload);
+        attempts++;
+        if (attempts === 3) return new Response(null, { status: 401 });
+        return Response.json({
+          choices: [
+            {
+              finish_reason: attempts === 4 ? 'length' : 'stop',
+              message: {
+                content: JSON.stringify({ index: attempts === 2 ? 3 : 1 }),
+              },
+            },
+          ],
+        });
+      },
+    ),
+  });
+  assert.deepEqual(
+    (await call(server, { method: 'GET', path: '/health', raw: '' })).body,
+    { status: 'ok', configured: false, outfitChoiceConfigured: true },
+  );
+  const path = '/api/outfit-choice';
+  const rejected = await call(server, {
+    path,
+    body: { ...payload, photoUri: photo },
+  });
+  assert.equal(rejected.status, 400);
+  assert.equal(attempts, 0);
+  const valid = await call(server, { path, body: payload });
+  assert.equal(valid.status, 200);
+  assert.deepEqual(valid.body, { index: 1 });
+  assert.equal((await call(server, { path, body: payload })).status, 502);
+  assert.equal((await call(server, { path, body: payload })).status, 502);
+  assert.equal((await call(server, { path, body: payload })).status, 502);
+  assert.equal(attempts, 4);
 });

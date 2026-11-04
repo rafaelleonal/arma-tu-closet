@@ -1,26 +1,13 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { AppLogo } from '../AppLogo';
 import { Button, useUI } from '../ui';
 
 export const STEP_NAMES = ['Tu estilo', 'Colores', 'Tu rutina', 'Apariencia'];
 export const LAST_STEP = STEP_NAMES.length - 1;
 
 export function OnboardingLogo() {
-  const { palette } = useUI();
-  return (
-    <Text
-      style={{
-        fontSize: 37,
-        lineHeight: 44,
-        fontWeight: '700',
-        letterSpacing: -4,
-        color: palette.ink,
-        paddingRight: 6,
-      }}
-    >
-      a.
-    </Text>
-  );
+  return <AppLogo />;
 }
 
 /** Logo, step counter, optional close and the progress bar. */

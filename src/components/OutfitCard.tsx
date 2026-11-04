@@ -14,6 +14,7 @@ interface OutfitCardProps {
   onFavorite: () => void;
   onWorn: () => void;
   onDetails?: () => void;
+  pinnedItemId?: string;
   onItem?: (item: WardrobeItem) => void;
 }
 
@@ -26,6 +27,7 @@ export function OutfitCard({
   onFavorite,
   onWorn,
   onDetails,
+  pinnedItemId,
   onItem,
 }: OutfitCardProps) {
   const { palette, s } = useUI();
@@ -42,6 +44,7 @@ export function OutfitCard({
           outfit={outfit}
           primary={primary}
           large={primary && !compact}
+          pinnedItemId={pinnedItemId}
           onItem={onItem}
           onDetails={onDetails}
         />
@@ -93,9 +96,13 @@ function OutfitGarments({
   outfit,
   primary,
   large,
+  pinnedItemId,
   onItem,
   onDetails,
-}: Pick<OutfitCardProps, 'outfit' | 'primary' | 'onItem' | 'onDetails'> & {
+}: Pick<
+  OutfitCardProps,
+  'outfit' | 'primary' | 'onItem' | 'onDetails' | 'pinnedItemId'
+> & {
   large?: boolean;
 }) {
   const { palette } = useUI();
@@ -103,28 +110,42 @@ function OutfitGarments({
   return (
     <>
       <View style={styles.garmentLine}>
-        {outfit.items.map((item) => (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={
-              onItem ? `Cambiar ${item.name}` : `Ver ${item.name}`
-            }
-            key={item.id}
-            onPress={() => (onItem ? onItem(item) : onDetails?.())}
-            style={{ alignItems: 'center', paddingHorizontal: 0 }}
-          >
-            <Garment item={item} size={large ? 88 : 64} />
-            {primary ? (
+        {outfit.items.map((item) =>
+          item.id === pinnedItemId ? (
+            <View key={item.id} style={{ alignItems: 'center' }}>
+              <Garment item={item} size={large ? 88 : 64} />
               <Text numberOfLines={2} style={styles.garmentName}>
                 {item.name}
               </Text>
-            ) : null}
-          </Pressable>
-        ))}
+              <Text style={{ color: palette.green, fontSize: 10 }}>
+                Prenda elegida
+              </Text>
+            </View>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                onItem ? `Cambiar ${item.name}` : `Ver ${item.name}`
+              }
+              key={item.id}
+              onPress={() => (onItem ? onItem(item) : onDetails?.())}
+              style={{ alignItems: 'center', paddingHorizontal: 0 }}
+            >
+              <Garment item={item} size={large ? 88 : 64} />
+              {primary ? (
+                <Text numberOfLines={2} style={styles.garmentName}>
+                  {item.name}
+                </Text>
+              ) : null}
+            </Pressable>
+          ),
+        )}
       </View>
       {primary ? (
         <Text style={{ color: palette.green, fontSize: 10, marginTop: 6 }}>
-          Toca una prenda para cambiarla
+          {pinnedItemId
+            ? 'Toca otra prenda para cambiarla'
+            : 'Toca una prenda para cambiarla'}
         </Text>
       ) : null}
     </>

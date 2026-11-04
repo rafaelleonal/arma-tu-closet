@@ -73,3 +73,5 @@ Usar títulos, acciones y ayudas breves. Se retiraron eslóganes, títulos promo
 Las nueve ilustraciones de prendas siguen las referencias de Café Sinónimo aportadas por el usuario: una tinta, trazo redondo e irregular, espacios transparentes y caras pequeñas. Comparten recursos entre el clóset, los conjuntos y las vistas de apariencia. La tinta adapta el dibujo al tema; las muestras de color describen la prenda. Las fotos se muestran sin tintado.
 
 Los dibujos son genéricos; su selección por categoría y algunas palabras del nombre no analiza la foto ni infiere estilo. La biblioteca todavía no distingue todos los tipos de prendas. [Archivos y prompts](../assets/garments/README.md). El nombre visible «Amplia» conserva el identificador persistido `editorial` para evitar un cambio de esquema innecesario.
+
+El gancho con destello es la marca de Arma tu outfit. En el encabezado, la bienvenida y la pantalla de carga, el gancho usa el color de texto y el destello usa el acento del tema. El icono de la app conserva su fondo verde claro. [Propuesta vectorial](../assets/brand/propuestas/02-en-el-gancho.svg) · [Icono](../assets/brand/app-icon.png).

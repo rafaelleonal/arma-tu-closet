@@ -141,6 +141,7 @@ function wardrobeItem(value: unknown): value is WardrobeItem {
     (value.photoUri === undefined || nonempty(value.photoUri)) &&
     (value.cutoutUri === undefined ||
       (nonempty(value.cutoutUri) && nonempty(value.photoUri))) &&
+    (value.wearMore === undefined || typeof value.wearMore === 'boolean') &&
     (value.isDemo === undefined || typeof value.isDemo === 'boolean') &&
     (value.styleIds === undefined || styles(value.styleIds))
   );

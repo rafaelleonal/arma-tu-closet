@@ -5,6 +5,7 @@ import type { LocalData } from '../storage/local';
 import type { useWeather } from '../weather/useWeather';
 import type { UpdateData } from '../hooks/useLocalData';
 import type { useRecommendations } from '../hooks/useRecommendations';
+import { useAiOutfitChoice } from '../hooks/useAiOutfitChoice';
 import { DemoBanner, type Tab } from '../components/AppChrome';
 import { OutfitCard } from '../components/OutfitCard';
 import type { SwapTarget } from '../components/OutfitSheets';
@@ -21,6 +22,7 @@ interface TodayScreenProps {
   onTab: (tab: Tab) => void;
   onEditContext: () => void;
   onSwap: (swap: SwapTarget) => void;
+  onCombine: (itemId: string) => void;
   onDetails: (outfit: Outfit) => void;
 }
 
@@ -83,9 +85,12 @@ function Recommendations({
   actions,
   onSwap,
   onDetails,
+  onCombine,
 }: TodayScreenProps) {
   const { palette } = useUI();
-  const [first, ...others] = recs.recommendations;
+  const ai = useAiOutfitChoice(recs.recommendations, recs.context);
+  const [first, ...others] = ai.outfits;
+  const wearMore = recs.wearMoreItem;
   const cardProps = (outfit: Outfit) => ({
     compact: data.appearance.outfitLayout === 'compact',
     showReasons: data.appearance.showReasons,
@@ -102,6 +107,15 @@ function Recommendations({
         onItem={(item) => onSwap({ outfit: first, category: item.category })}
         onDetails={() => onDetails(first)}
       />
+      {ai.enabled ? <AiChoiceControl choice={ai} /> : null}
+      {wearMore ? (
+        <Button
+          secondary
+          label={`Volver a usar · ${wearMore.name}`}
+          onPress={() => onCombine(wearMore.id)}
+          style={{ marginTop: 16 }}
+        />
+      ) : null}
       {others.length ? (
         <Text style={{ fontSize: 18, color: palette.ink, marginTop: 24 }}>
           Otras opciones
@@ -132,6 +146,35 @@ function Recommendations({
         }}
       />
     </>
+  );
+}
+
+function AiChoiceControl({
+  choice,
+}: {
+  choice: ReturnType<typeof useAiOutfitChoice>;
+}) {
+  const { s } = useUI();
+  return (
+    <View style={{ marginTop: 12 }}>
+      <Button
+        secondary
+        small
+        label={choice.status === 'pending' ? 'Consultando…' : 'Elegir con IA'}
+        disabled={choice.status === 'pending' || choice.status === 'ready'}
+        onPress={() => void choice.request()}
+      />
+      {choice.status === 'ready' ? (
+        <Text accessibilityLiveRegion="polite" style={s.subtitle}>
+          Propuesta principal elegida con IA.
+        </Text>
+      ) : null}
+      {choice.status === 'failed' ? (
+        <Text accessibilityRole="alert" style={s.subtitle}>
+          No se pudo consultar la IA. Puedes seguir con estas opciones.
+        </Text>
+      ) : null}
+    </View>
   );
 }
 

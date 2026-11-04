@@ -87,6 +87,7 @@ export interface WardrobeItem {
   available: boolean;
   lastWornAt?: string;
   wearCount?: number;
+  wearMore?: boolean;
   photoUri?: string;
   /** Optional in v3: background-free PNG made on the device from photoUri; the original photo is kept. */
   cutoutUri?: string;

@@ -34,7 +34,7 @@ Configuración preparada el 30/10/2026:
 
 [app.config.js](../app.config.js) aplica el sufijo según `APP_VARIANT`, que solo fijan los perfiles de EAS; `expo run` local conserva el identificador de `app.json`. `eas submit --profile production` envía Android a la pista interna como `draft`. `ios.config.usesNonExemptEncryption: false` declara que la app solo usa el cifrado estándar del sistema (HTTPS); revisarlo si se añade cifrado propio.
 
-Pendiente antes de la primera subida: icono, splash, `scheme`, política de privacidad pública y decidir qué hace **Analizar foto** en la build de tienda. Sin `EXPO_PUBLIC_AI_API_URL` muestra que el análisis no está configurado; `.env*` está ignorado, así que una build de EAS no incluye la URL local. Google exige subir el primer AAB a mano en Play Console; las siguientes pueden usar `eas submit`. `expo-doctor` (30/10/2026) pasa 19/20: cinco paquetes tienen parches de SDK 58 pendientes (`npx expo install --check`).
+El icono «En el gancho» está configurado en `app.json`. Pendiente antes de la primera subida: splash, `scheme`, política de privacidad pública y decidir qué hace **Analizar foto** en la build de tienda. Sin `EXPO_PUBLIC_AI_API_URL` muestra que el análisis no está configurado; `.env*` está ignorado, así que una build de EAS no incluye la URL local. Google exige subir el primer AAB a mano en Play Console; las siguientes pueden usar `eas submit`. `expo-doctor` (30/10/2026) pasa 19/20: cinco paquetes tienen parches de SDK 58 pendientes (`npx expo install --check`).
 
 ## Camino de distribución
 

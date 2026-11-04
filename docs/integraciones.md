@@ -33,7 +33,7 @@ pnpm server
 - `AI_SERVER_PORT`: opcional; 8787 por defecto. Cambiarlo exige actualizar la URL del cliente.
 - `EXPO_PUBLIC_AI_API_URL`: URL base del proxy en `.env`. Web local usa `http://127.0.0.1:8787` si falta. En nativo se requiere explícitamente. Reinicia Metro al cambiar variables.
 
-`pnpm server` carga `.env.server` con Node 24. Sin clave arranca y responde un error claro al analizar; no inventa un resultado. `GET /health` devuelve si está configurado, sin revelar credenciales. No se crea ningún modo simulado en el servidor normal.
+`pnpm server` carga `.env.server` con Node 24. Sin clave arranca y responde un error claro al analizar. `GET /health` indica si están configurados el análisis de fotos (`configured`) y la elección de conjuntos (`outfitChoiceConfigured`), sin verificar credenciales. No se crea ningún modo simulado en el servidor normal.
 
 ### Transporte y límites
 
@@ -52,3 +52,13 @@ Un teléfono físico usa su propio loopback: para pruebas necesita un reenvío l
 Consulta [evaluación](evaluacion.md) para pruebas exactas. A petición del usuario no se hizo una llamada real a OpenAI: los tests y el recorrido de confirmación usan una respuesta controlada. Quedan pendientes precisión con prendas reales, disponibilidad del modelo en la cuenta, latencia y costo efectivos. Open-Meteo sí tuvo consulta real.
 
 Antes de un despliegue público se necesitan autenticación, límites por usuario, HTTPS, tratamiento de fotos documentado, monitoreo sin contenido sensible y presupuesto. El clóset manual y el recomendador local no dependen de esa futura operación.
+
+## Elección de conjunto en Hoy
+
+Agrega `OPENROUTER_API_KEY` a tu `.env.server` local. Si el archivo aún no existe, copia `.env.server.example`. `OPENROUTER_OUTFIT_MODEL` es opcional y usa [`anthropic/claude-sonnet-5.5`](https://openrouter.ai/anthropic/claude-sonnet-5.5) por defecto. Si solo configuras OpenAI, el proxy usa esa configuración previa para ambos flujos. Si configuras ambas claves, usa OpenRouter para conjuntos y OpenAI para fotos. Un fallo de OpenRouter vuelve al orden local.
+
+1. Ejecuta `pnpm server`. El arranque debe indicar «Conjuntos: OpenRouter».
+2. En el simulador iOS, configura `EXPO_PUBLIC_AI_API_URL=http://127.0.0.1:8787` en `.env` y reinicia Metro. Abre el build de desarrollo de iOS.
+3. En **Hoy**, anota la primera propuesta y pulsa **Elegir con IA**. El botón aparece en desarrollo con al menos dos propuestas que cumplen los filtros del contexto. La IA puede elegir la primera opción.
+
+`POST /api/outfit-choice` comparte el proxy, los orígenes permitidos y los límites del análisis de fotos. Acepta de dos a cinco conjuntos, con un tope de 16 KiB. OpenRouter recibe los atributos y el contexto necesarios para devolver un índice. El proxy exige [salida estructurada](https://openrouter.ai/docs/guides/features/structured-outputs), solicita [excluir proveedores que recopilan datos](https://openrouter.ai/docs/guides/routing/provider-selection) y comprueba el índice contra las opciones. La llamada usa esfuerzo bajo y un máximo de 512 tokens de salida. El adaptador se verificó con respuestas simuladas. La primera consulta real queda pendiente.

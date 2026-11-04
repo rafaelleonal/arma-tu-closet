@@ -43,3 +43,32 @@ El perfil contiene `name` y `styleIds`. La apariencia contiene `themeId` (`linen
 `createLocalData()` crea datos independientes sin prendas, `onboarded: false` y `onboarding: { step: 0 }`. La interfaz puede persistir cada interacción y un paso entre 0 y 3 para continuar una introducción interrumpida. El campo de progreso es opcional para usuarios migrados y quienes terminaron. `createDefaultProfile()` y `createDefaultAppearance()` devuelven objetos nuevos. El valor inicial de apariencia es linen, editorial y razones visibles.
 
 Las pruebas de `tests/storage.test.ts` verifican migración conservando todos los campos anteriores, fotos y guardados, usuarios que ya terminaron, guardarropas vacíos, progreso parcial, perfil, apariencia, rechazo de v2 inválido/versiones desconocidas y serialización semántica de ida y vuelta. La lectura migra en memoria; después de hidratar, el efecto de persistencia de la app guarda el documento v3 en la misma clave mediante la cola de escrituras.
+
+## Combinar una prenda elegida
+
+`generateRecommendations` acepta `pinnedItemId` junto con `limit`. La prenda elegida se valida contra el clóset actual, disponibilidad y colores excluidos. Se fija antes de recortar los grupos de candidatas y participa en todas las combinaciones. Si es una capa o accesorio, su categoría deja de ser opcional durante esa búsqueda. Las combinaciones mantienen la estructura habitual. La interfaz pide hasta dos opciones y permite cambiar las demás piezas.
+
+## Quiero usarla más
+
+La marca es opcional y vive en la prenda como `wearMore`. Los documentos v3 anteriores se leen con la marca desactivada. Hoy muestra un solo acceso bajo el conjunto principal. Primero aprovecha las opciones visibles y, si ninguna contiene una prenda marcada que encaje, prueba hasta tres prendas marcadas con el generador de prenda fija. Comprueba disponibilidad, exclusiones, ocasión, abrigo estimado y calzado marcado para lluvia si aplica. Entre prendas candidatas se prioriza el uso registrado menos reciente. Registrar uso deja descansar la prenda durante la ventana de rotación, con un mínimo de un día, y conserva la marca.
+
+### Cómo evaluar una recomendación
+
+1. **Validez.** Prendas propias, disponibles, sin colores excluidos y con una base completa. Una pieza elegida se conserva. Estos son criterios de prueba, independientemente de la puntuación.
+2. **Contexto.** Ante el mismo clóset, comparar qué se propone con calor, frío, lluvia y distintas ocasiones. Revisar primero los casos donde un conjunto ocupa el primer lugar y la persona lo descartaría por clima u ocasión.
+3. **Gusto y rotación.** Usar colores y estilos declarados, más el uso confirmado. La ausencia de historial solo significa que la app todavía no registró usos. Mostrar una razón breve y conservar las advertencias.
+4. **Utilidad en el teléfono.** En el piloto, registrar tiempo hasta elegir, si cambió una pieza y si se puso el conjunto. Anotar por separado los recorridos de Hoy y de una prenda marcada. Guardar un conjunto sirve como señal secundaria. Si la gente descarta opciones, conservar ejemplos concretos para comparar cambios de ranking con el mismo clóset y contexto.
+
+Probar primero un cambio de ranking a la vez. Evaluar IA para ordenar conjuntos válidos solo si las reglas siguen fallando en casos de gusto o coordinación que se repiten después de corregir los atributos de las prendas.
+
+## Elección opcional con IA
+
+En desarrollo, **Elegir con IA** aparece en Hoy si hay al menos dos propuestas que encajan con la ocasión, el abrigo estimado y el calzado para lluvia. Usa las opciones visibles que ya pasaron los filtros del clóset. El servidor local compara sus atributos con este orden:
+
+1. Adecuación al plan y al clima. Considerar el abrigo de las piezas y, con lluvia, si el calzado y la capa están marcados para lluvia.
+2. Estilos y colores declarados, con una paleta que tenga sentido en conjunto.
+3. En empate, prendas que la persona quiere usar más y rotación reciente.
+
+La respuesta es el índice de una opción existente. Promueve esa opción a la primera posición y conserva las demás. Las razones y advertencias siguen saliendo de las reglas locales. La app envía solo al tocar el botón, sin fotos, nombres, ciudad ni historial detallado. Si el servidor falla o cambia el contexto, queda el orden local.
+
+Para saber si aporta valor, comparar la primera propuesta local con la elegida por IA usando los mismos clósets y contextos. Anotar cuál se pondría la persona, si tuvo que cambiar una pieza y el tiempo hasta elegir. Una prueba con un índice simulado comprueba el flujo, pero la calidad depende de una comparación con el proveedor real y personas.

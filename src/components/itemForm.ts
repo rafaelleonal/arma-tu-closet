@@ -43,6 +43,7 @@ export function itemFormFingerprint(item: WardrobeItem): string {
     item.warmth,
     item.rainReady,
     item.available,
+    item.wearMore === true,
     item.photoUri ?? null,
     item.cutoutUri ?? null,
   ]);

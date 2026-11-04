@@ -13,6 +13,7 @@ import {
 import { DetailsSection, type Details } from './item-editor/DetailsSection';
 import {
   AvailabilityField,
+  WearMoreField,
   CategoryField,
   ColorsField,
   DiscardPrompt,
@@ -54,10 +55,12 @@ export function ItemEditor({
   item,
   onSave,
   onClose,
+  onCombine,
 }: {
   item?: WardrobeItem;
   onSave: (item: WardrobeItem) => void;
   onClose: () => void;
+  onCombine?: (item: WardrobeItem) => void;
 }) {
   const { palette } = useUI();
   const { reduceMotion } = useFeedback();
@@ -73,6 +76,7 @@ export function ItemEditor({
   const warmthChosen = useRef(!!item);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [available, setAvailable] = useState(initial.available);
+  const [wearMore, setWearMore] = useState(item?.wearMore === true);
   const photo = useGarmentPhoto(item);
   const draft: WardrobeItem = {
     ...item,
@@ -82,11 +86,13 @@ export function ItemEditor({
     category,
     colors,
     available,
+    wearMore: wearMore || undefined,
     photoUri: photo.photoUri,
     cutoutUri: photo.photoUri ? photo.cutoutUri : undefined,
     isDemo: initial.isDemo,
   };
   const [initialFingerprint] = useState(() => itemFormFingerprint(draft));
+  const hasChanges = itemFormFingerprint(draft) !== initialFingerprint;
   const errors = itemFormErrors(draft);
   const scrollTo = (y: number) =>
     scroll.current?.scrollTo({ y, animated: !reduceMotion });
@@ -96,7 +102,7 @@ export function ItemEditor({
     onClose();
   }
   function closeEditor() {
-    if (itemFormFingerprint(draft) === initialFingerprint) {
+    if (!hasChanges) {
       discardAndClose();
       return;
     }
@@ -130,6 +136,16 @@ export function ItemEditor({
           onDiscard={discardAndClose}
         />
       ) : null}
+      {item && onCombine && !hasChanges && !confirmClose ? (
+        <Button
+          label="Combinar esta prenda"
+          onPress={() => {
+            discardAndClose();
+            onCombine(item);
+          }}
+          style={{ marginBottom: 16 }}
+        />
+      ) : null}
       <PhotoSection
         draft={draft}
         photo={photo}
@@ -158,7 +174,10 @@ export function ItemEditor({
         colors={colors}
       />
       {item ? (
-        <AvailabilityField value={available} onChange={setAvailable} />
+        <>
+          <AvailabilityField value={available} onChange={setAvailable} />
+          <WearMoreField value={wearMore} onChange={setWearMore} />
+        </>
       ) : null}
       <View
         onLayout={(event) => {
