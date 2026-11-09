@@ -30,6 +30,11 @@ const drawings: Record<IllustrationKind, ImageSourcePropType> = {
 
 /** A sticker keeps its own light border on any theme, like a real one on any surface. */
 const PAPER = '#FBFAF6';
+/** Ink for words written on sticker paper; fixed because the paper is. */
+export const STICKER_INK = '#242923';
+export const STICKER_PAPER = PAPER;
+/** Below this size the border would be thinner than a pixel, so the picture goes alone. */
+const SMALL = 70;
 /** Eight copies of the picture, pushed outwards, draw the border around any cut-out. */
 const RING = [
   [1, 0],
@@ -44,7 +49,7 @@ const RING = [
 const FALLBACK_ASPECT = 0.8;
 
 // iOS has no drop-shadow filter; its view shadow follows the picture when there is no background.
-const lifted: ViewStyle =
+export const lifted: ViewStyle =
   Platform.OS === 'ios'
     ? {
         shadowColor: '#000',
@@ -94,8 +99,20 @@ function CutoutSticker({
   style: ViewStyle;
   onError?: () => void;
 }) {
-  const edge = Math.max(2, Math.round(Math.min(maxWidth, maxHeight) * 0.022));
   const box = fit(aspect, maxWidth, maxHeight);
+  if (Math.min(maxWidth, maxHeight) < SMALL)
+    return (
+      <View style={[box, style]}>
+        <Image
+          accessible={false}
+          source={source}
+          onError={onError}
+          resizeMode="contain"
+          style={box}
+        />
+      </View>
+    );
+  const edge = Math.max(2, Math.round(Math.min(maxWidth, maxHeight) * 0.022));
   const picture = {
     width: box.width - edge * 2,
     height: box.height - edge * 2,
@@ -186,9 +203,33 @@ export function Sticker({
         style={turned}
       />
     );
-  const drawing = drawings[illustrationFor(item)];
   return (
-    <View style={[lifted, turned]}>
+    <DrawingSticker
+      kind={illustrationFor(item)}
+      maxWidth={maxWidth}
+      maxHeight={maxHeight}
+      style={turned}
+    />
+  );
+}
+
+/** The generic drawing of a kind of garment on its sticker paper. Decorative. */
+export function DrawingSticker({
+  kind,
+  maxWidth,
+  maxHeight,
+  style,
+}: {
+  kind: IllustrationKind;
+  maxWidth: number;
+  maxHeight: number;
+  style?: ViewStyle;
+}) {
+  const drawing = drawings[kind];
+  return (
+    <View
+      style={[Math.min(maxWidth, maxHeight) < SMALL ? null : lifted, style]}
+    >
       <Image
         accessible={false}
         source={drawing}

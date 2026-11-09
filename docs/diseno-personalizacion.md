@@ -90,7 +90,7 @@ Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportac
 
 ## Hoy como mesa de stickers
 
-Hoy abre directo en el outfit, sin la barra de marca. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático, la hora del dato, Open-Meteo y **Actualizar clima** quedan al final de la pantalla.
+Las tres pestañas abren directo en su contenido, sin barra de marca; el gancho queda en la bienvenida, el onboarding y la pantalla de carga. Hoy abre en el outfit. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático, la hora del dato, Open-Meteo y **Actualizar clima** quedan al final de la pantalla.
 
 Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre el mismo fondo de puntos del perchero, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista. **Otra vuelta** y **Elegir con IA** quedan debajo, como acciones secundarias.
 
@@ -107,6 +107,14 @@ Los motivos van en una burbuja con la voz de las prendas, como en el onboarding:
 **Algo nuevo** aparece junto al indicador de páginas cuando hay un objetivo de estilo; para lectores de pantalla se llama «Hoy me animo a algo nuevo». El aviso de categorías faltantes solo se muestra con ese modo encendido.
 
 La altura de la mesa se calcula con la pantalla para que la acción principal quede a la vista sin desplazarse en un teléfono de 812 puntos; en pantallas más bajas la pantalla se desplaza. La disposición Compacta usa una mesa más baja.
+
+## Mi estilo como tablero
+
+Mi estilo deja de ser una lista de paneles con botón. Arriba, sobre el mismo fondo de puntos, van los estilos como stickers de palabra: **Así me visto** abre Editar preferencias y **Quiero probar** abre la hoja Cambiar mi estilo; los de objetivo llevan «✦», como Algo nuevo en Hoy. Sin estilos elegidos, cada fila muestra un hueco punteado que dice qué elegir. Cada fila es un solo botón con su texto de acción.
+
+Debajo, **Guardados** es una fila que se desliza con cada outfit como collage pequeño; tocar uno abre el outfit. A ese tamaño los recortes van sin borde, porque mediría menos de un píxel.
+
+**Colores** usa el mismo selector del onboarding ([ColorPicker.tsx](../src/components/ColorPicker.tsx)): una pestaña para «Me gustan» y otra para «Prefiero evitar» sobre una sola cuadrícula, en lugar de dos listas de doce. **Apariencia** muestra los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers. Repetición de prendas y Almacenamiento cierran la pantalla sin cambios de contenido.
 
 ## Mi clóset como perchero
 
@@ -132,4 +140,4 @@ En Hoy cada dibujo se muestra como sticker: la misma ilustración sin carita sob
 
 Los dibujos son genéricos; su selección por categoría y algunas palabras del nombre no analiza la foto ni infiere estilo. La biblioteca todavía no distingue todos los tipos de prendas. [Archivos y prompts](../assets/garments/README.md). El nombre visible «Amplia» conserva el identificador persistido `editorial` para evitar un cambio de esquema innecesario.
 
-El gancho con destello es la marca de Arma tu outfit. En el encabezado, la bienvenida y la pantalla de carga, el gancho usa el color de texto y el destello usa el acento del tema. El icono de la app conserva su fondo verde claro. [Propuesta vectorial](../assets/brand/propuestas/02-en-el-gancho.svg) · [Icono](../assets/brand/app-icon.png).
+El gancho con destello es la marca de Arma tu outfit. En el onboarding, la bienvenida y la pantalla de carga, el gancho usa el color de texto y el destello usa el acento del tema. El icono de la app conserva su fondo verde claro. [Propuesta vectorial](../assets/brand/propuestas/02-en-el-gancho.svg) · [Icono](../assets/brand/app-icon.png).

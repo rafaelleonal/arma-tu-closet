@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Palette } from '../theme/ThemeProvider';
-import { AppLogo } from './AppLogo';
 import { useFeedback } from './Feedback';
 import { Button, useUI } from './ui';
 
@@ -13,19 +12,6 @@ const TABS = [
   { id: 'closet', icon: '▥', label: 'Mi clóset' },
   { id: 'style', icon: '◌', label: 'Mi estilo' },
 ] as const;
-
-export function AppHeader() {
-  const { palette, s } = useUI();
-  const styles = useMemo(() => createStyles(palette), [palette]);
-  return (
-    <View style={styles.header}>
-      <View style={s.row}>
-        <AppLogo size={34} />
-        <Text style={styles.brand}>arma tu outfit</Text>
-      </View>
-    </View>
-  );
-}
 
 export function TabBar({
   tab,
@@ -156,22 +142,6 @@ export function DemoBanner({ onStart }: { onStart: () => void }) {
 
 const createStyles = (palette: Palette) =>
   StyleSheet.create({
-    header: {
-      paddingHorizontal: 24,
-      paddingVertical: 14,
-      borderBottomWidth: 1,
-      borderColor: palette.line,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      gap: 8,
-    },
-    brand: {
-      color: palette.ink,
-      fontSize: 13,
-      letterSpacing: -0.2,
-      fontWeight: '600',
-    },
     tabBar: {
       borderTopWidth: 1,
       borderColor: palette.line,

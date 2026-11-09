@@ -314,3 +314,13 @@ Rediseño de Hoy según [la guía](diseno-personalizacion.md#hoy-como-mesa-de-st
 Recorrido en navegador con Expo web a 375 × 812. En `localhost:8093`, un clóset propio sin fotos: [stickers de dibujo](evidence/hoy-stickers-dibujos-web-375.jpg), cambio de página con los puntos. En `127.0.0.1:8093`, origen vacío con el clóset de ejemplo: [stickers de foto en Lino](evidence/hoy-stickers-lino-web-375.jpg) y [en Medianoche](evidence/hoy-stickers-medianoche-web-375.jpg), disposición con prenda completa y capa, Guardar y quitar sobre la segunda página, Prefiero otro, Hoy me lo puse sin duplicar el registro, hoja de cambio al tocar una prenda, y 320 × 568 sin desborde horizontal. El perchero conserva su fondo de puntos.
 
 Sin verificar: iOS y Android (la sombra usa propiedades distintas en cada uno y el borde de los recortes se dibuja con copias teñidas de la imagen), deslizar con el dedo, recortes y fotos propias de una persona, clima automático en la píldora, la disposición Compacta, los temas Papel, Salvia, Chicle y Malva, outfits con accesorio, VoiceOver y teclado.
+
+## 9/11/2026 — Mi estilo como tablero
+
+Rediseño de Mi estilo según [la guía](diseno-personalizacion.md#mi-estilo-como-tablero): estilos como stickers de palabra, guardados como collages, el selector de colores del onboarding y los temas en una fila. La barra de marca se retiró también de Mi clóset y Mi estilo.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados. No hay pruebas nuevas: el cambio es de presentación.
+
+Recorrido en navegador con Expo web en `127.0.0.1:8093`, clóset de ejemplo y un nombre sintético, a 375 × 812: [tablero en Lino](evidence/mi-estilo-tablero-lino-web-375.jpg) y [en Medianoche](evidence/mi-estilo-tablero-medianoche-web-375.jpg), huecos punteados sin estilos, abrir un guardado, abrir Cambiar mi estilo, abrir Editar preferencias y su paso de colores con el selector compartido, marcar y desmarcar un color con el documento guardado, cambiar de tema, y 320 × 640 sin desborde horizontal. Mi clóset se ve completo sin la barra.
+
+Sin verificar: iOS y Android, deslizar las filas con el dedo, guardados creados a mano o con fotos propias, muchos guardados, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.

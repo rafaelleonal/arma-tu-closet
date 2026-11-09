@@ -13,7 +13,6 @@ import type { Autosave } from '../hooks/useAutosave';
 import type { UpdateData } from '../hooks/useLocalData';
 import type { useRecommendations } from '../hooks/useRecommendations';
 import {
-  AppHeader,
   FloatingNotice,
   SaveErrorBanner,
   TabBar,
@@ -70,8 +69,6 @@ export function HomeShell(props: HomeShellProps) {
       style={[styles.root, { backgroundColor: palette.paper }]}
       edges={['top', 'left', 'right']}
     >
-      {/* Today opens straight on the outfit; its own heading replaces the brand bar. */}
-      {tab === 'today' ? null : <AppHeader />}
       <SaveErrorBanner
         message={autosave.saveError}
         onRetry={autosave.retrySave}
@@ -79,7 +76,7 @@ export function HomeShell(props: HomeShellProps) {
       <View style={{ flex: 1 }}>
         <ScrollView
           ref={contentScroll}
-          contentContainerStyle={[styles.main, tab === 'today' && styles.today]}
+          contentContainerStyle={styles.main}
           keyboardShouldPersistTaps="handled"
         >
           <MotionIn trigger={tab}>
@@ -229,11 +226,10 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   main: {
     padding: 24,
-    paddingTop: 32,
+    paddingTop: 16,
     paddingBottom: 50,
     width: '100%',
     maxWidth: 880,
     alignSelf: 'center',
   },
-  today: { paddingTop: 16 },
 });

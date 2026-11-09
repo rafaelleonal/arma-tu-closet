@@ -22,7 +22,7 @@ Desde **Mi clóset**, abre una prenda guardada y toca **Combínala**. La app pro
 
 Marca **Quiero usarla más** al editar una prenda. Si encaja con el contexto y la rotación, Hoy puede mostrar un acceso para volver a combinarla.
 
-En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy y cómo quieres verte. La **prueba de colorimetría** compara colores junto a tu selfie, como una prueba con telas, y propone tu paleta; la foto no sale del teléfono ni se guarda ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). Hoy muestra entonces **Algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
+En **Mi estilo → Quiero probar**, indica cómo te vistes hoy y cómo quieres verte. La **prueba de colorimetría** compara colores junto a tu selfie, como una prueba con telas, y propone tu paleta; la foto no sale del teléfono ni se guarda ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). Hoy muestra entonces **Algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
 
 En desarrollo, **Elegir con IA** puede priorizar una opción de Hoy entre conjuntos que ya encajan con el contexto. El proxy local admite OpenRouter con Claude Sonnet 5.5 para comparar esa elección con el orden local. [Configuración para iOS](docs/integraciones.md#elección-de-conjunto-en-hoy) · [Criterios](docs/recomendaciones.md#elección-opcional-con-ia).
 
