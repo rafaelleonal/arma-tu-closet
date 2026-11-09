@@ -461,8 +461,7 @@ test('an optional style goal round-trips and older v3 documents stay valid', () 
     styleGoal: {
       targetStyleIds: ['street'],
       exploring: true,
-      skinDepth: 'medium',
-      undertone: 'warm',
+      colorTone: 'autumn-deep',
     },
   };
   assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
@@ -475,8 +474,7 @@ test('an invalid style goal is a recoverable error, not replaced data', () => {
   for (const styleGoal of [
     { targetStyleIds: ['unknown'], exploring: false },
     { targetStyleIds: [], exploring: 'yes' },
-    { targetStyleIds: [], exploring: false, skinDepth: 'pale' },
-    { targetStyleIds: [], exploring: false, undertone: 'olive' },
+    { targetStyleIds: [], exploring: false, colorTone: 'pale' },
   ]) {
     const raw = JSON.stringify({ ...fixture(), styleGoal });
     assert.throws(() => parseLocalData(raw), /Tus datos no se reemplazaron/);

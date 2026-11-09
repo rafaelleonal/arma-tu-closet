@@ -47,12 +47,6 @@ Un teléfono físico usa su propio loopback: para pruebas necesita un reenvío l
 - Diez segundos para recibir el cuerpo, veinte para el proveedor y treinta en el cliente. Sin reintentos automáticos al proveedor para evitar costo duplicado.
 - Clave e imágenes no se escriben en logs. El proxy no persiste imágenes ni resultados. `store: false` desactiva almacenamiento de respuestas de OpenAI; no declara retención cero de todos los sistemas del proveedor.
 
-## Análisis de la foto de una persona
-
-En **Mi estilo → Cambiar mi estilo**, una foto opcional puede proponer claridad de piel, subtono y hasta tres estilos de la ropa visible. `POST /api/person-style` comparte el proxy, los orígenes, los límites de imagen y los contadores del análisis de prendas, y usa `OPENAI_API_KEY`. No hay un interruptor aparte.
-
-La foto se envía solo tras aceptar el permiso que nombra a OpenAI y pulsar Analizar foto. Cambiarla o quitarla retira el permiso. No se escribe en el documento local ni en el proxy, y `store: false` tiene el mismo alcance descrito arriba. Una foto sin persona, con varias personas, poco clara o de alguien que parece menor de edad devuelve un mensaje para reintentar o elegir a mano. [ADR-009](adr/0009-foto-de-persona-y-objetivo-de-estilo.md).
-
 ## Estado de verificación
 
 Consulta [evaluación](evaluacion.md) para pruebas exactas. A petición del usuario no se hizo una llamada real a OpenAI: los tests y el recorrido de confirmación usan una respuesta controlada. Quedan pendientes precisión con prendas reales, disponibilidad del modelo en la cuenta, latencia y costo efectivos. Open-Meteo sí tuvo consulta real.

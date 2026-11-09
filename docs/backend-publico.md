@@ -15,7 +15,6 @@ Cada dato lleva su origen: **Fuente** (documentación oficial consultada el 9/11
 | Forma | Monolito modular. El marketplace se prepara con decisiones de modelo, no con tablas ni código anticipados. |
 | IA | OpenAI (GPT-6 Luna) para analizar fotos y Claude Sonnet 5.5 para elegir outfit. |
 | Costo fijo | Unos 25 USD al mes en producción, más la IA por uso. Tope de la beta: 20 USD al mes de IA. |
-| **Bloqueo** | **La [política de uso de OpenAI](https://openai.com/es-419/policies/usage-policies/), en vigor desde el 20/11/2026, prohíbe la clasificación de personas por características personales. `/api/person-style` no debe activarse en público sin aclararlo ([sección 7](#riesgo-principal-la-política-de-uso-de-openai)).** |
 
 ```mermaid
 flowchart LR
@@ -36,7 +35,7 @@ flowchart LR
 |---|---|---|
 | A. App local | La app actual, sin backend. La IA aparece como «Ya casi…» en TestFlight y oculta en App Store. | Publicar sin esperar al servidor. |
 | B. Base y cuentas | Repositorio NestJS, CI, Docker, staging, cuentas opcionales y borrado de cuenta. | Una base sobre la que crecer. |
-| C. IA pública | Los tres endpoints actuales con permiso explícito, cuotas y tope de gasto. | Analizar fotos y elegir outfit en la tienda. |
+| C. IA pública | Los dos endpoints actuales con permiso explícito, cuotas y tope de gasto. | Analizar fotos y elegir outfit en la tienda. |
 | D. Respaldo y sincronización | Lo descrito en [cuentas y datos](cuentas-y-datos.md), con la API en lugar del acceso directo a Postgres. | Cambiar de teléfono sin perder el clóset. |
 | E. Marketplace | Vendedores, publicaciones, pedidos y pagos. Se construye solo si hay uso y demanda comprobados. | Vender ropa propia y de tiendas. |
 
@@ -129,7 +128,7 @@ Las etapas D y E añaden las entidades de [cuentas y datos](cuentas-y-datos.md#m
 
 **Qué nunca entra**
 
-5. Bytes de imagen, resultados de analizar una foto, tono de piel, IP, tokens, URLs firmadas ni contraseñas. El tono de piel se queda en el teléfono; sincronizarlo exigiría una decisión aparte.
+5. Bytes de imagen, resultados de analizar una foto, selfies, tono de colorimetría, IP, tokens, URLs firmadas ni contraseñas. El tono se queda en el teléfono; sincronizarlo exigiría una decisión aparte.
 
 **Retención por clase**
 
@@ -183,7 +182,6 @@ Son **supuestos** de partida; ajustarlos con datos de la beta.
 | Límite | Hoy, en loopback | Primera versión |
 |---|---|---|
 | Análisis de prendas por persona | Sin distinción | 30 al día, 150 al mes |
-| Foto de persona por persona | Sin distinción | 3 al día, 6 al mes |
 | Elección de outfit por persona | Sin distinción | 10 al día, 100 al mes |
 | Ritmo por persona | 6 por minuto, global | 6 por minuto |
 | Tamaño de imagen | 4 MiB | 1.5 MiB, tras reducirla en el cliente |
@@ -239,11 +237,9 @@ Con 100 personas, Sonnet cabe en el tope de 20 USD y Opus no. Elegir entre 2 y 5
 
 ## 7. Fotos y datos sensibles
 
-### Riesgo principal: la política de uso de OpenAI
+### Fotos de personas
 
-La [política de uso](https://openai.com/es-419/policies/usage-policies/), en vigor desde el 20/11/2026, incluye entre los usos prohibidos la clasificación de personas con base en «características personales o datos biométricos». `/api/person-style` clasifica la claridad de piel y el subtono a partir de una foto.
-
-El uso tiene consentimiento y sirve a la propia persona, y la cláusula parece dirigida a otros casos, pero el texto no lo excluye. El incumplimiento puede costar el acceso a la cuenta que sirve también los otros endpoints. Según la [decisión 1](#10-decisiones), se preguntará a OpenAI; la consulta está pendiente de enviar por el titular. Hace falta una respuesta escrita que cubra este uso: una respuesta automática del soporte no basta. Hasta entonces, la función queda apagada y las opciones a mano siguen disponibles.
+Ninguna foto de una persona llega al backend ni a un proveedor. La [política de uso de OpenAI](https://openai.com/es-419/policies/usage-policies/), en vigor desde el 20/11/2026, prohíbe la clasificación de personas por características personales, así que la colorimetría se hace en el teléfono y la decide la persona ([ADR-010](adr/0010-colorimetria-en-el-dispositivo.md)). `/api/person-style` se retiró.
 
 ### Recorrido de la foto
 
@@ -251,7 +247,6 @@ El uso tiene consentimiento y sirve a la propia persona, y la cláusula parece d
 |---|---|
 | Prenda, etapa C | Se reduce, se retiran metadatos y pasa por la API en memoria. Sin disco, caché ni colas. Es la excepción que Tabe permite para fotos reducidas en el cliente. |
 | Prenda, etapa D | Subida directa con URL firmada, y a OpenAI con una URL firmada de 5 minutos. **Tabe:** su regla general. |
-| Persona | Nunca toca un bucket. En memoria durante la solicitud, si la función se publica. |
 | OpenAI, por defecto | `store: false`, pero los [registros de abuso se conservan hasta 30 días](https://developers.openai.com/api/docs/guides/your-data). Hay que decírselo a la persona. |
 | OpenAI con ZDR | Sujeto a aprobación. Nunca prometer «retención cero» absoluta. |
 
@@ -267,19 +262,17 @@ Lista cerrada: ruta, estado, código de error interno, duración, estado del pro
 
 | Flujo | Hoy | Antes de publicar |
 |---|---|---|
-| Foto de persona | Permiso por foto que nombra a OpenAI. | Añadir la retención de hasta 30 días, que sea una foto propia y la confirmación de edad. |
 | Foto de prenda | Aviso visible sin permiso aparte. | Permiso explícito la primera vez, revocable. |
 | Elegir con IA | Solo en desarrollo. | Permiso que nombre al proveedor y diga qué se envía. |
-| Textos | «Tus datos se quedan en tu teléfono» y «Tu tono de piel solo se guarda aquí». | Cambiarlos al activar la IA: dejan de ser exactos. |
+| Textos | «Tus datos se quedan en tu teléfono». | Cambiarlo al activar la IA: deja de ser exacto para las fotos de prendas. |
 
 | Dato | App Privacy (Apple) | Data safety (Google) |
 |---|---|---|
 | Correo e identificador de cuenta | Contact Info y User ID · funcionalidad · vinculado | Email e IDs · funcionalidad y gestión de cuenta |
-| Foto de prenda o persona | Photos or Videos · funcionalidad | Photos · recopilada · opcional |
-| Tono de piel y estilos propuestos | Sensitive Info · funcionalidad | Other info · opcional |
+| Foto de prenda | Photos or Videos · funcionalidad | Photos · recopilada · opcional |
 | Atributos para elegir outfit | Other User Content | App activity u Other info |
 
-Las fotos se declaran aunque el backend no las guarde, porque los 30 días de OpenAI superan las definiciones de dato efímero de [Apple](https://developer.apple.com/app-store/app-privacy-details/) y [Google](https://support.google.com/googleplay/android-developer/answer/10787469). El tono de piel en Apple es un criterio propio y conservador. Si la función se publica en la UE o el Reino Unido, conviene revisión legal.
+Las fotos se declaran aunque el backend no las guarde, porque los 30 días de OpenAI superan las definiciones de dato efímero de [Apple](https://developer.apple.com/app-store/app-privacy-details/) y [Google](https://support.google.com/googleplay/android-developer/answer/10787469). La selfie de la colorimetría no se declara: nunca sale del dispositivo.
 
 ## 8. Prácticas de ingeniería
 
@@ -324,13 +317,13 @@ Antes de la fase 1, registrar un ADR con cuentas, alojamiento y límites: cambia
 
 | Fase | Entrega | Criterio de salida |
 |---|---|---|
-| **0. Medición** | Titular y países, respuesta de OpenAI, primera llamada real por endpoint y comparación de Sonnet con Opus en un conjunto fijo. | Tokens, latencia y calidad reales reemplazan los supuestos. |
+| **0. Medición** | Titular y países, primera llamada real por endpoint y comparación de Sonnet con Opus en un conjunto fijo. | Tokens, latencia y calidad reales reemplazan los supuestos. |
 | **1. Base** | Repositorio, módulos vacíos, CI, Docker, staging, observabilidad y `/api/status`. | Un PR sin pruebas falla. El despliegue a staging se cancela si falla una migración. |
 | **2. Cuentas** | Auth, guardas, tabla `users`, eliminación de cuenta y acceso en la app. | Una persona no puede ver datos de otra. Eliminar borra todo y revoca Apple. Probado en iPhone físico. |
 | **3. IA con proveedor simulado** | Endpoints portados, permisos, cuotas, gasto e idempotencia. | Sin sesión, 401. Cuota, 429. Cuerpo excesivo, 413. Presupuesto agotado, 503. Las pruebas de concurrencia no superan ninguna cuota. La cadena canaria no aparece en registros. |
 | **4. Proveedor real en staging** | Clave propia con límite bajo y topes activos. | Costo por análisis no mayor al doble del estimado. p95 bajo 15 s con arranque en frío. Apagar una función tarda menos de un minuto. |
 | **5. Privacidad y fichas** | Política pública, App Privacy, Data safety y textos de permiso. | Cada dato enviado por el código aparece en la política y en ambas fichas. |
-| **6. Beta y publicación** | TestFlight con 5 a 20 personas y luego App Store, con backend encendido durante la revisión. | Una semana sin contenido en registros y con gasto dentro del tope. Activar prendas, luego elección y `person-style` al final. |
+| **6. Beta y publicación** | TestFlight con 5 a 20 personas y luego App Store, con backend encendido durante la revisión. | Una semana sin contenido en registros y con gasto dentro del tope. Activar prendas y luego elección. |
 | **7. Respaldo** | Etapa D, según [cuentas y datos](cuentas-y-datos.md#orden-de-implementación-y-aceptación). | Restauración en un segundo teléfono sin pérdida. |
 | **8. Marketplace** | Etapa E, solo con demanda observada. | Decisión documentada, revisión fiscal y moderación operando antes del primer pago real. |
 
@@ -342,7 +335,7 @@ Aceptadas por el titular el 9/11/2026, salvo la 8.
 
 | # | Decisión | Estado |
 |---|---|---|
-| 1 | **Foto de persona en público.** | Preguntar a OpenAI y publicarla solo con respuesta escrita favorable, con modo manual mientras tanto. Sin respuesta en un plazo razonable, calcular el tono en el dispositivo o dejarlo manual. Publicarla asumiendo el riesgo queda descartado. |
+| 1 | **Foto de persona.** | No se envía a ningún proveedor ni se consulta a OpenAI. La colorimetría se hace en el dispositivo ([ADR-010](adr/0010-colorimetria-en-el-dispositivo.md)). |
 | 2 | **Métodos de acceso.** | Apple y Google. Código por correo solo si hace falta, porque añade SMTP. |
 | 3 | **Repositorio.** | Aparte, como `tabe-api`, con el contrato publicado por OpenAPI. |
 | 4 | **Alojamiento.** | Cloud Run. |

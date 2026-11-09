@@ -40,9 +40,13 @@ La persona que ya tiene clóset abre «Mi estilo → Editar preferencias» y edi
 
 ## Funciones que dependen del backend
 
-Mientras una build no tenga servicio de IA configurado (`isAiAvailable`), Analizar foto, en prendas y en Mi estilo, se muestra como «Ya casi…» y no es un control. Las alternativas manuales siguen disponibles. Web en `localhost` y las builds con `EXPO_PUBLIC_AI_API_URL` muestran la acción real.
+Mientras una build no tenga servicio de IA configurado (`isAiAvailable`), Analizar foto, en prendas, se muestra como «Ya casi…» y no es un control. Las alternativas manuales siguen disponibles. Web en `localhost` y las builds con `EXPO_PUBLIC_AI_API_URL` muestran la acción real.
 
 El aviso solo aparece en desarrollo y en los perfiles `preview` y `testflight` de [eas.json](../eas.json), que definen `EXPO_PUBLIC_SHOW_COMING_SOON`. El perfil `production` lo oculta porque la [guía 2.1 de Apple](https://developer.apple.com/app-store/review/guidelines/) pide retirar el contenido provisional antes de enviar. Sube a TestFlight con `eas build --profile testflight` y a revisión con `--profile production`.
+
+## Colorimetría
+
+La prueba simula el drapeado de la colorimetría personal de Corea y Japón: la selfie rodeada de dos colores, lado a lado, y nueve elecciones. Decide la persona; no hay IA ni medición. La pregunta pide una piel «más uniforme» y orienta hacia ojeras, sombras y rojeces. Nunca se pide «más clara», para no premiar aclarar la piel. El resultado se presenta como «según lo que elegiste» y aclara que es una simulación.
 
 ## Tono de la app
 
@@ -50,7 +54,7 @@ La referencia es el [onboarding de Letterly](https://x.com/bthreeagency/status/2
 
 **Reglas de voz**
 
-1. **Un personaje habla.** Las prendas son un equipo con nombre: Tere (playera), Cami (camisa), Chama (chamarra) y Teni (tenis). Cada una se presenta y comenta en primera persona.
+1. **Un personaje habla.** Las prendas son un equipo con nombre: Tere (playera), Cami (camisa), Chama (chamarra), Teni (tenis) y Bufi (bufanda). Cada una se presenta y comenta en primera persona.
 2. **Burbuja y pregunta van separadas.** La burbuja es pequeña y conversa; la pregunta va sola, grande y es el encabezado para lectores de pantalla.
 3. **Reacciona a lo que dices.** Usa el nombre cuando lo hay y responde a cada elección diciendo lo que la app hace de verdad.
 4. **Los botones avanzan la historia.** «Vamos a tu clóset», «Ahora los colores», «Ver mi outfit». Saltar se dice sin culpa: «Lo hago después».

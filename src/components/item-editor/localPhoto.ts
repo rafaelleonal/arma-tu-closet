@@ -29,12 +29,13 @@ export async function cameraPermission(isCurrent: () => boolean) {
   return isCurrent() ? permission : null;
 }
 
-export function launchPicker(camera: boolean) {
+export function launchPicker(camera: boolean, selfie = false) {
   const options: ImagePicker.ImagePickerOptions = {
     mediaTypes: ['images'],
     quality: 0.65,
     base64: Platform.OS === 'web',
-    allowsEditing: false,
+    allowsEditing: selfie,
+    ...(selfie ? { cameraType: ImagePicker.CameraType.front } : {}),
   };
   return camera
     ? ImagePicker.launchCameraAsync(options)

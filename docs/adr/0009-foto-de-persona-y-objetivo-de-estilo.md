@@ -1,7 +1,7 @@
 # ADR-009 — Foto de la persona y objetivo de estilo
 
 - Fecha: 9/11/2026.
-- Estado: aceptada para el prototipo local.
+- Estado: la foto de la persona quedó sustituida por [ADR-010](0010-colorimetria-en-el-dispositivo.md); el objetivo de estilo y el campo opcional en v3 siguen vigentes.
 - Alcance: hoja **Cambiar mi estilo** en Mi estilo y modo **Hoy me animo a algo nuevo** en Hoy.
 
 ## Contexto

@@ -4,7 +4,6 @@ import {
 } from './outfitChoice';
 import { createGarmentServer } from './app';
 import { createOpenAiAnalyzer, DEFAULT_OPENAI_MODEL } from './openai';
-import { createOpenAiPersonStyleAnalyzer } from './personStyle';
 
 const port = Number(process.env.AI_SERVER_PORT || 8787);
 if (!Number.isInteger(port) || port < 1 || port > 65_535)
@@ -20,10 +19,7 @@ const chooseOutfit = openRouterKey
       process.env.OPENROUTER_OUTFIT_MODEL?.trim() || undefined,
     )
   : openAiChooser;
-const analyzePerson = key
-  ? createOpenAiPersonStyleAnalyzer(key, model)
-  : undefined;
-const server = createGarmentServer({ analyze, analyzePerson, chooseOutfit });
+const server = createGarmentServer({ analyze, chooseOutfit });
 server.on('error', () => {
   console.error(
     'No se pudo iniciar el servidor local de análisis. Revisa AI_SERVER_PORT.',

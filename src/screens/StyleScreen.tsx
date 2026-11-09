@@ -127,7 +127,7 @@ export function StyleScreen({
           Los datos y fotos se guardan en este dispositivo. Borrar sus datos o
           desinstalar la app puede eliminarlos. Sin respaldo en la nube. Al
           analizar una foto, se envía a OpenAI para proponer sus atributos. Tu
-          tono de piel solo se guarda aquí.
+          colorimetría solo se guarda aquí.
         </Text>
         <Text style={[s.subtitle, { fontSize: 12, marginTop: 10 }]}>
           {data.wearHistory.length}{' '}

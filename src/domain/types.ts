@@ -74,27 +74,23 @@ export const STYLE_OPTIONS: readonly {
   },
 ];
 
-export const SKIN_DEPTHS = ['light', 'medium', 'deep'] as const;
-export type SkinDepth = (typeof SKIN_DEPTHS)[number];
-export const UNDERTONES = ['warm', 'neutral', 'cool'] as const;
-export type Undertone = (typeof UNDERTONES)[number];
-export const SKIN_DEPTH_LABELS: Record<SkinDepth, string> = {
-  light: 'Clara',
-  medium: 'Media',
-  deep: 'Oscura',
-};
-export const UNDERTONE_LABELS: Record<Undertone, string> = {
-  warm: 'Cálido',
-  neutral: 'Neutro',
-  cool: 'Frío',
-};
+export const COLOR_TONES = [
+  'spring-light',
+  'spring-bright',
+  'summer-light',
+  'summer-mute',
+  'autumn-mute',
+  'autumn-deep',
+  'winter-bright',
+  'winter-deep',
+] as const;
+export type ColorTone = (typeof COLOR_TONES)[number];
 
-/** Chosen or confirmed by the person. An unset tone means "no sé". */
+/** Chosen by the person. A tone only exists after they finish the color test. */
 export interface StyleGoal {
   targetStyleIds: StyleId[];
   exploring: boolean;
-  skinDepth?: SkinDepth;
-  undertone?: Undertone;
+  colorTone?: ColorTone;
 }
 
 /** Plain, JSON-serializable local wardrobe data. No gender is inferred. */

@@ -1,11 +1,9 @@
-import { isItemEligible, normalizeColor } from './recommendations';
+import { isItemEligible } from './recommendations';
 import type {
   Category,
   RecommendationContext,
-  SkinDepth,
   StyleGoal,
   StyleId,
-  Undertone,
   WardrobeItem,
 } from './types';
 
@@ -22,40 +20,6 @@ export function styleContext(
   return goal?.exploring && goal.targetStyleIds.length
     ? { styleIds: goal.targetStyleIds, explore: true }
     : { styleIds };
-}
-
-/**
- * Styling convention, not a measurement: a starting point the person accepts or ignores.
- * It only ever adds favorites, so it never removes a garment from the suggestions.
- */
-const TONE_COLORS: Record<SkinDepth, Record<Undertone, string[]>> = {
-  light: {
-    warm: ['beige', 'cafe', 'verde', 'naranja', 'azul'],
-    neutral: ['azul', 'verde', 'gris', 'beige', 'rosa'],
-    cool: ['azul', 'gris', 'rosa', 'morado', 'negro'],
-  },
-  medium: {
-    warm: ['verde', 'naranja', 'cafe', 'rojo', 'beige'],
-    neutral: ['azul', 'verde', 'rojo', 'beige', 'blanco'],
-    cool: ['azul', 'morado', 'rosa', 'gris', 'blanco'],
-  },
-  deep: {
-    warm: ['amarillo', 'naranja', 'rojo', 'verde', 'blanco'],
-    neutral: ['blanco', 'rojo', 'azul', 'verde', 'amarillo'],
-    cool: ['blanco', 'morado', 'azul', 'rosa', 'rojo'],
-  },
-};
-
-/** Empty until the person sets a tone. An excluded color is never suggested. */
-export function suggestedColors(
-  goal: Pick<StyleGoal, 'skinDepth' | 'undertone'>,
-  excludedColors: string[],
-): string[] {
-  if (!goal.skinDepth && !goal.undertone) return [];
-  const excluded = new Set(excludedColors.map(normalizeColor));
-  return TONE_COLORS[goal.skinDepth ?? 'medium'][
-    goal.undertone ?? 'neutral'
-  ].filter((color) => !excluded.has(normalizeColor(color)));
 }
 
 /** Base categories with no eligible garment tagged with the goal's styles. */

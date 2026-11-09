@@ -74,7 +74,7 @@ export function Chip({
   );
 }
 /** Teasers stay out of App Store builds: only dev and the testflight/preview profiles set this. */
-export const SHOW_COMING_SOON =
+const SHOW_COMING_SOON =
   __DEV__ || process.env.EXPO_PUBLIC_SHOW_COMING_SOON === '1';
 
 /** Not a control: names a feature that needs a backend this build does not have. */

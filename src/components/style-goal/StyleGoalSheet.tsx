@@ -2,33 +2,23 @@ import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import {
   EMPTY_STYLE_GOAL,
-  SKIN_DEPTHS,
-  SKIN_DEPTH_LABELS,
+  COLOR_TONE_INFO,
   STYLE_OPTIONS,
-  UNDERTONES,
-  UNDERTONE_LABELS,
   colorLabels,
   suggestedColors,
   type StyleGoal,
   type StyleId,
 } from '../../domain';
 import type { LocalData } from '../../storage/local';
+import { ColorTest, ToneSwatches } from '../colorimetry/ColorTest';
 import { Sheet } from '../Sheet';
 import { Button, Chip, colorHex, FieldLabel, useUI } from '../ui';
-import { PersonPhotoSection } from './PersonPhotoSection';
-import { usePersonPhoto } from './usePersonPhoto';
 
 export interface StyleGoalResult {
   goal: StyleGoal;
   styleIds: StyleId[];
   colors: string[];
 }
-
-const SKIN_SWATCHES = {
-  light: '#F1D3BC',
-  medium: '#C68E62',
-  deep: '#6B4226',
-} as const;
 
 function toggled<T>(values: T[], value: T): T[] {
   return values.includes(value)
@@ -58,54 +48,6 @@ function StyleChips({
   );
 }
 
-function ToneFields({
-  goal,
-  onChange,
-}: {
-  goal: StyleGoal;
-  onChange: (change: Partial<StyleGoal>) => void;
-}) {
-  const { s } = useUI();
-  return (
-    <>
-      <FieldLabel>Tono de piel · opcional</FieldLabel>
-      <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
-        Se guarda solo en este dispositivo. Toca de nuevo para quitarlo.
-      </Text>
-      <View style={s.wrap}>
-        {SKIN_DEPTHS.map((depth) => (
-          <Chip
-            key={depth}
-            label={SKIN_DEPTH_LABELS[depth]}
-            swatch={SKIN_SWATCHES[depth]}
-            selected={goal.skinDepth === depth}
-            onPress={() =>
-              onChange({
-                skinDepth: goal.skinDepth === depth ? undefined : depth,
-              })
-            }
-          />
-        ))}
-      </View>
-      <FieldLabel>Subtono · opcional</FieldLabel>
-      <View style={s.wrap}>
-        {UNDERTONES.map((undertone) => (
-          <Chip
-            key={undertone}
-            label={UNDERTONE_LABELS[undertone]}
-            selected={goal.undertone === undertone}
-            onPress={() =>
-              onChange({
-                undertone: goal.undertone === undertone ? undefined : undertone,
-              })
-            }
-          />
-        ))}
-      </View>
-    </>
-  );
-}
-
 export function StyleGoalSheet({
   data,
   onClose,
@@ -121,13 +63,26 @@ export function StyleGoalSheet({
     data.styleGoal ?? EMPTY_STYLE_GOAL,
   );
   const [colors, setColors] = useState<string[]>([]);
-  const photo = usePersonPhoto();
+  const [testing, setTesting] = useState(false);
   const change = (next: Partial<StyleGoal>) =>
     setGoal((current) => ({ ...current, ...next }));
   const suggested = suggestedColors(
     goal,
     data.preferences.excludedColors,
   ).filter((color) => !data.preferences.preferredColors.includes(color));
+  const tone = goal.colorTone && COLOR_TONE_INFO[goal.colorTone];
+  if (testing)
+    return (
+      <Sheet title="Colorimetría" onClose={() => setTesting(false)}>
+        <ColorTest
+          onDone={(colorTone) => {
+            change({ colorTone });
+            setColors([]);
+            setTesting(false);
+          }}
+        />
+      </Sheet>
+    );
   return (
     <Sheet title="Cambiar mi estilo" onClose={onClose}>
       <FieldLabel>Hoy me visto más…</FieldLabel>
@@ -137,22 +92,40 @@ export function StyleGoalSheet({
         value={goal.targetStyleIds}
         onChange={(targetStyleIds) => change({ targetStyleIds })}
       />
-      <PersonPhotoSection
-        photo={photo}
-        onApply={(suggestion) => {
-          change({
-            skinDepth: suggestion.skinDepth ?? goal.skinDepth,
-            undertone: suggestion.undertone ?? goal.undertone,
-          });
-          if (suggestion.styleIds.length) setStyleIds(suggestion.styleIds);
-        }}
+      <FieldLabel>Tu colorimetría · opcional</FieldLabel>
+      {tone ? (
+        <>
+          <Text style={[s.sectionTitle, { marginBottom: 12 }]}>
+            {tone.label}
+          </Text>
+          <ToneSwatches colors={tone.palette} />
+        </>
+      ) : (
+        <Text style={[s.subtitle, { fontSize: 12 }]}>
+          Compara colores junto a tu cara para saber cuáles te van mejor. Tu
+          foto no sale del teléfono.
+        </Text>
+      )}
+      <Button
+        secondary
+        label={tone ? 'Repetir la prueba' : 'Hacer la prueba'}
+        style={{ marginTop: 14 }}
+        onPress={() => setTesting(true)}
       />
-      <ToneFields goal={goal} onChange={change} />
+      {tone ? (
+        <Button
+          secondary
+          small
+          label="Quitar resultado"
+          style={{ marginTop: 8 }}
+          onPress={() => change({ colorTone: undefined })}
+        />
+      ) : null}
       {suggested.length ? (
         <>
-          <FieldLabel>Colores para animarte</FieldLabel>
+          <FieldLabel>Tus colores</FieldLabel>
           <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
-            Un punto de partida. Los que elijas se suman a tus favoritos.
+            Los que elijas se suman a tus favoritos.
           </Text>
           <View style={s.wrap}>
             {suggested.map((color) => (

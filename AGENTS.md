@@ -37,7 +37,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 
 1. Las sugerencias y los intercambios solo utilizan prendas actuales, disponibles y sin ningún color excluido. Un color preferido no anula una exclusión. El compositor manual permite elegir prendas disponibles por decisión explícita de la persona.
 2. La base válida es arriba + abajo + calzado, o prenda completa + calzado. Puede añadir una capa y un accesorio. No inventes piezas para completar un clóset insuficiente.
-3. La rotación, ocasión, abrigo y afinidad de estilo son señales flexibles. La escasez puede producir repeticiones o advertencias. No infieras género ni atributos no visibles de una foto. La IA puede proponer nombre, categoría y colores de una prenda con confirmación explícita. De una foto de la persona solo puede proponer claridad de piel, subtono y estilos de la ropa visible ([ADR-009](docs/adr/0009-foto-de-persona-y-objetivo-de-estilo.md)); nunca raza, origen, edad ni cuerpo. El tono de piel sugiere colores que la persona acepta; no puntúa ni excluye prendas.
+3. La rotación, ocasión, abrigo y afinidad de estilo son señales flexibles. La escasez puede producir repeticiones o advertencias. No infieras género ni atributos no visibles de una foto. La IA puede proponer nombre, categoría y colores de una prenda con confirmación explícita. Una foto de la persona nunca se envía a un proveedor: la colorimetría ocurre en el dispositivo y decide la persona ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). El tono resultante sugiere colores que la persona acepta; no puntúa ni excluye prendas.
 4. La afinidad de estilo usa etiquetas explícitas. Los temas visuales no cambian la puntuación. Ocultar explicaciones no oculta advertencias necesarias.
 5. Guardar un conjunto no registra uso. El uso se confirma con el clóset actual; la UI evita duplicarlo para el mismo conjunto en el mismo día local. El dominio recibe la fecha, y la ventana de rotación usa días transcurridos de 24 horas.
 6. Los datos de ejemplo requieren una elección explícita. Un clóset propio vacío sigue vacío. Volver a personalizar conserva prendas, fotos, guardados e historial.
@@ -50,7 +50,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 - Los datos inválidos o de versión desconocida deben producir un error recuperable, sin sustituirlos por valores iniciales.
 - Respeta la carga inicial, la cola de escrituras y los avisos de éxito posteriores al guardado. Un error de escritura no debe presentarse como éxito.
 - El límite web se comprueba sobre el documento completo. No elimines esa protección para acomodar una imagen de prueba.
-- Las fotos de usuario no reciben el tintado de las ilustraciones. Solo la acción explícita Analizar foto puede enviarlas al servidor local y a OpenAI; seleccionar una foto no autoriza un envío automático. La foto de una persona exige además un permiso específico por foto y no se guarda. Utiliza imágenes sintéticas o de ejemplo para QA y evita incluir fotos personales en evidencia, registros o commits.
+- Las fotos de usuario no reciben el tintado de las ilustraciones. Solo la acción explícita Analizar foto puede enviarlas al servidor local y a OpenAI; seleccionar una foto no autoriza un envío automático. La selfie de la colorimetría no se guarda ni sale del dispositivo. Utiliza imágenes sintéticas o de ejemplo para QA y evita incluir fotos personales en evidencia, registros o commits.
 
 ## Interfaz y contenido
 

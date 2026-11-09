@@ -22,7 +22,7 @@ Desde **Mi clóset**, abre una prenda guardada y toca **Combínala**. La app pro
 
 Marca **Quiero usarla más** al editar una prenda. Si encaja con el contexto y la rotación, Hoy puede mostrar un acceso para volver a combinarla.
 
-En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy, cómo quieres verte y, si quieres, tu tono de piel, a mano o con una foto que confirmas ([ADR-009](docs/adr/0009-foto-de-persona-y-objetivo-de-estilo.md)). Hoy muestra entonces **Hoy me animo a algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
+En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy y cómo quieres verte. La **prueba de colorimetría** compara colores junto a tu selfie, como una prueba con telas, y propone tu paleta; la foto no sale del teléfono ni se guarda ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). Hoy muestra entonces **Hoy me animo a algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
 
 En desarrollo, **Elegir con IA** puede priorizar una opción de Hoy entre conjuntos que ya encajan con el contexto. El proxy local admite OpenRouter con Claude Sonnet 5.5 para comparar esa elección con el orden local. [Configuración para iOS](docs/integraciones.md#elección-de-conjunto-en-hoy) · [Criterios](docs/recomendaciones.md#elección-opcional-con-ia).
 
@@ -132,7 +132,7 @@ Límites actuales que afectan el uso:
 - El esquema v3 migra v1/v2 y conserva la clave `@arma-tu-outfit/v1` para migrar datos existentes; un documento inválido no se reemplaza por la demo.
 - En web, el JSON completo —incluidas fotos— tiene un límite interno de 2 millones de caracteres; no equivale a la cuota garantizada del navegador. En móvil, las fotos se copian al directorio de documentos de la app. Los archivos que quedan sin referencias aún no se limpian automáticamente.
 - No hay deshacer uso ni edición del historial. Los guardados conservan una instantánea; registrar uso revalida las prendas actuales. El compositor elige categorías, no es un lienzo para arrastrar prendas.
-- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA asiste en nombre, categoría y colores de una prenda, y en tono de piel y estilos de una foto de la persona. En desarrollo también puede elegir entre conjuntos válidos. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
+- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA asiste en nombre, categoría y colores de una prenda. En desarrollo también puede elegir entre conjuntos válidos. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
 
 ## Documentación y próximos pasos
 

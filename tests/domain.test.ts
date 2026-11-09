@@ -2,7 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   COLOR_OPTIONS,
+  COLOR_TEST_STEPS,
+  COLOR_TONES,
+  COLOR_TONE_INFO,
   STYLE_IDS,
+  colorTestResult,
+  colorTestStep,
   createDefaultContext,
   generateRecommendations,
   isValidOutfit,
@@ -16,6 +21,8 @@ import {
 } from '../src/domain';
 import type {
   Category,
+  ColorTone,
+  DrapeVote,
   RecommendationContext,
   WardrobeItem,
 } from '../src/domain';
@@ -615,16 +622,71 @@ test('without explore the ranking ignores wear-based exploration', () => {
   );
 });
 
-test('suggested colors need a chosen tone and respect exclusions', () => {
+const answerAll = (vote: (index: number) => DrapeVote) => {
+  const votes: DrapeVote[] = [];
+  while (colorTestStep(votes)) votes.push(vote(votes.length));
+  return votes;
+};
+
+test('every path of the color test ends in a known tone after nine comparisons', () => {
+  const reached = new Set<string>();
+  for (let path = 0; path < 3 ** COLOR_TEST_STEPS; path += 251) {
+    const votes = answerAll(
+      (index) =>
+        (['a', 'b', 'tie'] as const)[Math.floor(path / 3 ** index) % 3],
+    );
+    assert.equal(votes.length, COLOR_TEST_STEPS);
+    const result = colorTestResult(votes);
+    assert.ok(result && COLOR_TONES.includes(result.tone));
+    reached.add(result.tone);
+  }
+  assert.equal(reached.size, COLOR_TONES.length);
+});
+
+test('color test rounds narrow temperature, season and subtype', () => {
+  const cases: [DrapeVote, DrapeVote, DrapeVote, ColorTone][] = [
+    ['a', 'a', 'a', 'spring-light'],
+    ['a', 'a', 'b', 'spring-bright'],
+    ['a', 'b', 'a', 'autumn-mute'],
+    ['a', 'b', 'b', 'autumn-deep'],
+    ['b', 'a', 'a', 'summer-light'],
+    ['b', 'a', 'b', 'summer-mute'],
+    ['b', 'b', 'a', 'winter-bright'],
+    ['b', 'b', 'b', 'winter-deep'],
+  ];
+  for (const [temperature, season, subtype, tone] of cases) {
+    const votes = answerAll((index) =>
+      index < 3 ? temperature : index < 6 ? season : subtype,
+    );
+    assert.deepEqual(colorTestResult(votes), { tone, confident: true });
+  }
+});
+
+test('a tied round still gives a result but reports low confidence', () => {
+  const result = colorTestResult(answerAll(() => 'tie'));
+  assert.equal(result?.confident, false);
+  assert.equal(colorTestResult(['a', 'b']), null);
+});
+
+test('the color test alternates sides and keeps later rounds on the winning branch', () => {
+  assert.equal(colorTestStep([])?.aOnLeft, true);
+  assert.equal(colorTestStep(['a'])?.aOnLeft, false);
+  const warm = colorTestStep(['a', 'a', 'a']);
+  const cool = colorTestStep(['b', 'b', 'b']);
+  assert.notDeepEqual(warm?.pair, cool?.pair);
+});
+
+test('every tone maps to wardrobe colors and suggestions respect exclusions', () => {
   assert.deepEqual(suggestedColors({}, []), []);
-  const colors = suggestedColors({ skinDepth: 'deep', undertone: 'warm' }, []);
-  assert.ok(colors.length > 0);
-  assert.ok(colors.every((color) => COLOR_OPTIONS.includes(color)));
-  const without = suggestedColors({ skinDepth: 'deep', undertone: 'warm' }, [
-    colors[0].toUpperCase(),
-  ]);
-  assert.ok(!without.includes(colors[0]));
-  assert.ok(suggestedColors({ undertone: 'cool' }, []).length > 0);
+  for (const tone of COLOR_TONES) {
+    const { colors, palette } = COLOR_TONE_INFO[tone];
+    assert.ok(colors.every((color) => COLOR_OPTIONS.includes(color)));
+    assert.ok(palette.every((hex) => /^#[0-9A-F]{6}$/.test(hex)));
+    const without = suggestedColors({ colorTone: tone }, [
+      colors[0].toUpperCase(),
+    ]);
+    assert.ok(!without.includes(colors[0]));
+  }
 });
 
 test('style gaps report missing base categories without inventing garments', () => {

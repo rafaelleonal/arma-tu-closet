@@ -1,9 +1,8 @@
 import {
   CATEGORIES,
+  COLOR_TONES,
   OCCASIONS,
-  SKIN_DEPTHS,
   STYLE_IDS,
-  UNDERTONES,
   isValidOutfit,
   type Context,
   type Outfit,
@@ -237,8 +236,7 @@ function styleGoal(value: unknown): value is StyleGoal {
     record(value) &&
     styles(value.targetStyleIds) &&
     typeof value.exploring === 'boolean' &&
-    (value.skinDepth === undefined || known(value.skinDepth, SKIN_DEPTHS)) &&
-    (value.undertone === undefined || known(value.undertone, UNDERTONES))
+    (value.colorTone === undefined || known(value.colorTone, COLOR_TONES))
   );
 }
 

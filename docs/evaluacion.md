@@ -299,3 +299,9 @@ Se sustituyó el tono con modismos por una voz cálida a partir del onboarding d
 
 `pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (100 pruebas) aprobados. Recorrido en navegador en `voz.localhost:8093` a 390 × 780 con un nombre sintético, del saludo al clóset de ejemplo. Sin verificar: VoiceOver y teléfono real.
 
+## 9/11/2026 — Prueba de colorimetría en el dispositivo
+
+[ADR-010](adr/0010-colorimetria-en-el-dispositivo.md). Se retiró el análisis de foto de persona con IA y se añadió la prueba de nueve comparaciones.
+
+Recorrido en navegador en `color.localhost:8093` a 390 × 780, con una cara sintética dibujada en canvas: permiso de elección, comparaciones, Atrás, «No noto diferencia», resultado, colores sugeridos sin el color excluido, y guardado. Sin solicitudes a la API y sin foto en el documento guardado. Sin verificar: cámara frontal y recorte en iPhone, coherencia del resultado con personas reales, y VoiceOver.
+

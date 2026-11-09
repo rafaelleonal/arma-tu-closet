@@ -3,10 +3,6 @@ import {
   parseGarmentSuggestion,
   type GarmentSuggestion,
 } from './contracts';
-import {
-  parsePersonStyleSuggestion,
-  type PersonStyleSuggestion,
-} from './personStyleContract';
 
 export class AiClientError extends Error {
   constructor(
@@ -160,14 +156,6 @@ export function analyzeGarmentPhoto(
   options: AnalyzePhotoOptions,
 ): Promise<GarmentSuggestion> {
   return postPhoto(imageDataUrl, options, parseGarmentSuggestion);
-}
-
-/** Only ever called after an explicit action with visible consent. */
-export function analyzePersonPhoto(
-  imageDataUrl: string,
-  options: AnalyzePhotoOptions,
-): Promise<PersonStyleSuggestion> {
-  return postPhoto(imageDataUrl, options, parsePersonStyleSuggestion);
 }
 
 async function postPhoto<T>(
