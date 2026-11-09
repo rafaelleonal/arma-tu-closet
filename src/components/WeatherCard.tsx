@@ -7,8 +7,8 @@ import { Button, useUI } from './ui';
 
 type Weather = ReturnType<typeof useWeather>;
 
-/** Today's weather and occasion. Manual weather is always labeled as manual. */
-export function WeatherCard({
+/** Today's weather and occasion in one line. Manual weather is always labeled as manual. */
+export function WeatherPill({
   data,
   context,
   weather,
@@ -19,68 +19,52 @@ export function WeatherCard({
   weather: Weather;
   onEdit: () => void;
 }) {
-  const { palette, s } = useUI();
+  const { palette } = useUI();
   const automatic = weather.effective?.source === 'automatic';
+  const degrees = Math.round(
+    automatic ? data.weather.snapshot!.temperatureC : context.temperatureC,
+  );
   return (
-    <View style={[styles.card, { backgroundColor: palette.sand }]}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Editar clima y ocasión"
-        onPress={onEdit}
-        style={styles.summary}
-      >
-        <View style={[s.row, { flexShrink: 1 }]}>
-          <Text style={{ fontSize: 31, color: palette.ink }}>
-            {context.raining ? '☂' : '☼'}
-          </Text>
-          <View style={{ flexShrink: 1 }}>
-            <Text style={{ fontSize: 19, color: palette.ink }}>
-              {Math.round(
-                automatic
-                  ? data.weather.snapshot!.temperatureC
-                  : context.temperatureC,
-              )}
-              °{' '}
-              <Text style={{ fontSize: 13 }}>
-                {weather.effective?.context.city || data.context.city}
-              </Text>
-            </Text>
-            <Text style={[s.subtitle, { fontSize: 11 }]}>
-              {automatic
-                ? `Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? 'Con precipitación' : 'Sin precipitación'}`
-                : `Clima manual · ${data.context.season}`}
-            </Text>
-          </View>
-        </View>
-        <View>
-          <Text style={{ fontSize: 13, color: palette.ink }}>
-            {occasionLabels[data.context.occasion]}
-          </Text>
-          <Text style={{ fontSize: 11, color: palette.rust, marginTop: 5 }}>
-            Cambiar ↗
-          </Text>
-        </View>
-      </Pressable>
-      {data.weather.mode === 'automatic' ? (
-        <AutomaticWeatherStatus data={data} weather={weather} />
-      ) : null}
-    </View>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Editar clima y ocasión. ${degrees} grados${automatic ? '' : ', clima manual'}, ${occasionLabels[data.context.occasion]}`}
+      onPress={onEdit}
+      style={({ pressed }) => [
+        styles.pill,
+        { backgroundColor: palette.white, borderColor: palette.line },
+        pressed && { opacity: 0.72 },
+      ]}
+    >
+      <Text style={{ fontSize: 17, color: palette.rust }}>
+        {context.raining ? '☂' : '☼'}
+      </Text>
+      <Text style={{ fontSize: 13, color: palette.ink }}>
+        {degrees}°{automatic ? '' : ' manual'} ·{' '}
+        {occasionLabels[data.context.occasion]}
+      </Text>
+      <Text style={{ fontSize: 11, color: palette.muted }}>▾</Text>
+    </Pressable>
   );
 }
 
-function AutomaticWeatherStatus({
+/** Where the automatic forecast comes from and how fresh it is; the manual one needs no status. */
+export function WeatherStatus({
   data,
+  context,
   weather,
 }: {
   data: LocalData;
+  context: Context;
   weather: Weather;
 }) {
   const { palette, s } = useUI();
+  const automatic = weather.effective?.source === 'automatic';
+  const place = weather.effective?.context.city || data.context.city;
   return (
-    <View style={{ marginTop: 12, gap: 8 }}>
+    <View style={styles.status}>
       <Text style={[s.subtitle, { fontSize: 11 }]}>
-        {weather.effective?.source === 'automatic'
-          ? `Actualizado ${new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit' }).format(new Date(data.weather.snapshot!.fetchedAt))}`
+        {automatic
+          ? `${place ? `${place} · ` : ''}Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? 'Con precipitación' : 'Sin precipitación'} · Actualizado ${new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit' }).format(new Date(data.weather.snapshot!.fetchedAt))}`
           : weather.loading
             ? 'Consultando clima. Por ahora se usa el manual.'
             : 'Sin clima reciente. Se usa el manual de respaldo.'}
@@ -124,18 +108,14 @@ function AutomaticWeatherStatus({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    borderRadius: 16,
-    gap: 10,
-    marginTop: 16,
-  },
-  summary: {
+  pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    flexWrap: 'wrap',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 22,
+    borderWidth: 1,
   },
+  status: { marginTop: 22, gap: 8 },
 });

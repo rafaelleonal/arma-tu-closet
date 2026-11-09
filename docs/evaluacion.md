@@ -305,3 +305,12 @@ Se sustituyó el tono con modismos por una voz cálida a partir del onboarding d
 
 Recorrido en navegador en `color.localhost:8093` a 390 × 780, con una cara sintética dibujada en canvas: permiso de elección, comparaciones, Atrás, «No noto diferencia», resultado, colores sugeridos sin el color excluido, y guardado. Sin solicitudes a la API y sin foto en el documento guardado. Sin verificar: cámara frontal y recorte en iPhone, coherencia del resultado con personas reales, y VoiceOver.
 
+## 9/11/2026 — Hoy como mesa de stickers
+
+Rediseño de Hoy según [la guía](diseno-personalizacion.md#hoy-como-mesa-de-stickers): outfit como stickers, una acción principal, clima en píldora y motivos con la voz de las prendas. Nueve stickers de dibujo nuevos en `assets/garments/stickers/`.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados. Una prueba nueva recorre los motivos que escribe el recomendador y falla si alguno se queda sin voz. `npx expo export --platform all` terminó sin errores e incluyó los nueve stickers; exportar no prueba iOS ni Android.
+
+Recorrido en navegador con Expo web a 375 × 812. En `localhost:8093`, un clóset propio sin fotos: [stickers de dibujo](evidence/hoy-stickers-dibujos-web-375.jpg), cambio de página con los puntos. En `127.0.0.1:8093`, origen vacío con el clóset de ejemplo: [stickers de foto en Lino](evidence/hoy-stickers-lino-web-375.jpg) y [en Medianoche](evidence/hoy-stickers-medianoche-web-375.jpg), disposición con prenda completa y capa, Guardar y quitar sobre la segunda página, Prefiero otro, Hoy me lo puse sin duplicar el registro, hoja de cambio al tocar una prenda, y 320 × 568 sin desborde horizontal. El perchero conserva su fondo de puntos.
+
+Sin verificar: iOS y Android (la sombra usa propiedades distintas en cada uno y el borde de los recortes se dibuja con copias teñidas de la imagen), deslizar con el dedo, recortes y fotos propias de una persona, clima automático en la píldora, la disposición Compacta, los temas Papel, Salvia, Chicle y Malva, outfits con accesorio, VoiceOver y teclado.

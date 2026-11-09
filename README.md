@@ -16,13 +16,13 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 - En iOS 17+ con la build de desarrollo, **Quitar fondo** recorta la foto de una prenda en el teléfono y conserva la original ([ADR-006](docs/adr/0006-recorte-de-fondo-en-dispositivo.md)).
 - Conservar el clóset, preferencias, fotos y uso en el dispositivo. Puedes empezar con ropa propia o elegir una demo identificada como ejemplo, con fotos de prendas recortadas ([créditos](assets/demo/README.md)).
 
-Las ilustraciones son dibujos genéricos. Puedes analizar una foto con IA para proponer nombre, categoría y colores: revisas y confirmas la propuesta antes de incorporarla al formulario, y guardas la prenda por separado. Los demás atributos siguen siendo manuales.
+Las ilustraciones son dibujos genéricos; en Hoy, las prendas se muestran como stickers: su foto recortada o, si no tiene, ese dibujo. Puedes analizar una foto con IA para proponer nombre, categoría y colores: revisas y confirmas la propuesta antes de incorporarla al formulario, y guardas la prenda por separado. Los demás atributos siguen siendo manuales.
 
 Desde **Mi clóset**, abre una prenda guardada y toca **Combínala**. La app propone hasta dos conjuntos con esa pieza fija y el contexto de Hoy. Puedes cambiar las demás prendas, guardar o registrar el uso. Si falta una categoría, puedes agregar una prenda y volver a la misma selección.
 
 Marca **Quiero usarla más** al editar una prenda. Si encaja con el contexto y la rotación, Hoy puede mostrar un acceso para volver a combinarla.
 
-En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy y cómo quieres verte. La **prueba de colorimetría** compara colores junto a tu selfie, como una prueba con telas, y propone tu paleta; la foto no sale del teléfono ni se guarda ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). Hoy muestra entonces **Hoy me animo a algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
+En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy y cómo quieres verte. La **prueba de colorimetría** compara colores junto a tu selfie, como una prueba con telas, y propone tu paleta; la foto no sale del teléfono ni se guarda ([ADR-010](docs/adr/0010-colorimetria-en-el-dispositivo.md)). Hoy muestra entonces **Algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
 
 En desarrollo, **Elegir con IA** puede priorizar una opción de Hoy entre conjuntos que ya encajan con el contexto. El proxy local admite OpenRouter con Claude Sonnet 5.5 para comparar esa elección con el orden local. [Configuración para iOS](docs/integraciones.md#elección-de-conjunto-en-hoy) · [Criterios](docs/recomendaciones.md#elección-opcional-con-ia).
 
@@ -103,7 +103,7 @@ src/weather/            Cliente Open-Meteo, caché y contexto derivado
 src/ai/                 Contrato y cliente de análisis de prendas
 server/                 Proxy local de IA sin persistencia de fotos
 src/theme/              Paletas y proveedor de apariencia
-assets/garments/         Ilustraciones locales y prompts
+assets/garments/         Ilustraciones locales, sus stickers y prompts
 tests/                 Pruebas de dominio, esquema y contraste
 docs/                  Producto, arquitectura, decisiones y evidencia
 ```

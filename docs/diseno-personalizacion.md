@@ -1,11 +1,12 @@
 # Diseño y personalización
 
-Actualizado: 23 de octubre de 2026. Criterios de diseño de la app local de Expo, incluyendo la revisión de textos e ilustraciones. Prioridad: aprender móvil y explorar el producto. La evidencia de implementación está en [evaluación](evaluacion.md).
+Actualizado: 9 de noviembre de 2026. Criterios de diseño de la app local de Expo, incluyendo la revisión de textos e ilustraciones. Prioridad: aprender móvil y explorar el producto. La evidencia de implementación está en [evaluación](evaluacion.md).
 
 ## Referencias y traducción al producto
 
 - **Revolut:** su anuncio de Revolut 10, publicado el 10/10/2023, describe temas, fondos, widgets y navegación personalizables. Tomamos la idea de permitir que la persona adapte la interfaz a su uso. Es una referencia histórica oficial; no una auditoría de la app actual de 2026. [Fuente](https://www.revolut.com/blog/post/revolut-10/).
 - **Resend:** su guía de diseño propone cercanía con clientes, claridad y resolver problemas concretos. Su filosofía pide una primera experiencia rápida, sin decenas de pasos. Lo traducimos en pocas decisiones, valores iniciales útiles y un resultado visible de inmediato. No copiamos su estética como sustituto de esas decisiones. [Diseño, actualizado el 27/08/2026](https://resend.com/handbook/design/how-we-think-about-design), [filosofía](https://resend.com/philosophy).
+- **Tablero High Taste Apps:** [colección de Appllama](https://appllama.io/u/jaimin/high-taste-apps) revisada el 9/11/2026; solo sus pantallas de bienvenida son públicas. Fija el nivel al que apuntamos: una idea por pantalla, un protagonista grande y una sola acción principal. De daplit tomamos la idea de mostrar objetos reales como stickers, no su retícula ni sus textos.
 
 ## Dos capas, dos efectos
 
@@ -23,7 +24,7 @@ En el primer arranque, antes del paso 1, la bienvenida muestra las prendas salud
 
 | Paso | Decisión | Ayuda y resultado |
 |---|---|---|
-| 1. Hola | Nombre opcional y qué le cuesta más al vestirse. | La respuesta no se guarda. Cada opción responde con lo que la app hace de verdad: «Nunca le atino al clima» muestra la ciudad y «Quiero cambiar de estilo» activa **Hoy me animo a algo nuevo** al elegir un objetivo. La ubicación se pide solo al pulsar **Usar mi ubicación**. |
+| 1. Hola | Nombre opcional y qué le cuesta más al vestirse. | La respuesta no se guarda. Cada opción responde con lo que la app hace de verdad: «Nunca le atino al clima» muestra la ciudad y «Quiero cambiar de estilo» activa **Algo nuevo** al elegir un objetivo. La ubicación se pide solo al pulsar **Usar mi ubicación**. |
 | 2. Tu estilo | Hasta tres estilos actuales y hasta tres a los que quiere acercarse. | Se puede continuar sin elegir. No convertir estilos en identidades fijas. |
 | 3. Colores | Preferir y evitar, ambos opcionales. | Una misma opción no puede quedar en ambos grupos. Explicar que evitar un color puede reducir las combinaciones. |
 | 4. Tu conjunto | Ve un conjunto con lo que eligió, ocasión habitual, apariencia y clóset propio o demo. | Con clóset vacío usa prendas de ejemplo identificadas y no las escribe en el documento. Elecciones explícitas «Vamos con mi ropa» y «Ver el clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
@@ -87,6 +88,26 @@ La referencia es el [onboarding de Letterly](https://x.com/bthreeagency/status/2
 
 Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportación web no prueban reinicio nativo, cámara, contraste visual ni que la persona entienda sus elecciones. Para el piloto, observar si completa el flujo sin ayuda y puede explicar qué cambió; no medir éxito solo por finalizar cuatro pantallas.
 
+## Hoy como mesa de stickers
+
+Hoy abre directo en el outfit, sin la barra de marca. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático, la hora del dato, Open-Meteo y **Actualizar clima** quedan al final de la pantalla.
+
+Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre el mismo fondo de puntos del perchero, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista. **Otra vuelta** y **Elegir con IA** quedan debajo, como acciones secundarias.
+
+| Prenda | Sticker |
+|---|---|
+| Con recorte (propio o de ejemplo) | La foto sin fondo con un borde claro alrededor. |
+| Con foto sin recortar | La foto en un marco claro cuadrado. |
+| Sin foto | El dibujo genérico sin carita, sobre su propio papel. Para lectores de pantalla sigue siendo «Ilustración genérica». |
+
+El papel del sticker es claro en todos los temas, como un sticker real sobre cualquier superficie; por eso el dibujo no se tiñe con el tema en Hoy. Los colores de la prenda siguen aparte, en la etiqueta con su nombre.
+
+Los motivos van en una burbuja con la voz de las prendas, como en el onboarding: «Hoy vamos en plan urbano.» en lugar de «Estilo: urbano». [reasonVoice.ts](../src/domain/reasonVoice.ts) reescribe cada motivo sin añadir afirmaciones; uno que no conoce se muestra tal cual. Se dicen hasta dos. Las advertencias no cambian de voz ni se ocultan al desactivar los motivos.
+
+**Algo nuevo** aparece junto al indicador de páginas cuando hay un objetivo de estilo; para lectores de pantalla se llama «Hoy me animo a algo nuevo». El aviso de categorías faltantes solo se muestra con ese modo encendido.
+
+La altura de la mesa se calcula con la pantalla para que la acción principal quede a la vista sin desplazarse en un teléfono de 812 puntos; en pantallas más bajas la pantalla se desplaza. La disposición Compacta usa una mesa más baja.
+
 ## Mi clóset como perchero
 
 Inspirado en el perchero del portafolio de Batch Merch (Inspora, «portfolio website»): fondo claro con puntos, un tubo cromado y prendas colgadas de canto. La prenda elegida gira de frente (`rotateY` con perspectiva, 320 ms, sin animación con Reducir movimiento) y debajo aparece su nombre, categoría, colores, «Ejemplo» si aplica, el interruptor de disponibilidad y **Editar prenda**. Arriba, capas, prendas completas y abajo cuelgan del tubo con un largo aproximado por categoría; calzado y accesorios van en una repisa.
@@ -106,6 +127,8 @@ Ocasiones, abrigo, lluvia y estilos quedan en **Más detalles**, plegado y con u
 Usar títulos, acciones y ayudas breves. Se retiraron eslóganes, títulos promocionales de conjuntos y descripciones decorativas de estilos y temas. Los errores, restricciones y advertencias que ayudan a decidir permanecen visibles.
 
 Las nueve ilustraciones de prendas siguen las referencias de Café Sinónimo aportadas por el usuario: una tinta, trazo redondo e irregular, espacios transparentes y caras pequeñas. Comparten recursos entre el clóset, los conjuntos y las vistas de apariencia. La tinta adapta el dibujo al tema; las muestras de color describen la prenda. Las fotos se muestran sin tintado.
+
+En Hoy cada dibujo se muestra como sticker: la misma ilustración sin carita sobre una silueta clara con borde troquelado. La carita se queda en el onboarding, donde las prendas hablan. Los nueve stickers se generan con [garment-stickers.py](../scripts/garment-stickers.py) a partir de los originales, que no cambian.
 
 Los dibujos son genéricos; su selección por categoría y algunas palabras del nombre no analiza la foto ni infiere estilo. La biblioteca todavía no distingue todos los tipos de prendas. [Archivos y prompts](../assets/garments/README.md). El nombre visible «Amplia» conserva el identificador persistido `editorial` para evitar un cambio de esquema innecesario.
 

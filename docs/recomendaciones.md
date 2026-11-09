@@ -77,7 +77,7 @@ Para saber si aporta valor, comparar la primera propuesta local con la elegida p
 
 `StyleGoal` guarda los estilos a los que la persona quiere acercarse, si está explorando y, de forma opcional, el tono de la prueba de colorimetría. Es un campo opcional del esquema v3.
 
-Con **Hoy me animo a algo nuevo**, `context.styleIds` pasa a ser el objetivo y `context.explore` sube el peso de la afinidad de 15 a 40 y favorece prendas con un uso o ninguno. Disponibilidad, colores excluidos y base válida no cambian. Si faltan prendas con esas etiquetas, las sugerencias siguen con la ropa disponible y `styleGaps` indica las categorías sin cubrir; no se inventan prendas.
+Con **Algo nuevo**, `context.styleIds` pasa a ser el objetivo y `context.explore` sube el peso de la afinidad de 15 a 40 y favorece prendas con un uso o ninguno. Disponibilidad, colores excluidos y base válida no cambian. Si faltan prendas con esas etiquetas, las sugerencias siguen con la ropa disponible y `styleGaps` indica las categorías sin cubrir; no se inventan prendas.
 
 La prueba de colorimetría (`src/domain/colorimetry.ts`) hace nueve comparaciones en tres rondas: temperatura, estación y subtipo. Cada ronda se decide por mayoría y las rondas siguientes dependen de las anteriores. Un empate conserva la primera opción e informa baja confianza. Los lados se alternan para que la preferencia por un lado no decida.
 

@@ -16,7 +16,7 @@ const illustrations = {
   jacket: require('../../assets/garments/jacket.png'),
   scarf: require('../../assets/garments/scarf.png'),
 };
-type IllustrationKind = keyof typeof illustrations;
+export type IllustrationKind = keyof typeof illustrations;
 
 /** Decorative, tintable ink drawing. User photos never pass through this component. */
 export function GarmentIllustration({
@@ -38,7 +38,7 @@ export function GarmentIllustration({
   );
 }
 
-function illustrationFor(item: WardrobeItem): IllustrationKind {
+export function illustrationFor(item: WardrobeItem): IllustrationKind {
   const name = item.name
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -80,6 +80,12 @@ export function useGarmentImages(item: WardrobeItem) {
   };
 }
 
+/** Says what the picture is, so a generic drawing is never read out as the garment's photo. */
+export function garmentArtLabel(hasOwnPhoto: boolean, hasDemoPhoto: boolean) {
+  if (hasOwnPhoto) return 'Foto';
+  return hasDemoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica';
+}
+
 const SWATCH_SLOT = 13;
 const MORE_WIDTH = 18;
 
@@ -105,7 +111,7 @@ export function Garment({
   return (
     <View
       accessible
-      accessibilityLabel={`${cutoutUri || photoUri ? 'Foto' : demoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica'} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`}
+      accessibilityLabel={`${garmentArtLabel(Boolean(cutoutUri || photoUri), Boolean(demoPhoto))} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`}
       style={styles.art}
     >
       {cutoutUri ? (

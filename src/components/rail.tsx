@@ -106,21 +106,24 @@ export function RailWall({
     <View
       style={[styles.wall, { backgroundColor: palette.art, height }, style]}
     >
-      <Svg style={StyleSheet.absoluteFill} aria-hidden>
-        <Defs>
-          <Pattern
-            id="dots"
-            width="14"
-            height="14"
-            patternUnits="userSpaceOnUse"
-          >
-            <Circle cx="2" cy="2" r="1" fill={palette.line} />
-          </Pattern>
-        </Defs>
-        <Rect width="100%" height="100%" fill="url(#dots)" />
-      </Svg>
+      <Dots />
       {children}
     </View>
+  );
+}
+
+/** The dotted paper behind the rail and behind today's outfit. Fills its parent. */
+export function Dots() {
+  const { palette } = useUI();
+  return (
+    <Svg width="100%" height="100%" style={StyleSheet.absoluteFill} aria-hidden>
+      <Defs>
+        <Pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+          <Circle cx="2" cy="2" r="1" fill={palette.line} />
+        </Pattern>
+      </Defs>
+      <Rect width="100%" height="100%" fill="url(#dots)" />
+    </Svg>
   );
 }
 

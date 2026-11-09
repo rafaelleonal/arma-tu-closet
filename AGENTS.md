@@ -57,7 +57,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 - Texto breve, cálido y natural, en la voz de las prendas, según [la guía de tono](docs/diseno-personalizacion.md#tono-de-la-app). Sin modismos fuertes, adjetivos promocionales ni descripciones que solo repitan el título. Permisos, privacidad, tono de piel y errores que afecten datos se escriben claros y sin personaje. No uses palabras con género para hablarle a la persona.
 - Personalización con roles compartidos, siguiendo [la guía de diseño](docs/diseno-personalizacion.md). Revisa todos los temas cuando cambies colores; verifica Medianoche de forma visual.
 - Mantén etiquetas accesibles, estados seleccionados, áreas táctiles y controles utilizables en pantallas estrechas. Una prueba de contraste no sustituye la revisión de foco, teclado y lector de pantalla.
-- Sigue [la familia de ilustraciones](assets/garments/README.md): una tinta, fondo transparente, trazos redondos y caras pequeñas. Usa archivos locales y registra los prompts de nuevos recursos. Los colores de la prenda se muestran aparte.
+- Sigue [la familia de ilustraciones](assets/garments/README.md): una tinta, fondo transparente, trazos redondos y caras pequeñas. Usa archivos locales y registra los prompts de nuevos recursos. Los colores de la prenda se muestran aparte. En Hoy las prendas van como stickers: la foto recortada o, sin foto, el dibujo sin carita de `assets/garments/stickers/`, que se regenera con su script.
 
 ## Comprobaciones y entrega
 

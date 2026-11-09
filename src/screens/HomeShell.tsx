@@ -70,7 +70,8 @@ export function HomeShell(props: HomeShellProps) {
       style={[styles.root, { backgroundColor: palette.paper }]}
       edges={['top', 'left', 'right']}
     >
-      <AppHeader />
+      {/* Today opens straight on the outfit; its own heading replaces the brand bar. */}
+      {tab === 'today' ? null : <AppHeader />}
       <SaveErrorBanner
         message={autosave.saveError}
         onRetry={autosave.retrySave}
@@ -78,7 +79,7 @@ export function HomeShell(props: HomeShellProps) {
       <View style={{ flex: 1 }}>
         <ScrollView
           ref={contentScroll}
-          contentContainerStyle={styles.main}
+          contentContainerStyle={[styles.main, tab === 'today' && styles.today]}
           keyboardShouldPersistTaps="handled"
         >
           <MotionIn trigger={tab}>
@@ -92,7 +93,6 @@ export function HomeShell(props: HomeShellProps) {
                 onTab={onTab}
                 onEditContext={() => setContextOpen(true)}
                 onSwap={setSwap}
-                onDetails={setSelectedOutfit}
                 onCombine={setCombineItemId}
               />
             ) : null}
@@ -235,4 +235,5 @@ const styles = StyleSheet.create({
     maxWidth: 880,
     alignSelf: 'center',
   },
+  today: { paddingTop: 16 },
 });
