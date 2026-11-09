@@ -4,7 +4,7 @@ Actualizado: 27/10/2026. Alcance: prototipo local. Decisiones: [servicios opcion
 
 ## Open-Meteo
 
-1. Abre Hoy → Cambiar → Automático, o el bloque Clima del paso Tu rutina en el onboarding.
+1. Abre Hoy → Cambiar → Automático, o elige «Nunca le atino al clima» en el primer paso del onboarding.
 2. En iOS/Android pulsa **Usar mi ubicación**; si no das permiso o no se encuentra la ciudad, usa **Buscar por nombre** y selecciona un resultado. Una búsqueda escrita no cambia por sí sola la ciudad.
 3. En Hoy, revisa el clima manual de respaldo y pulsa Aplicar. En el onboarding la ciudad se aplica al elegirla.
 
@@ -46,6 +46,12 @@ Un teléfono físico usa su propio loopback: para pruebas necesita un reenvío l
 - Dos análisis simultáneos, seis por minuto y cincuenta por proceso del servidor; reiniciarlo reinicia esos contadores. Son topes de desarrollo, no cuotas por usuario.
 - Diez segundos para recibir el cuerpo, veinte para el proveedor y treinta en el cliente. Sin reintentos automáticos al proveedor para evitar costo duplicado.
 - Clave e imágenes no se escriben en logs. El proxy no persiste imágenes ni resultados. `store: false` desactiva almacenamiento de respuestas de OpenAI; no declara retención cero de todos los sistemas del proveedor.
+
+## Análisis de la foto de una persona
+
+En **Mi estilo → Cambiar mi estilo**, una foto opcional puede proponer claridad de piel, subtono y hasta tres estilos de la ropa visible. `POST /api/person-style` comparte el proxy, los orígenes, los límites de imagen y los contadores del análisis de prendas, y usa `OPENAI_API_KEY`. No hay un interruptor aparte.
+
+La foto se envía solo tras aceptar el permiso que nombra a OpenAI y pulsar Analizar foto. Cambiarla o quitarla retira el permiso. No se escribe en el documento local ni en el proxy, y `store: false` tiene el mismo alcance descrito arriba. Una foto sin persona, con varias personas, poco clara o de alguien que parece menor de edad devuelve un mensaje para reintentar o elegir a mano. [ADR-009](adr/0009-foto-de-persona-y-objetivo-de-estilo.md).
 
 ## Estado de verificación
 

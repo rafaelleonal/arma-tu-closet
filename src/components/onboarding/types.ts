@@ -9,6 +9,7 @@ export type PersonalizationPatch = Partial<
     | 'context'
     | 'onboarding'
     | 'weather'
+    | 'styleGoal'
   >
 >;
 

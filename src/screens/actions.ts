@@ -45,7 +45,7 @@ export function createOutfitActions(
           : [outfit, ...current.savedOutfits],
       }));
       autosave.noticeAfterSave(
-        saved ? 'Quitado de guardados.' : 'Conjunto guardado.',
+        saved ? 'Lo quité de guardados.' : 'Outfit guardado.',
       );
     },
     worn(outfit: Outfit) {
@@ -62,7 +62,7 @@ export function createOutfitActions(
           (entry) => entry.id === outfit.id && localDay(entry.date) === today,
         )
       ) {
-        autosave.setNotice('Este conjunto ya está registrado como usado hoy.');
+        autosave.setNotice('Ya lo registraste hoy.');
         return;
       }
       update((current) => ({
@@ -77,7 +77,7 @@ export function createOutfitActions(
           ...current.wearHistory,
         ].slice(0, 365),
       }));
-      autosave.noticeAfterSave('Uso registrado.');
+      autosave.noticeAfterSave('Anotado: te lo pusiste hoy.');
     },
   };
 }

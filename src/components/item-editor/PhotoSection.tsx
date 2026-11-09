@@ -4,7 +4,8 @@ import type { WardrobeItem } from '../../domain';
 import type { GarmentSuggestion } from '../../ai/contracts';
 import { Garment } from '../Garment';
 import { GarmentSuggestionReview } from '../GarmentSuggestionReview';
-import { Button, FieldLabel, useUI } from '../ui';
+import { Button, ComingSoon, FieldLabel, useUI } from '../ui';
+import { photoAnalysisAvailable } from './localPhoto';
 import type { GarmentPhoto } from './useGarmentPhoto';
 
 /** Photo preview, picker, background removal and the optional analysis. */
@@ -151,6 +152,12 @@ function analysisLabel(photo: GarmentPhoto) {
 
 function AnalysisControls({ photo }: { photo: GarmentPhoto }) {
   const { s } = useUI();
+  if (!photoAnalysisAvailable())
+    return (
+      <View style={{ marginTop: 18 }}>
+        <ComingSoon label="Analizar foto con IA" />
+      </View>
+    );
   return (
     <View style={{ marginTop: 18 }}>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>

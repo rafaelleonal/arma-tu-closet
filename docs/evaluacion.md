@@ -268,3 +268,34 @@ En iPhone 15 Pro simulado con iOS 17.5 y Expo Go, se marcó Playera blanca y se 
 `pnpm test` aprobó 87 pruebas. El servidor simulado aceptó un índice válido, rechazó un índice fuera de la lista y rechazó una solicitud con una foto antes de invocar al proveedor. En iPhone 15 Pro simulado con iOS 17.5 y Expo Go, tocar «Elegir con IA» promovió el conjunto con camisa de mezclilla en lugar del vestido blanco usando una respuesta simulada. TypeScript y lint pasaron. Queda pendiente comparar la calidad de un modelo real y probarlo en teléfono físico.
 
 Se revisó visualmente el gancho en el simulador de iPhone 15 Pro con iOS 17.5 en [Lino](evidence/gancho-lino-ios.png) y [Medianoche](evidence/gancho-medianoche-ios.png). Ambos trazos conservan contraste de al menos 5.9:1 sobre el fondo principal en los seis temas. La configuración de Expo apunta al PNG opaco de 1024 × 1024 y el proyecto nativo local de iOS tiene una copia del recurso. La prueba del icono en la pantalla de inicio requiere instalar una nueva build.
+
+## 9/11/2026 — Objetivo de estilo y foto de la persona
+
+Implementación de [ADR-009](adr/0009-foto-de-persona-y-objetivo-de-estilo.md). `pnpm typecheck`, `pnpm lint` y `pnpm test` (98 pruebas) aprobados.
+
+Recorrido en navegador con Expo web en `localhost:8093`, documento de QA, foto sintética de 1×1 y **respuesta de IA simulada**: Analizar bloqueado sin permiso y sin solicitudes, una solicitud tras aceptar, propuesta aplicada, color excluido ausente de las sugerencias, foto ausente del documento guardado, objetivo conservado tras recargar y aviso de categorías faltantes en Hoy.
+
+Sin verificar: inferencia real con OpenAI (no había clave local), precisión con distintos tonos de piel y luz, cámara y permisos en iPhone o Android, y lector de pantalla.
+
+## 9/11/2026 — Onboarding conversacional y «Próximamente»
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (100 pruebas) aprobados.
+
+Recorrido en navegador con Expo web en `arma.localhost:8093`, origen vacío que se comporta como una build sin servicio de IA, a 390 × 780: bienvenida sin prendas cortadas, cuatro pasos, ciudad visible solo con «Vestirme según el clima», exploración activada con «Cambiar de estilo», reanudar en el paso 4 tras recargar, conjunto de ejemplo sin escribir prendas en el documento, tema Medianoche, clóset vacío tras «Empezar con mi ropa», «Próximamente» en prendas y en Cambiar mi estilo, y edición sin bienvenida.
+
+Sin verificar: VoiceOver, animación y teclado en iPhone o Android, y los otros cuatro temas en los pasos nuevos.
+
+## 9/11/2026 — Tono joven y aviso oculto en tienda
+
+Textos de botones, títulos, estados vacíos y avisos reescritos según la [guía de tono](diseno-personalizacion.md#tono-de-la-app); permisos, privacidad, tono de piel y errores se conservaron. El aviso «Ya mero…» queda limitado a desarrollo y a los perfiles `preview` y `testflight`.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (100 pruebas) aprobados. Exportación web con `__DEV__` falso: el texto «Ya mero…» no aparece sin la variable y sí con `EXPO_PUBLIC_SHOW_COMING_SOON=1`. Recorrido en navegador en `tono.localhost:8093` a 320 × 640, del onboarding al clóset de ejemplo, Hoy y Cambiar mi estilo: sin controles cortados ni desbordes.
+
+Sin verificar: builds reales de EAS con los perfiles `testflight` y `production`, VoiceOver y la lectura del tono con personas de otras regiones.
+
+## 9/11/2026 — Voz con personajes
+
+Se sustituyó el tono con modismos por una voz cálida a partir del onboarding de referencia: prendas con nombre, burbuja y pregunta separadas, reacción al nombre y botones que avanzan la historia. El aviso de la sección anterior pasó a «Ya casi…».
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (100 pruebas) aprobados. Recorrido en navegador en `voz.localhost:8093` a 390 × 780 con un nombre sintético, del saludo al clóset de ejemplo. Sin verificar: VoiceOver y teléfono real.
+

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { COLOR_OPTIONS, colorLabels } from '../../domain';
 import { useFeedback } from '../Feedback';
 import { colorHex, useUI } from '../ui';
+import { Guide } from './Guide';
 import type { StepProps } from './types';
 
 export type ColorMode = 'favorite' | 'avoid';
@@ -37,13 +38,15 @@ export function ColorsStep({
   }
   const modes = [
     { id: 'favorite', label: 'Me gustan', count: preferredColors.length },
-    { id: 'avoid', label: 'Evitar', count: excludedColors.length },
+    { id: 'avoid', label: 'Prefiero evitar', count: excludedColors.length },
   ] as const;
   return (
     <>
-      <Text accessibilityRole="header" style={[s.title, { marginBottom: 22 }]}>
-        Colores
-      </Text>
+      <Guide
+        kind="jacket"
+        say="Yo soy Chama, la chamarra. Vamos con los colores."
+        title="¿Qué colores te gustan?"
+      />
       <View
         style={{
           backgroundColor: palette.wash,
@@ -84,8 +87,8 @@ export function ColorsStep({
       </View>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 20 }]}>
         {mode === 'favorite'
-          ? 'Se priorizan en tus sugerencias.'
-          : 'Excluye prendas con estos colores registrados.'}
+          ? 'Los uso primero en tus outfits.'
+          : 'No te propongo prendas con estos colores.'}
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         {COLOR_OPTIONS.map((color) => (
@@ -167,7 +170,7 @@ function ColorTile({
       </Text>
       {inOther ? (
         <Text style={{ fontSize: 8, marginTop: 3, color: palette.muted }}>
-          {mode === 'favorite' ? 'En evitar' : 'En favoritos'}
+          {mode === 'favorite' ? 'Lo evitas' : 'Te gusta'}
         </Text>
       ) : null}
     </Pressable>

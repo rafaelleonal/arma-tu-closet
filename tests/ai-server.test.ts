@@ -530,3 +530,90 @@ test('outfit choice sends bounded attributes and only accepts a candidate index'
   assert.equal((await call(server, { path, body: payload })).status, 502);
   assert.equal(attempts, 4);
 });
+
+const personPath = '/api/person-style';
+const personSuggestion = {
+  skinDepth: 'medium',
+  undertone: null,
+  styleIds: ['street'],
+};
+
+test('person style returns only the confirmed-attribute contract', async (t) => {
+  const server = await setup(t, {
+    analyzePerson: async () => ({
+      status: 'ok',
+      suggestion: personSuggestion,
+    }),
+  });
+  const result = await call(server, {
+    path: personPath,
+    body: { imageDataUrl: photo },
+  });
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body, { suggestion: personSuggestion });
+});
+
+test('person style rejects any attribute outside the contract', async (t) => {
+  const server = await setup(t, {
+    analyzePerson: async () => ({
+      status: 'ok',
+      suggestion: { ...personSuggestion, ethnicity: 'x' },
+    }),
+  });
+  const result = await call(server, {
+    path: personPath,
+    body: { imageDataUrl: photo },
+  });
+  assert.equal(result.status, 502);
+  assert.equal('suggestion' in result.body, false);
+});
+
+test('person style explains unusable photos and empty proposals', async (t) => {
+  for (const [output, fragment] of [
+    [{ status: 'no_person', suggestion: null }, /persona/],
+    [{ status: 'multiple_people', suggestion: null }, /varias personas/],
+    [{ status: 'unclear', suggestion: null }, /con claridad/],
+    [
+      {
+        status: 'ok',
+        suggestion: { skinDepth: null, undertone: null, styleIds: [] },
+      },
+      /con claridad/,
+    ],
+  ] as const) {
+    const server = await setup(t, { analyzePerson: async () => output });
+    const result = await call(server, {
+      path: personPath,
+      body: { imageDataUrl: photo },
+    });
+    assert.equal(result.status, 422);
+    assert.match(String(result.body.error), fragment);
+  }
+});
+
+test('person style needs its own analyzer and keeps origin checks', async (t) => {
+  const garmentOnly = await setup(t, { analyze: async () => success });
+  assert.equal(
+    (
+      await call(garmentOnly, {
+        path: personPath,
+        body: { imageDataUrl: photo },
+      })
+    ).status,
+    503,
+  );
+  let calls = 0;
+  const server = await setup(t, {
+    analyzePerson: async () => {
+      calls++;
+      return { status: 'ok', suggestion: personSuggestion };
+    },
+  });
+  const blocked = await call(server, {
+    path: personPath,
+    headers: { Origin: 'https://example.com' },
+    body: { imageDataUrl: photo },
+  });
+  assert.equal(blocked.status, 403);
+  assert.equal(calls, 0);
+});

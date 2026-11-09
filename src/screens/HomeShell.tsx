@@ -106,7 +106,7 @@ export function HomeShell(props: HomeShellProps) {
                 onManual={() => setManualOpen(true)}
                 onDemoReady={() =>
                   autosave.noticeAfterSave(
-                    'Clóset de ejemplo listo. Quítalo cuando agregues tu ropa.',
+                    'Listo, ya puedes ver el clóset de ejemplo. Quítalo cuando agregues tu ropa.',
                   )
                 }
               />
@@ -117,6 +117,7 @@ export function HomeShell(props: HomeShellProps) {
                 update={update}
                 onPersonalize={props.onPersonalize}
                 onOpenOutfit={setSelectedOutfit}
+                onNoticeAfterSave={autosave.noticeAfterSave}
               />
             ) : null}
           </MotionIn>
@@ -186,7 +187,7 @@ export function HomeShell(props: HomeShellProps) {
             }));
             setManualOpen(false);
             onTab('style');
-            autosave.noticeAfterSave('Conjunto guardado.');
+            autosave.noticeAfterSave('Outfit guardado.');
           }}
         />
       ) : null}

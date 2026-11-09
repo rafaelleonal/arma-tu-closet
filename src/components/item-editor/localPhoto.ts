@@ -4,9 +4,18 @@ import * as FileSystem from 'expo-file-system/legacy';
 import {
   AiClientError,
   imageMimeTypeFromBase64,
+  isAiAvailable,
   validateImageDataUrl,
 } from '../../ai/client';
 import { MAX_IMAGE_BYTES } from '../../ai/contracts';
+
+export function photoAnalysisAvailable(): boolean {
+  return isAiAvailable(
+    Platform.OS,
+    process.env.EXPO_PUBLIC_AI_API_URL,
+    Platform.OS === 'web' ? window.location.hostname : undefined,
+  );
+}
 
 /**
  * Asks for the camera only after the person taps Tomar foto. Returns null when the editor

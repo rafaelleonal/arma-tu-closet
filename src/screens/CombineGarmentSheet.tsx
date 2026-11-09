@@ -77,7 +77,7 @@ export function CombineGarmentSheet({
   }
 
   return (
-    <Sheet title="Combinar esta prenda" onClose={onClose}>
+    <Sheet title="Combínala" onClose={onClose}>
       {item ? (
         <Text style={[s.sectionTitle, { marginBottom: 12 }]}>{item.name}</Text>
       ) : null}

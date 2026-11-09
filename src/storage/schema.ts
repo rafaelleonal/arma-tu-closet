@@ -1,10 +1,13 @@
 import {
   CATEGORIES,
   OCCASIONS,
+  SKIN_DEPTHS,
   STYLE_IDS,
+  UNDERTONES,
   isValidOutfit,
   type Context,
   type Outfit,
+  type StyleGoal,
   type StyleId,
   type WardrobeItem,
 } from '../domain';
@@ -68,6 +71,8 @@ export interface LegacyLocalDataV2 extends PersonalizedLocalData {
 export interface LocalData extends PersonalizedLocalData {
   version: 3;
   weather: WeatherSettings;
+  /** Optional in v3: existing documents simply have no goal yet. */
+  styleGoal?: StyleGoal;
 }
 
 export function createDefaultProfile(): Profile {
@@ -227,11 +232,22 @@ function personalizedLocalData(
   );
 }
 
+function styleGoal(value: unknown): value is StyleGoal {
+  return (
+    record(value) &&
+    styles(value.targetStyleIds) &&
+    typeof value.exploring === 'boolean' &&
+    (value.skinDepth === undefined || known(value.skinDepth, SKIN_DEPTHS)) &&
+    (value.undertone === undefined || known(value.undertone, UNDERTONES))
+  );
+}
+
 export function isLocalData(value: unknown): value is LocalData {
   return (
     personalizedLocalData(value) &&
     value.version === 3 &&
-    isWeatherSettings(value.weather)
+    isWeatherSettings(value.weather) &&
+    (value.styleGoal === undefined || styleGoal(value.styleGoal))
   );
 }
 

@@ -12,6 +12,7 @@ Estos ADRs documentan las decisiones estructurales ya implementadas en el protot
 | [006](0006-recorte-de-fondo-en-dispositivo.md) | Recorte de fondo en el dispositivo con un módulo local y build de desarrollo | Aceptada para el prototipo local (iOS) |
 | [007](0007-estructura-del-front-y-reglas-de-lint.md) | Pantallas, hooks y componentes separados; límites de arquitectura y tamaño con ESLint | Aceptada para el prototipo |
 | [008](0008-eleccion-opcional-con-ia.md) | Elección opcional entre conjuntos locales válidos | Aceptada para evaluación en desarrollo |
+| [009](0009-foto-de-persona-y-objetivo-de-estilo.md) | Foto de la persona con permiso explícito y objetivo de estilo | Aceptada para el prototipo local |
 
 ## Cuándo crear un ADR
 

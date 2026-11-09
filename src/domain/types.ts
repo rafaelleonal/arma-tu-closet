@@ -74,6 +74,29 @@ export const STYLE_OPTIONS: readonly {
   },
 ];
 
+export const SKIN_DEPTHS = ['light', 'medium', 'deep'] as const;
+export type SkinDepth = (typeof SKIN_DEPTHS)[number];
+export const UNDERTONES = ['warm', 'neutral', 'cool'] as const;
+export type Undertone = (typeof UNDERTONES)[number];
+export const SKIN_DEPTH_LABELS: Record<SkinDepth, string> = {
+  light: 'Clara',
+  medium: 'Media',
+  deep: 'Oscura',
+};
+export const UNDERTONE_LABELS: Record<Undertone, string> = {
+  warm: 'Cálido',
+  neutral: 'Neutro',
+  cool: 'Frío',
+};
+
+/** Chosen or confirmed by the person. An unset tone means "no sé". */
+export interface StyleGoal {
+  targetStyleIds: StyleId[];
+  exploring: boolean;
+  skinDepth?: SkinDepth;
+  undertone?: Undertone;
+}
+
 /** Plain, JSON-serializable local wardrobe data. No gender is inferred. */
 export interface WardrobeItem {
   id: string;
@@ -107,6 +130,8 @@ export interface RecommendationContext {
   rotationDays: number;
   /** Soft affinity only; missing tags never exclude a garment. */
   styleIds?: StyleId[];
+  /** Strengthens styleIds and favors rarely worn garments. Hard limits do not change. */
+  explore?: boolean;
   /** ISO timestamp supplied by the caller for reproducible results. */
   now: string;
 }

@@ -133,7 +133,9 @@ export function NameField({
             : `Si lo dejas vacío se llamará ${suggested}`
         }
         placeholderTextColor={palette.muted}
-        placeholder={typed ? undefined : suggested || 'Ej. Camisa de lino'}
+        placeholder={
+          typed ? undefined : suggested || 'Ej. La camisa de las bodas'
+        }
         value={value}
         maxLength={60}
         onChangeText={onChange}

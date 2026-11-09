@@ -1,19 +1,10 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { seedWardrobe } from '../../domain';
 import { MotionIn } from '../Feedback';
 import { Button, useUI } from '../ui';
+import { Crew } from './Crew';
 import { OnboardingLogo } from './OnboardingChrome';
-import { WelcomeRail } from './WelcomeRail';
-
-const RAIL_IDS = [
-  'demo2-tee-gray',
-  'demo2-shirt-denim',
-  'demo2-tee-white',
-  'demo2-jacket-denim',
-  'demo2-sweater-navy',
-];
 
 export function Welcome({ onStart }: { onStart: () => void }) {
   const { s, palette } = useUI();
@@ -36,9 +27,7 @@ export function Welcome({ onStart }: { onStart: () => void }) {
         <OnboardingLogo />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <MotionIn trigger="welcome">
-            <WelcomeRail
-              items={seedWardrobe.filter((item) => RAIL_IDS.includes(item.id))}
-            />
+            <Crew />
             <Text
               accessibilityRole="header"
               style={{
@@ -58,19 +47,19 @@ export function Welcome({ onStart }: { onStart: () => void }) {
                 { fontSize: 16, lineHeight: 24, marginTop: 14 },
               ]}
             >
-              Conjuntos con la ropa de tu clóset, según el clima y la ocasión
-              del día.
+              Tere, Cami y compañía te ayudan a elegir qué ponerte con la ropa
+              que ya tienes.
             </Text>
           </MotionIn>
         </View>
-        <Button label="Empezar" onPress={onStart} />
+        <Button label="Vamos a tu clóset" onPress={onStart} />
         <Text
           style={[
             s.subtitle,
             { fontSize: 11, textAlign: 'center', marginTop: 14 },
           ]}
         >
-          Sin cuenta. Tus datos se quedan en este dispositivo.
+          Sin cuenta. Tus datos se quedan en tu teléfono.
         </Text>
       </View>
     </SafeAreaView>

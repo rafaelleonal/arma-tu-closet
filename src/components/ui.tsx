@@ -73,6 +73,20 @@ export function Chip({
     </MotionPressable>
   );
 }
+/** Teasers stay out of App Store builds: only dev and the testflight/preview profiles set this. */
+export const SHOW_COMING_SOON =
+  __DEV__ || process.env.EXPO_PUBLIC_SHOW_COMING_SOON === '1';
+
+/** Not a control: names a feature that needs a backend this build does not have. */
+export function ComingSoon({ label }: { label: string }) {
+  const { s } = useUI();
+  if (!SHOW_COMING_SOON) return null;
+  return (
+    <View style={[s.panel, { paddingVertical: 14 }]}>
+      <Text style={[s.subtitle, { fontSize: 13 }]}>{label} · Ya casi…</Text>
+    </View>
+  );
+}
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   const { s } = useUI();
   return <Text style={s.label}>{children}</Text>;

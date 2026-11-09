@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   COLOR_OPTIONS,
@@ -10,6 +10,10 @@ import type { LocalData } from '../storage/local';
 import type { UpdateData } from '../hooks/useLocalData';
 import { AppearanceSettings } from '../components/AppearanceSettings';
 import { Garment } from '../components/Garment';
+import {
+  StyleGoalSheet,
+  type StyleGoalResult,
+} from '../components/style-goal/StyleGoalSheet';
 import { Button, Chip, colorHex, useUI } from '../components/ui';
 
 type Preferences = LocalData['preferences'];
@@ -19,13 +23,34 @@ export function StyleScreen({
   update,
   onPersonalize,
   onOpenOutfit,
+  onNoticeAfterSave,
 }: {
   data: LocalData;
   update: UpdateData;
   onPersonalize: () => void;
   onOpenOutfit: (outfit: Outfit) => void;
+  onNoticeAfterSave: (message: string) => void;
 }) {
   const { palette, s } = useUI();
+  const [goalOpen, setGoalOpen] = useState(false);
+  const targets = STYLE_OPTIONS.filter((style) =>
+    data.styleGoal?.targetStyleIds.includes(style.id),
+  ).map((style) => style.label);
+  const saveGoal = ({ goal, styleIds, colors }: StyleGoalResult) => {
+    update((current) => ({
+      ...current,
+      styleGoal: goal,
+      profile: { ...current.profile, styleIds },
+      preferences: {
+        ...current.preferences,
+        preferredColors: [
+          ...new Set([...current.preferences.preferredColors, ...colors]),
+        ],
+      },
+    }));
+    setGoalOpen(false);
+    onNoticeAfterSave('Guardé tu objetivo.');
+  };
   const setPreferences = (fn: (current: Preferences) => Partial<Preferences>) =>
     update((current) => ({
       ...current,
@@ -45,10 +70,30 @@ export function StyleScreen({
                   (id) => STYLE_OPTIONS.find((style) => style.id === id)?.label,
                 )
                 .join(' · ')
-            : 'Sin estilos seleccionados'}
+            : 'Aún no eliges estilos'}
         </Text>
         <Button secondary label="Editar preferencias" onPress={onPersonalize} />
       </View>
+      <View style={[s.panel, { marginBottom: 18 }]}>
+        <Text style={s.sectionTitle}>Cambiar mi estilo</Text>
+        <Text style={[s.subtitle, { marginBottom: 16 }]}>
+          {targets.length ? targets.join(' · ') : 'Sin objetivo todavía'}
+        </Text>
+        <Button
+          secondary
+          label={
+            targets.length ? 'Editar objetivo' : 'Elegir cómo quiero verme'
+          }
+          onPress={() => setGoalOpen(true)}
+        />
+      </View>
+      {goalOpen ? (
+        <StyleGoalSheet
+          data={data}
+          onClose={() => setGoalOpen(false)}
+          onSave={saveGoal}
+        />
+      ) : null}
       <AppearanceSettings
         value={data.appearance}
         onChange={(appearance) =>
@@ -62,7 +107,7 @@ export function StyleScreen({
       <View style={[s.panel, { marginTop: 18 }]}>
         <Text style={s.sectionTitle}>Repetición de prendas</Text>
         <Text style={[s.subtitle, { fontSize: 12, marginBottom: 18 }]}>
-          Tiempo entre usos. Puede repetirse una prenda si faltan opciones.
+          Cuánto esperar para repetir una prenda. Si faltan opciones, se repite.
         </Text>
         <View style={s.wrap}>
           {[0, 3, 7, 14].map((days) => (
@@ -81,7 +126,8 @@ export function StyleScreen({
         <Text style={[s.subtitle, { fontSize: 12 }]}>
           Los datos y fotos se guardan en este dispositivo. Borrar sus datos o
           desinstalar la app puede eliminarlos. Sin respaldo en la nube. Al
-          analizar una foto, se envía a OpenAI para proponer sus atributos.
+          analizar una foto, se envía a OpenAI para proponer sus atributos. Tu
+          tono de piel solo se guarda aquí.
         </Text>
         <Text style={[s.subtitle, { fontSize: 12, marginTop: 10 }]}>
           {data.wearHistory.length}{' '}
@@ -114,13 +160,13 @@ function ColorPreferences({
     {
       key: 'preferredColors',
       other: 'excludedColors',
-      title: 'Colores favoritos',
-      hint: 'Tienen prioridad en las sugerencias.',
+      title: 'Me gustan',
+      hint: 'Los uso primero en tus outfits.',
     },
     {
       key: 'excludedColors',
       other: 'preferredColors',
-      title: 'Colores a evitar',
+      title: 'Prefiero evitar',
       hint: 'Se excluyen de las sugerencias.',
     },
   ] as const;
@@ -181,7 +227,7 @@ function SavedOutfits({
           <Pressable
             key={outfit.id}
             accessibilityRole="button"
-            accessibilityLabel={`Ver conjunto guardado: ${outfit.items.map((item) => item.name).join(', ')}`}
+            accessibilityLabel={`Ver outfit guardado: ${outfit.items.map((item) => item.name).join(', ')}`}
             onPress={() => onOpen(outfit)}
             style={[
               styles.savedRow,
@@ -197,16 +243,16 @@ function SavedOutfits({
               <Text style={{ color: palette.ink, fontSize: 13 }}>
                 {outfit.id.startsWith('manual-')
                   ? 'Creado por ti'
-                  : 'Conjunto guardado'}
+                  : 'Outfit guardado'}
               </Text>
               <Text style={[s.subtitle, { fontSize: 11 }]}>
-                {outfit.items.length} prendas · Ver conjunto ↗
+                {outfit.items.length} prendas · Ver outfit ↗
               </Text>
             </View>
           </Pressable>
         ))
       ) : (
-        <Text style={s.subtitle}>No hay conjuntos guardados.</Text>
+        <Text style={s.subtitle}>Todavía no guardas ningún outfit.</Text>
       )}
     </>
   );

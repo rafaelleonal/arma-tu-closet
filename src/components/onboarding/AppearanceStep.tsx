@@ -1,7 +1,10 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { OCCASIONS, occasionLabels } from '../../domain';
 import { AppearanceSettings } from '../AppearanceSettings';
-import { Button, useUI } from '../ui';
+import { Button, Chip, FieldLabel, useUI } from '../ui';
+import { FirstOutfitPreview } from './FirstOutfitPreview';
+import { Guide } from './Guide';
 import type { OnboardingEntry, StepProps } from './types';
 
 /** Last step. Only the first run offers the example closet; it never replaces an existing one. */
@@ -14,9 +17,24 @@ export function AppearanceStep({
   const { s, palette } = useUI();
   return (
     <>
-      <Text accessibilityRole="header" style={[s.title, { marginBottom: 24 }]}>
-        Apariencia
-      </Text>
+      <Guide
+        kind="sneakers"
+        say="Soy Teni, los tenis. Con lo que me contaste armé esto."
+        title="Tu primer outfit"
+      />
+      <FirstOutfitPreview data={data} />
+      <FieldLabel>¿Para qué te vistes casi siempre?</FieldLabel>
+      <View style={s.wrap}>
+        {OCCASIONS.map((occasion) => (
+          <Chip
+            key={occasion}
+            label={occasionLabels[occasion]}
+            selected={data.context.occasion === occasion}
+            onPress={() => onChange({ context: { ...data.context, occasion } })}
+          />
+        ))}
+      </View>
+      <FieldLabel>Apariencia</FieldLabel>
       <AppearanceSettings
         compact
         value={data.appearance}
@@ -24,7 +42,7 @@ export function AppearanceStep({
       />
       {edit ? (
         <View style={{ marginTop: 28 }}>
-          <Button label="Listo" onPress={() => onFinish('keep')} />
+          <Button label="¡Listo!" onPress={() => onFinish('keep')} />
         </View>
       ) : (
         <View style={{ marginTop: 32 }}>
@@ -36,15 +54,15 @@ export function AppearanceStep({
               marginBottom: 10,
             }}
           >
-            Clóset
+            ¿Con qué ropa empezamos?
           </Text>
           <Text style={[s.subtitle, { fontSize: 12, marginBottom: 17 }]}>
             El ejemplo contiene prendas ficticias.
           </Text>
-          <Button label="Empezar con mi ropa" onPress={() => onFinish('own')} />
+          <Button label="Vamos con mi ropa" onPress={() => onFinish('own')} />
           <Button
             secondary
-            label="Usar clóset de ejemplo"
+            label="Ver el clóset de ejemplo"
             onPress={() => onFinish('demo')}
             style={{ marginTop: 10 }}
           />

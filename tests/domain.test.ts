@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  COLOR_OPTIONS,
   STYLE_IDS,
   createDefaultContext,
   generateRecommendations,
@@ -8,6 +9,9 @@ import {
   pickWearMoreItem,
   recordOutfitWorn,
   seedWardrobe,
+  styleContext,
+  styleGaps,
+  suggestedColors,
   swapOutfitItem,
 } from '../src/domain';
 import type {
@@ -557,4 +561,110 @@ test('wear-more can find a valid pinned outfit outside the visible shortlist', (
     pickWearMoreItem(visible, today, wardrobe, [pinned.id]),
     undefined,
   );
+});
+
+const tagged = (
+  id: string,
+  category: Category,
+  styleIds: WardrobeItem['styleIds'],
+  overrides: Partial<WardrobeItem> = {},
+) => item(id, category, { styleIds, ...overrides });
+const exploreCloset = () => [
+  tagged('top-street', 'top', ['street']),
+  item('top-plain', 'top', { wearCount: 9 }),
+  item('bottom', 'bottom'),
+  item('shoes', 'shoes'),
+];
+
+test('explore mode moves the target style first and explains rarely worn pieces', () => {
+  const outfit = generateRecommendations(
+    exploreCloset(),
+    context({ styleIds: ['street'], explore: true }),
+  ).outfits[0];
+  assert.ok(outfit.items.some((piece) => piece.id === 'top-street'));
+  assert.ok(outfit.reasons.includes('Incluye prendas poco usadas'));
+});
+
+test('explore mode never brings back an excluded color or unavailable garment', () => {
+  const closet = [
+    tagged('top-red', 'top', ['street'], { colors: ['rojo'] }),
+    tagged('top-off', 'top', ['street'], { available: false }),
+    item('top-plain', 'top'),
+    item('bottom', 'bottom'),
+    item('shoes', 'shoes'),
+  ];
+  const { outfits } = generateRecommendations(
+    closet,
+    context({ styleIds: ['street'], explore: true, excludedColors: ['Rojo'] }),
+  );
+  assert.ok(outfits.length > 0);
+  for (const outfit of outfits) {
+    assert.ok(isValidOutfit(outfit.items));
+    assert.ok(
+      outfit.items.every((piece) => !['top-red', 'top-off'].includes(piece.id)),
+    );
+  }
+});
+
+test('without explore the ranking ignores wear-based exploration', () => {
+  const closet = exploreCloset();
+  const base = context({ styleIds: ['street'] });
+  assert.deepEqual(
+    generateRecommendations(closet, base).outfits,
+    generateRecommendations(closet, { ...base, explore: false }).outfits,
+  );
+});
+
+test('suggested colors need a chosen tone and respect exclusions', () => {
+  assert.deepEqual(suggestedColors({}, []), []);
+  const colors = suggestedColors({ skinDepth: 'deep', undertone: 'warm' }, []);
+  assert.ok(colors.length > 0);
+  assert.ok(colors.every((color) => COLOR_OPTIONS.includes(color)));
+  const without = suggestedColors({ skinDepth: 'deep', undertone: 'warm' }, [
+    colors[0].toUpperCase(),
+  ]);
+  assert.ok(!without.includes(colors[0]));
+  assert.ok(suggestedColors({ undertone: 'cool' }, []).length > 0);
+});
+
+test('style gaps report missing base categories without inventing garments', () => {
+  const street = context({ styleIds: ['street'] });
+  assert.deepEqual(styleGaps(exploreCloset(), context({ styleIds: [] })), []);
+  assert.deepEqual(styleGaps(exploreCloset(), street), ['bottom', 'shoes']);
+  assert.deepEqual(
+    styleGaps(
+      [
+        tagged('dress', 'one-piece', ['street']),
+        tagged('shoes', 'shoes', ['street']),
+      ],
+      street,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    styleGaps(
+      [
+        tagged('dress', 'one-piece', ['street'], { available: false }),
+        tagged('shoes', 'shoes', ['street'], { colors: ['rojo'] }),
+      ],
+      { ...street, excludedColors: ['rojo'] },
+    ),
+    ['top', 'bottom', 'shoes'],
+  );
+});
+
+test('the goal replaces current styles only while exploring with a target', () => {
+  const goal = { targetStyleIds: ['street' as const], exploring: true };
+  assert.deepEqual(styleContext(['classic'], goal), {
+    styleIds: ['street'],
+    explore: true,
+  });
+  assert.deepEqual(styleContext(['classic'], { ...goal, exploring: false }), {
+    styleIds: ['classic'],
+  });
+  assert.deepEqual(
+    styleContext(['classic'], { targetStyleIds: [], exploring: true }),
+    { styleIds: ['classic'] },
+  );
+  assert.deepEqual(styleContext(['classic']), { styleIds: ['classic'] });
 });

@@ -30,7 +30,7 @@ export function ManualBuilder({
       ? ['top', 'bottom', 'shoes', 'layer', 'accessory']
       : ['one-piece', 'shoes', 'layer', 'accessory'];
   return (
-    <Sheet title="Armar conjunto" onClose={onClose}>
+    <Sheet title="Armar outfit" onClose={onClose}>
       <View style={[s.wrap, { marginTop: 20 }]}>
         <Chip
           label="Arriba + abajo"
@@ -101,7 +101,7 @@ export function ManualBuilder({
         </Text>
       ) : null}
       <Button
-        label="Guardar conjunto"
+        label="Guardar outfit"
         style={{ marginTop: 25 }}
         onPress={() => {
           const required: Category[] =
@@ -109,7 +109,7 @@ export function ManualBuilder({
               ? ['top', 'bottom', 'shoes']
               : ['one-piece', 'shoes'];
           if (required.some((slot) => !selected[slot])) {
-            setError('Completa el conjunto y elige calzado para guardarlo.');
+            setError('Complétalo y elige calzado para guardarlo.');
             return;
           }
           const chosen = slots.flatMap((slot) =>

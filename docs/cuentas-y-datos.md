@@ -2,6 +2,8 @@
 
 23/10/2026 · Propuesta, sin implementación ni recursos contratados. El prototipo sigue usando almacenamiento local v3. Esta propuesta no sustituye el [ADR-002](adr/0002-persistencia-local.md).
 
+**Actualización del 9/11/2026:** el [plan del backend público](backend-publico.md) mantiene aquí el objetivo, el modelo de datos, la migración y la sincronización, pero cambia dos cosas: la app habla con una API NestJS en lugar de acceder a Postgres con RLS, y la cuenta también se pide para el análisis con IA. Donde este documento mencione políticas RLS por propietario o una función de análisis, rige ese plan.
+
 ## Objetivo
 
 Recuperar el clóset al cambiar de teléfono y usarlo en dos dispositivos. Crear una cuenta debe ser opcional para registrar ropa y armar conjuntos. Una caída de red no debe impedir consultar o editar las prendas descargadas.

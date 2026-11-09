@@ -15,6 +15,11 @@ import {
   outfitChoiceOutput,
 } from '../src/ai/outfitChoiceContract';
 import type { OutfitChooser } from './outfitChoice';
+import {
+  parsePersonStyleResult,
+  personRejectionMessages,
+  type PersonStyleAnalyzer,
+} from './personStyle';
 
 export const ALLOWED_ORIGINS = [
   'http://localhost:8081',
@@ -25,6 +30,7 @@ export const ALLOWED_ORIGINS = [
 
 export interface ServerOptions {
   analyze?: GarmentAnalyzer;
+  analyzePerson?: PersonStyleAnalyzer;
   chooseOutfit?: OutfitChooser;
   limits?: Partial<{
     concurrent: number;
@@ -39,6 +45,7 @@ export interface ServerOptions {
 /** Loopback prototype only: Origin/Host checks are not production authentication. */
 export function createGarmentServer({
   analyze,
+  analyzePerson,
   chooseOutfit,
   limits: overrides,
   now = Date.now,
@@ -65,6 +72,7 @@ export function createGarmentServer({
   async function handle(request: IncomingMessage, response: ServerResponse) {
     const path = request.url?.split('?')[0];
     const choosing = path === '/api/outfit-choice';
+    const person = path === '/api/person-style';
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('Vary', 'Origin');
@@ -99,7 +107,7 @@ export function createGarmentServer({
           configured: !!analyze,
           outfitChoiceConfigured: !!chooseOutfit,
         });
-      if (path !== '/api/garment-analysis' && !choosing)
+      if (path !== '/api/garment-analysis' && !choosing && !person)
         throw new RequestError(404, 'Ruta no encontrada.');
       if (request.method === 'OPTIONS') {
         if (!origin)
@@ -112,7 +120,7 @@ export function createGarmentServer({
         response.setHeader('Allow', 'POST, OPTIONS');
         throw new RequestError(405, 'Usa POST para analizar una foto.');
       }
-      if (choosing ? !chooseOutfit : !analyze)
+      if (choosing ? !chooseOutfit : person ? !analyzePerson : !analyze)
         throw new RequestError(
           503,
           choosing
@@ -143,7 +151,9 @@ export function createGarmentServer({
       }
       const run: (signal: AbortSignal) => Promise<unknown> = choosing
         ? prepareOutfitChoice(input, chooseOutfit!)
-        : prepareAnalysis(input, analyze!);
+        : person
+          ? preparePersonStyle(input, analyzePerson!)
+          : prepareAnalysis(input, analyze!);
       if (now() - windowStart >= 60_000) {
         windowStart = now();
         minuteRequests = 0;
@@ -315,6 +325,16 @@ function prepareAnalysis(input: unknown, analyze: GarmentAnalyzer) {
     const result = parseAnalysisResult(await analyze(image, signal));
     if (result.status !== 'ok')
       throw new RequestError(422, rejectionMessages[result.status]);
+    return { suggestion: result.suggestion };
+  };
+}
+
+function preparePersonStyle(input: unknown, analyze: PersonStyleAnalyzer) {
+  const image = parseImageRequest(input);
+  return async (signal: AbortSignal) => {
+    const result = parsePersonStyleResult(await analyze(image, signal));
+    if (result.status !== 'ok')
+      throw new RequestError(422, personRejectionMessages[result.status]);
     return { suggestion: result.suggestion };
   };
 }

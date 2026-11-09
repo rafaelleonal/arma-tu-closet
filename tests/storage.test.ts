@@ -454,3 +454,31 @@ test('wear-more marker round trips in v3 and stays optional on existing garments
     false,
   );
 });
+
+test('an optional style goal round-trips and older v3 documents stay valid', () => {
+  const data: LocalData = {
+    ...fixture(),
+    styleGoal: {
+      targetStyleIds: ['street'],
+      exploring: true,
+      skinDepth: 'medium',
+      undertone: 'warm',
+    },
+  };
+  assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
+  const previous = fixture();
+  assert.equal(previous.styleGoal, undefined);
+  assert.deepEqual(parseLocalData(JSON.stringify(previous)), previous);
+});
+
+test('an invalid style goal is a recoverable error, not replaced data', () => {
+  for (const styleGoal of [
+    { targetStyleIds: ['unknown'], exploring: false },
+    { targetStyleIds: [], exploring: 'yes' },
+    { targetStyleIds: [], exploring: false, skinDepth: 'pale' },
+    { targetStyleIds: [], exploring: false, undertone: 'olive' },
+  ]) {
+    const raw = JSON.stringify({ ...fixture(), styleGoal });
+    assert.throws(() => parseLocalData(raw), /Tus datos no se reemplazaron/);
+  }
+});

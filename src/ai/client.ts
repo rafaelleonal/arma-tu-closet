@@ -3,6 +3,10 @@ import {
   parseGarmentSuggestion,
   type GarmentSuggestion,
 } from './contracts';
+import {
+  parsePersonStyleSuggestion,
+  type PersonStyleSuggestion,
+} from './personStyleContract';
 
 export class AiClientError extends Error {
   constructor(
@@ -130,6 +134,20 @@ export function resolveAiApiUrl(
   return `${url.toString().replace(/\/$/, '')}/api/garment-analysis`;
 }
 
+/** False until a backend is configured for this build, as in today's store builds. */
+export function isAiAvailable(
+  platform: string,
+  configuredUrl = process.env.EXPO_PUBLIC_AI_API_URL,
+  hostname?: string,
+): boolean {
+  try {
+    resolveAiApiUrl(platform, configuredUrl, hostname);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export interface AnalyzePhotoOptions {
   apiUrl: string;
   signal?: AbortSignal;
@@ -137,7 +155,22 @@ export interface AnalyzePhotoOptions {
   fetchImpl?: typeof fetch;
 }
 
-export async function analyzeGarmentPhoto(
+export function analyzeGarmentPhoto(
+  imageDataUrl: string,
+  options: AnalyzePhotoOptions,
+): Promise<GarmentSuggestion> {
+  return postPhoto(imageDataUrl, options, parseGarmentSuggestion);
+}
+
+/** Only ever called after an explicit action with visible consent. */
+export function analyzePersonPhoto(
+  imageDataUrl: string,
+  options: AnalyzePhotoOptions,
+): Promise<PersonStyleSuggestion> {
+  return postPhoto(imageDataUrl, options, parsePersonStyleSuggestion);
+}
+
+async function postPhoto<T>(
   imageDataUrl: string,
   {
     apiUrl,
@@ -145,7 +178,8 @@ export async function analyzeGarmentPhoto(
     timeoutMs = 30_000,
     fetchImpl = fetch,
   }: AnalyzePhotoOptions,
-): Promise<GarmentSuggestion> {
+  parse: (suggestion: unknown) => T,
+): Promise<T> {
   validateImageDataUrl(imageDataUrl);
   if (signal?.aborted)
     throw new AiClientError('aborted', 'Análisis cancelado.');
@@ -174,7 +208,7 @@ export async function analyzeGarmentPhoto(
       reject(stopReason);
     }, timeoutMs);
   });
-  const request = async (): Promise<GarmentSuggestion> => {
+  const request = async (): Promise<T> => {
     let response: Response;
     try {
       response = await fetchImpl(apiUrl, {
@@ -216,7 +250,7 @@ export async function analyzeGarmentPhoto(
     try {
       if (!body || typeof body !== 'object' || !('suggestion' in body))
         throw new Error('missing');
-      return parseGarmentSuggestion(body.suggestion);
+      return parse(body.suggestion);
     } catch {
       throw new AiClientError(
         'response',

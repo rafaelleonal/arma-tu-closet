@@ -16,7 +16,7 @@ import {
   StepFooter,
   StepHeader,
 } from './onboarding/OnboardingChrome';
-import { RoutineStep } from './onboarding/RoutineStep';
+import { HelloStep, type Struggle } from './onboarding/HelloStep';
 import { StyleStep } from './onboarding/StyleStep';
 import type { OnboardingEntry, PersonalizationPatch } from './onboarding/types';
 import { Welcome } from './onboarding/Welcome';
@@ -45,6 +45,7 @@ export function Onboarding({
   const savedStep = data.onboarding?.step ?? 0;
   const [step, setStep] = useState(edit ? 0 : savedStep);
   const [colorMode, setColorMode] = useState<ColorMode>('favorite');
+  const [struggle, setStruggle] = useState<Struggle>();
   // Shown once per launch before the first step; not persisted, so it needs no schema change.
   const [welcome, setWelcome] = useState(!edit && savedStep === 0);
   const scroll = useRef<ScrollViewInstance>(null);
@@ -89,15 +90,23 @@ export function Onboarding({
           }}
         >
           <MotionIn trigger={step}>
-            {step === 0 ? <StyleStep {...stepProps} /> : null}
+            {step === 0 ? (
+              <HelloStep
+                {...stepProps}
+                struggle={struggle}
+                onStruggle={setStruggle}
+              />
+            ) : null}
             {step === 1 ? (
+              <StyleStep {...stepProps} startExploring={struggle === 'style'} />
+            ) : null}
+            {step === 2 ? (
               <ColorsStep
                 {...stepProps}
                 mode={colorMode}
                 onMode={setColorMode}
               />
             ) : null}
-            {step === 2 ? <RoutineStep {...stepProps} /> : null}
             {step === 3 ? (
               <AppearanceStep {...stepProps} edit={edit} onFinish={onFinish} />
             ) : null}

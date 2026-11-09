@@ -77,6 +77,10 @@ function styleAffinity(
   );
 }
 
+function lightlyUsed(item: WardrobeItem): boolean {
+  return (item.wearCount ?? 0) <= 1;
+}
+
 function temperature(context: RecommendationContext): number {
   return Number.isFinite(context.temperatureC) ? context.temperatureC : 22;
 }
@@ -118,7 +122,8 @@ function itemPriority(
       ? 4
       : 0) +
     (context.raining && item.rainReady ? 5 : 0) +
-    (matchedStyles(item, context).length ? 5 : 0) -
+    (matchedStyles(item, context).length ? (context.explore ? 15 : 5) : 0) +
+    (context.explore && lightlyUsed(item) ? 4 : 0) -
     (recent(item, context) ? 10 : 0) -
     Math.abs(item.warmth - Math.min(3, targetWarmth(context))) * 2
   );
@@ -147,7 +152,10 @@ function scoreItems(
   return (
     100 +
     (24 * occasionMatches) / Math.max(1, items.length) +
-    styleAffinity(items, context) * 15 +
+    styleAffinity(items, context) * (context.explore ? 40 : 15) +
+    (context.explore
+      ? (items.filter(lightlyUsed).length / Math.max(1, items.length)) * 8
+      : 0) +
     Math.min(
       12,
       items.filter((item) =>
@@ -223,6 +231,9 @@ function makeOutfit(
     )
   )
     reasons.push('Color favorito');
+  // First, because the card only shows the top reasons.
+  if (context.explore && items.some(lightlyUsed))
+    reasons.unshift('Incluye prendas poco usadas');
   const styles = new Set(items.flatMap((item) => matchedStyles(item, context)));
   if (styles.size) {
     const labels = STYLE_OPTIONS.filter((style) => styles.has(style.id)).map(
@@ -300,7 +311,7 @@ export function generateRecommendations(
     return {
       status: 'empty',
       outfits: [],
-      message: 'Agrega tus prendas para empezar a combinar.',
+      message: 'Tu clóset está vacío. Agrega tu primera prenda.',
     };
   // Deduplicate IDs defensively after restoring local JSON or importing garments.
   const unique = [...new Map(wardrobe.map((item) => [item.id, item])).values()];

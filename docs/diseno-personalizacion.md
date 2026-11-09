@@ -17,14 +17,18 @@ Un estilo es una preferencia declarada, no una propiedad descubierta en una foto
 
 ## Bienvenida y cuatro pasos
 
-En el primer arranque, antes del paso 1, una bienvenida muestra tres ilustraciones, el nombre de la app, una frase de qué hace, **Empezar** y que no hace falta cuenta. No se persiste: si la persona cierra la app a mitad del alta, vuelve al paso guardado sin repetirla. Editar preferencias no la muestra.
+El onboarding es una conversación con las prendas ilustradas: en cada paso una prenda comenta en una burbuja y debajo va la pregunta, que es el encabezado para lectores de pantalla. Las ilustraciones son decorativas y se mueven solo si Reducir movimiento está apagado.
+
+En el primer arranque, antes del paso 1, la bienvenida muestra las prendas saludando, el nombre de la app, una frase de qué hace, **Empezar** y que no hace falta cuenta. No se persiste: si la persona cierra la app a mitad del alta, vuelve al paso guardado sin repetirla. Editar preferencias no la muestra.
 
 | Paso | Decisión | Ayuda y resultado |
 |---|---|---|
-| 1. Tu estilo | Nombre opcional y hasta tres estilos; poder continuar sin elegir. | «Elige hasta 3». No convertir estilos en identidades fijas. |
-| 2. Colores | Preferir y evitar, ambos opcionales. | Una misma opción no puede quedar en ambos grupos. Explicar que evitar un color puede reducir las combinaciones. |
-| 3. Tu rutina | Ocasión inicial, cuánto desea variar y ciudad del clima (opcional). | Valores iniciales visibles. Rotación suave: recordar repeticiones, permitir volver a usarlas. La ubicación se pide solo al pulsar **Usar mi ubicación**; la búsqueda por nombre queda disponible. |
-| 4. Apariencia | Vista previa de tema y disposición; motivos; empezar con clóset propio vacío o demo. | Cambiar tema debe transformar la vista previa. Elecciones explícitas «Empezar con mi ropa» y «Usar clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
+| 1. Hola | Nombre opcional y qué le cuesta más al vestirse. | La respuesta no se guarda. Cada opción responde con lo que la app hace de verdad: «Nunca le atino al clima» muestra la ciudad y «Quiero cambiar de estilo» activa **Hoy me animo a algo nuevo** al elegir un objetivo. La ubicación se pide solo al pulsar **Usar mi ubicación**. |
+| 2. Tu estilo | Hasta tres estilos actuales y hasta tres a los que quiere acercarse. | Se puede continuar sin elegir. No convertir estilos en identidades fijas. |
+| 3. Colores | Preferir y evitar, ambos opcionales. | Una misma opción no puede quedar en ambos grupos. Explicar que evitar un color puede reducir las combinaciones. |
+| 4. Tu conjunto | Ve un conjunto con lo que eligió, ocasión habitual, apariencia y clóset propio o demo. | Con clóset vacío usa prendas de ejemplo identificadas y no las escribe en el documento. Elecciones explícitas «Vamos con mi ropa» y «Ver el clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
+
+La rotación ya no se pregunta aquí: parte de 3 días y se cambia en Mi estilo.
 
 Mostrar «n de 4», acción principal y «Atrás». Las elecciones anteriores se conservan al volver. No bloquear por nombre, estilo o ciudad vacíos; no añadir una pantalla obligatoria de confirmación. Sin ciudad, el clima sigue siendo manual.
 
@@ -33,6 +37,33 @@ Mostrar «n de 4», acción principal y «Atrás». Las elecciones anteriores se
 Guardar el progreso permite cerrar y continuar en el mismo paso. Un error de guardado debe indicarse; no afirmar que quedó guardado hasta que termine. Al finalizar, las decisiones se aplican a la app y sobreviven a reiniciar.
 
 La persona que ya tiene clóset abre «Mi estilo → Editar preferencias» y edita sus preferencias. Conservar identificadores, fotos, conjuntos guardados e historial. La elección inicial demo/propio se limita al primer arranque; volver a personalizar no es una acción de restablecimiento. Al migrar datos existentes, usar valores iniciales seguros sin obligar a repetir el alta.
+
+## Funciones que dependen del backend
+
+Mientras una build no tenga servicio de IA configurado (`isAiAvailable`), Analizar foto, en prendas y en Mi estilo, se muestra como «Ya casi…» y no es un control. Las alternativas manuales siguen disponibles. Web en `localhost` y las builds con `EXPO_PUBLIC_AI_API_URL` muestran la acción real.
+
+El aviso solo aparece en desarrollo y en los perfiles `preview` y `testflight` de [eas.json](../eas.json), que definen `EXPO_PUBLIC_SHOW_COMING_SOON`. El perfil `production` lo oculta porque la [guía 2.1 de Apple](https://developer.apple.com/app-store/review/guidelines/) pide retirar el contenido provisional antes de enviar. Sube a TestFlight con `eas build --profile testflight` y a revisión con `--profile production`.
+
+## Tono de la app
+
+La referencia es el [onboarding de Letterly](https://x.com/bthreeagency/status/2119753178753507565), observado en video el 9/11/2026. Tomamos su forma de comunicar, no sus frases, personajes ni pantallas de pago.
+
+**Reglas de voz**
+
+1. **Un personaje habla.** Las prendas son un equipo con nombre: Tere (playera), Cami (camisa), Chama (chamarra) y Teni (tenis). Cada una se presenta y comenta en primera persona.
+2. **Burbuja y pregunta van separadas.** La burbuja es pequeña y conversa; la pregunta va sola, grande y es el encabezado para lectores de pantalla.
+3. **Reacciona a lo que dices.** Usa el nombre cuando lo hay y responde a cada elección diciendo lo que la app hace de verdad.
+4. **Los botones avanzan la historia.** «Vamos a tu clóset», «Ahora los colores», «Ver mi outfit». Saltar se dice sin culpa: «Lo hago después».
+5. **La confianza se dice con la misma voz, sin rodeos.** «Sin cuenta. Tus datos se quedan en tu teléfono.»
+6. **Cierre con nombre.** «Todo listo, Alex.»
+7. **Español natural y neutro.** Cálido y de tú, sin modismos fuertes ni chistes forzados. Se dice «outfit» en lugar de «conjunto».
+
+**Límites**
+
+- Permisos y envío de fotos, privacidad, tono de piel, errores que afecten datos, validaciones y datos del clima se escriben claros y sin personaje.
+- Humor sobre la ropa, nunca sobre la persona. Sin palabras con género para hablarle a quien usa la app; los nombres son de las prendas.
+- Una voz amable no sustituye decir «clóset de ejemplo» o «prendas ficticias».
+- Un mensaje de error dice primero qué pasó y qué hacer.
 
 ## Tradeoffs deliberados
 
@@ -56,7 +87,7 @@ Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportac
 
 Inspirado en el perchero del portafolio de Batch Merch (Inspora, «portfolio website»): fondo claro con puntos, un tubo cromado y prendas colgadas de canto. La prenda elegida gira de frente (`rotateY` con perspectiva, 320 ms, sin animación con Reducir movimiento) y debajo aparece su nombre, categoría, colores, «Ejemplo» si aplica, el interruptor de disponibilidad y **Editar prenda**. Arriba, capas, prendas completas y abajo cuelgan del tubo con un largo aproximado por categoría; calzado y accesorios van en una repisa.
 
-El perchero solo se usa en la bienvenida (prendas de ejemplo girando una tras otra) y mientras el clóset tiene únicamente prendas de ejemplo. En cuanto hay ropa propia, Mi clóset cambia a una cuadrícula de fotos cuadradas de 3 columnas con filtros por categoría, que admite fotos con cualquier fondo. El efecto del perchero depende de fotos sin fondo. El clóset de ejemplo usa fotos de Unsplash recortadas con Apple Vision ([créditos](../assets/demo/README.md)). Una prenda propia sin foto usa su dibujo con un gancho dibujado; una foto propia con fondo se ve, pero no tan limpia: recortarla en el teléfono requiere un módulo nativo y una build de desarrollo. El clóset vacío ofrece **Usar clóset de ejemplo** como elección explícita.
+El perchero se usa mientras el clóset tiene únicamente prendas de ejemplo. En cuanto hay ropa propia, Mi clóset cambia a una cuadrícula de fotos cuadradas de 3 columnas con filtros por categoría, que admite fotos con cualquier fondo. El efecto del perchero depende de fotos sin fondo. El clóset de ejemplo usa fotos de Unsplash recortadas con Apple Vision ([créditos](../assets/demo/README.md)). Una prenda propia sin foto usa su dibujo con un gancho dibujado; una foto propia con fondo se ve, pero no tan limpia: recortarla en el teléfono requiere un módulo nativo y una build de desarrollo. El clóset vacío ofrece **Ver el clóset de ejemplo** como elección explícita.
 
 ## Agregar prenda
 

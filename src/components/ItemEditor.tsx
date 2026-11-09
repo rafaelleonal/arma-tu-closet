@@ -138,7 +138,7 @@ export function ItemEditor({
       ) : null}
       {item && onCombine && !hasChanges && !confirmClose ? (
         <Button
-          label="Combinar esta prenda"
+          label="Combínala"
           onPress={() => {
             discardAndClose();
             onCombine(item);

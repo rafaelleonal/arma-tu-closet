@@ -57,13 +57,13 @@ export function ClosetScreen({
         <View style={[s.panel, { paddingVertical: 35 }]}>
           <Text style={s.sectionTitle}>Agrega tus prendas</Text>
           <Text style={[s.subtitle, { marginBottom: 24 }]}>
-            Para un conjunto necesitas una parte de arriba, una de abajo y
+            Para un outfit necesitas una parte de arriba, una de abajo y
             calzado; o una prenda completa y calzado.
           </Text>
           <Button label="Agregar prenda" onPress={onAdd} />
           <Button
             secondary
-            label="Usar clóset de ejemplo"
+            label="Ver el clóset de ejemplo"
             onPress={() => {
               // An existing closet is never replaced by the example.
               update((current) =>
@@ -82,7 +82,7 @@ export function ClosetScreen({
       )}
       <Button
         secondary
-        label="Armar conjunto"
+        label="Armar outfit"
         onPress={onManual}
         style={{ marginTop: 24 }}
       />

@@ -6,7 +6,7 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 
 ## Qué puedes hacer
 
-- Ver una bienvenida breve y elegir estilos, colores preferidos, colores a evitar y ciudad del clima en un onboarding de cuatro pasos; continuar sin completar las preferencias opcionales.
+- Ver una bienvenida con las prendas ilustradas y responder un onboarding conversacional de cuatro pasos: qué te cuesta al vestirte, tu estilo actual y deseado, tus colores y un primer conjunto de ejemplo. Puedes continuar sin completar las preferencias opcionales.
 - Activar o desactivar la vibración en móvil; las transiciones respetan Reducir movimiento.
 - Personalizar la apariencia con los temas Lino, Papel, Medianoche, Salvia, Chicle y Malva, vista Amplia o Compacta y explicaciones opcionales.
 - Agregar prendas con lo esencial (categoría y colores; foto y nombre opcionales) y ajustar en **Más detalles** ocasiones, abrigo, lluvia y estilos. Editar también la disponibilidad.
@@ -18,9 +18,11 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 
 Las ilustraciones son dibujos genéricos. Puedes analizar una foto con IA para proponer nombre, categoría y colores: revisas y confirmas la propuesta antes de incorporarla al formulario, y guardas la prenda por separado. Los demás atributos siguen siendo manuales.
 
-Desde **Mi clóset**, abre una prenda guardada y toca **Combinar esta prenda**. La app propone hasta dos conjuntos con esa pieza fija y el contexto de Hoy. Puedes cambiar las demás prendas, guardar o registrar el uso. Si falta una categoría, puedes agregar una prenda y volver a la misma selección.
+Desde **Mi clóset**, abre una prenda guardada y toca **Combínala**. La app propone hasta dos conjuntos con esa pieza fija y el contexto de Hoy. Puedes cambiar las demás prendas, guardar o registrar el uso. Si falta una categoría, puedes agregar una prenda y volver a la misma selección.
 
 Marca **Quiero usarla más** al editar una prenda. Si encaja con el contexto y la rotación, Hoy puede mostrar un acceso para volver a combinarla.
+
+En **Mi estilo → Cambiar mi estilo**, indica cómo te vistes hoy, cómo quieres verte y, si quieres, tu tono de piel, a mano o con una foto que confirmas ([ADR-009](docs/adr/0009-foto-de-persona-y-objetivo-de-estilo.md)). Hoy muestra entonces **Hoy me animo a algo nuevo**: combina hacia ese objetivo con tu ropa y avisa qué categorías no tienen prendas de ese estilo.
 
 En desarrollo, **Elegir con IA** puede priorizar una opción de Hoy entre conjuntos que ya encajan con el contexto. El proxy local admite OpenRouter con Claude Sonnet 5.5 para comparar esa elección con el orden local. [Configuración para iOS](docs/integraciones.md#elección-de-conjunto-en-hoy) · [Criterios](docs/recomendaciones.md#elección-opcional-con-ia).
 
@@ -43,11 +45,11 @@ Opciones de desarrollo:
 
 Usa la URL que indique Expo. En navegador, `localhost` y `127.0.0.1` tienen almacenamientos independientes: cambiar de origen puede mostrar un clóset distinto. Para el iPhone, el proyecto abre directamente en Expo Go de App Store; sigue la [guía de prueba](docs/prueba-iphone.md). La copia temporal SDK 54 que se usó antes queda como histórica.
 
-Para probar el flujo: completa el onboarding, elige **Usar clóset de ejemplo** o **Empezar con mi ropa**, revisa **Hoy** y cambia una prenda. Con ropa propia necesitas arriba + abajo + calzado, o una prenda completa + calzado. Las preferencias se editan en **Mi estilo → Editar preferencias**.
+Para probar el flujo: completa el onboarding, elige **Ver el clóset de ejemplo** o **Vamos con mi ropa**, revisa **Hoy** y cambia una prenda. Con ropa propia necesitas arriba + abajo + calzado, o una prenda completa + calzado. Las preferencias se editan en **Mi estilo → Editar preferencias**.
 
 ## Clima y análisis de fotos
 
-En **Hoy → Cambiar → Automático** (o en el paso Tu rutina del onboarding), pulsa **Usar mi ubicación** en iOS/Android o busca la ciudad por nombre. El permiso de ubicación se pide solo al pulsar el botón; se guarda la ciudad, no tu posición, y no hay seguimiento en segundo plano. La app actualiza el clima al abrirse y cada 30 minutos mientras está activa; muestra la hora y usa la sensación térmica para ordenar conjuntos. Un dato de tres horas o más deja de usarse: vuelve al clima manual de respaldo. No promete pronóstico para todo el día. [ADR-005](docs/adr/0005-ubicacion-para-elegir-ciudad.md).
+En **Hoy → Cambiar → Automático** (o en el primer paso del onboarding, al elegir «Nunca le atino al clima»), pulsa **Usar mi ubicación** en iOS/Android o busca la ciudad por nombre. El permiso de ubicación se pide solo al pulsar el botón; se guarda la ciudad, no tu posición, y no hay seguimiento en segundo plano. La app actualiza el clima al abrirse y cada 30 minutos mientras está activa; muestra la hora y usa la sensación térmica para ordenar conjuntos. Un dato de tres horas o más deja de usarse: vuelve al clima manual de respaldo. No promete pronóstico para todo el día. [ADR-005](docs/adr/0005-ubicacion-para-elegir-ciudad.md).
 
 Para habilitar el análisis:
 
@@ -130,7 +132,7 @@ Límites actuales que afectan el uso:
 - El esquema v3 migra v1/v2 y conserva la clave `@arma-tu-outfit/v1` para migrar datos existentes; un documento inválido no se reemplaza por la demo.
 - En web, el JSON completo —incluidas fotos— tiene un límite interno de 2 millones de caracteres; no equivale a la cuota garantizada del navegador. En móvil, las fotos se copian al directorio de documentos de la app. Los archivos que quedan sin referencias aún no se limpian automáticamente.
 - No hay deshacer uso ni edición del historial. Los guardados conservan una instantánea; registrar uso revalida las prendas actuales. El compositor elige categorías, no es un lienzo para arrastrar prendas.
-- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA asiste en nombre, categoría y colores de una prenda. En desarrollo también puede elegir entre conjuntos válidos. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
+- Sin tendencias, compras, pagos ni aprendizaje de gustos. La IA asiste en nombre, categoría y colores de una prenda, y en tono de piel y estilos de una foto de la persona. En desarrollo también puede elegir entre conjuntos válidos. Las restricciones de colores aplican a sugerencias e intercambios; el armado manual permite elegir entre las prendas disponibles.
 
 ## Documentación y próximos pasos
 

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import {
   AiClientError,
   analyzeGarmentPhoto,
+  isAiAvailable,
   imageMimeTypeFromBase64,
   resolveAiApiUrl,
   validateImageDataUrl,
@@ -191,4 +192,13 @@ test('invalid images fail before sending anything', async () => {
     errorCode('image'),
   );
   assert.equal(calls, 0);
+});
+
+test('AI features report availability so a build without backend can say so', () => {
+  assert.equal(isAiAvailable('ios', ''), false);
+  assert.equal(isAiAvailable('android', undefined), false);
+  assert.equal(isAiAvailable('ios', 'https://api.example.com'), true);
+  assert.equal(isAiAvailable('web', '', 'localhost'), true);
+  assert.equal(isAiAvailable('web', '', 'app.example.com'), false);
+  assert.equal(isAiAvailable('ios', 'no es url'), false);
 });

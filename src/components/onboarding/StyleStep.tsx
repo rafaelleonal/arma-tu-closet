@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
-import { STYLE_OPTIONS, type StyleId } from '../../domain';
+import { Pressable, Text, View } from 'react-native';
+import { EMPTY_STYLE_GOAL, STYLE_OPTIONS, type StyleId } from '../../domain';
 import { useFeedback } from '../Feedback';
-import { FieldLabel, useUI } from '../ui';
+import { Chip, FieldLabel, useUI } from '../ui';
+import { Guide } from './Guide';
 import type { StepProps } from './types';
 
 const styleMarks: Record<StyleId, string> = {
@@ -16,13 +17,21 @@ const styleMarks: Record<StyleId, string> = {
   feminine: '❀',
 };
 
-export function StyleStep({ data, onChange }: StepProps) {
+const MAX_STYLES = 3;
+
+export function StyleStep({
+  data,
+  onChange,
+  startExploring,
+}: StepProps & { startExploring: boolean }) {
   const { s, palette } = useUI();
   const feedback = useFeedback();
   const [notice, setNotice] = useState('');
   const selectedIds = data.profile.styleIds;
+  const goal = data.styleGoal ?? EMPTY_STYLE_GOAL;
+  const name = data.profile.name.trim();
   function select(id: StyleId) {
-    if (!selectedIds.includes(id) && selectedIds.length >= 3) {
+    if (!selectedIds.includes(id) && selectedIds.length >= MAX_STYLES) {
       setNotice('Máximo 3. Quita uno para elegir otro.');
       return;
     }
@@ -37,14 +46,33 @@ export function StyleStep({ data, onChange }: StepProps) {
       },
     });
   }
+  function selectTarget(id: StyleId) {
+    const chosen = goal.targetStyleIds.includes(id);
+    if (!chosen && goal.targetStyleIds.length >= MAX_STYLES) {
+      setNotice('Máximo 3. Quita uno para elegir otro.');
+      return;
+    }
+    feedback.selection();
+    setNotice('');
+    const targetStyleIds = chosen
+      ? goal.targetStyleIds.filter((value) => value !== id)
+      : [...goal.targetStyleIds, id];
+    onChange({
+      styleGoal: {
+        ...goal,
+        targetStyleIds,
+        exploring:
+          targetStyleIds.length > 0 && (goal.exploring || startExploring),
+      },
+    });
+  }
   return (
     <>
-      <Text accessibilityRole="header" style={s.title}>
-        Tu estilo
-      </Text>
-      <Text style={[s.subtitle, { marginTop: 12, marginBottom: 20 }]}>
-        Elige hasta 3.
-      </Text>
+      <Guide
+        kind="shirt"
+        say={`${name ? `${name}, soy` : 'Soy'} Cami, la camisa. Cuéntame de tu ropa.`}
+        title="¿Cómo te vistes casi siempre?"
+      />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         {STYLE_OPTIONS.map((option) => (
           <StyleCard
@@ -56,6 +84,17 @@ export function StyleStep({ data, onChange }: StepProps) {
           />
         ))}
       </View>
+      <FieldLabel>¿Y cómo te gustaría verte?</FieldLabel>
+      <View style={s.wrap}>
+        {STYLE_OPTIONS.map((option) => (
+          <Chip
+            key={option.id}
+            label={option.label}
+            selected={goal.targetStyleIds.includes(option.id)}
+            onPress={() => selectTarget(option.id)}
+          />
+        ))}
+      </View>
       <Text
         accessibilityLiveRegion="polite"
         style={{
@@ -64,21 +103,8 @@ export function StyleStep({ data, onChange }: StepProps) {
           fontSize: 11,
         }}
       >
-        {notice || `${selectedIds.length} de 3 · Opcional`}
+        {notice || 'Hasta 3 en cada grupo · Opcional'}
       </Text>
-      <FieldLabel>Nombre · opcional</FieldLabel>
-      <TextInput
-        accessibilityLabel="Tu nombre, opcional"
-        placeholder="Tu nombre"
-        placeholderTextColor={palette.muted}
-        value={data.profile.name}
-        onChangeText={(name) =>
-          onChange({ profile: { ...data.profile, name } })
-        }
-        maxLength={40}
-        autoComplete="given-name"
-        style={s.input}
-      />
     </>
   );
 }

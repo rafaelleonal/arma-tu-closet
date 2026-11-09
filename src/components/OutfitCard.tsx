@@ -51,7 +51,7 @@ export function OutfitCard({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
-            saved ? 'Quitar conjunto de guardados' : 'Guardar conjunto'
+            saved ? 'Quitar outfit de guardados' : 'Guardar outfit'
           }
           accessibilityState={{ selected: saved }}
           aria-pressed={saved}
@@ -73,7 +73,7 @@ export function OutfitCard({
         />
         <View style={[s.row, { marginTop: 20 }]}>
           <Button
-            label={primary ? 'Lo usé hoy' : 'Ver conjunto'}
+            label={primary ? 'Hoy me lo puse' : 'Ver outfit'}
             onPress={primary ? onWorn : () => onDetails?.()}
             small={!primary}
             style={{ flex: 1 }}

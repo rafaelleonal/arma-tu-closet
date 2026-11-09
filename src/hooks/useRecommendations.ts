@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import {
   generateRecommendations,
   pickWearMoreItem,
+  styleContext,
   type Context,
 } from '../domain';
 import { createLocalData, type LocalData } from '../storage/local';
@@ -18,7 +19,7 @@ export function useRecommendations(data: LocalData | null, weather: Weather) {
         data?.context ||
         createLocalData().context),
       ...(data?.preferences || createLocalData().preferences),
-      styleIds: data?.profile.styleIds ?? [],
+      ...styleContext(data?.profile.styleIds ?? [], data?.styleGoal),
       now: new Date().toISOString(),
     }),
     // weather.effective is rebuilt on every render: data.weather and its source capture the
@@ -30,6 +31,7 @@ export function useRecommendations(data: LocalData | null, weather: Weather) {
       weather.effective?.source,
       data?.preferences,
       data?.profile.styleIds,
+      data?.styleGoal,
       data?.items,
       generation,
     ],

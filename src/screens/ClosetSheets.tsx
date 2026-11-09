@@ -46,7 +46,7 @@ export function ClosetSheets({
               : [item, ...current.items],
           }));
           setEditor(null);
-          autosave.noticeAfterSave('Prenda guardada.');
+          autosave.noticeAfterSave('Listo, quedó guardada.');
         }}
       />
     );

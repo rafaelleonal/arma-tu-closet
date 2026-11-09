@@ -20,7 +20,7 @@ Expo Go sirve para probar flujo, cámara, ubicación, archivos y haptics. No val
 
 1. Mac y iPhone en la misma Wi-Fi, sin red de invitados que aísle dispositivos. Mantener la Mac despierta y Metro abierto.
 2. Escanear el QR con Cámara de iOS y abrir Expo Go. Permitir acceso a la red local si iOS lo solicita.
-3. Completar el onboarding y elegir **Empezar con mi ropa** para esta prueba. Un clóset vacío es el resultado esperado: el clóset del navegador no se sincroniza con el teléfono.
+3. Completar el onboarding y elegir **Vamos con mi ropa** para esta prueba. Un clóset vacío es el resultado esperado: el clóset del navegador no se sincroniza con el teléfono.
 4. Si no conecta, abrir en Safari la dirección `http://<IP de la Mac>:<puerto>` que muestra Expo para comprobar acceso LAN. Si tampoco responde, revisar misma red, permiso de red local de Expo Go, IP vigente y firewall de la Mac. No borrar datos ni reinstalar Expo Go para intentar solucionarlo.
 5. Si muestra incompatibilidad de SDK, actualizar Expo Go desde App Store y confirmar que el enlace sea el del proyecto principal. Registrar el mensaje y la versión de Expo Go.
 
@@ -42,7 +42,7 @@ El servidor de análisis no está iniciado ni expuesto. La prueba de cámara y a
 | Movimiento | Comparar con Reducir movimiento de iOS activado/desactivado | Con reducción, no hay desplazamiento de entrada, escala al pulsar ni slide de hojas. Los controles siguen respondiendo. | Pendiente en iPhone |
 | Accesibilidad | VoiceOver, texto ampliado y teclado visible | Nombres y selecciones comprensibles, acciones alcanzables y sin texto cortado. | Pendiente en iPhone |
 
-Expo Go controla sus propios textos de permisos; el texto configurado en `app.json` se prueba en una build propia. El micrófono no es necesario. La ubicación se pide solo al pulsar **Usar mi ubicación** (Hoy → Cambiar → Automático o paso Tu rutina); basta la aproximada. Probar permitir, no permitir y **Abrir Ajustes**: sin permiso debe quedar disponible la búsqueda por nombre. iOS puede omitir haptics por bajo consumo, ajustes del sistema o cámara activa; comprobarlos fuera de captura. [ImagePicker](https://docs.expo.dev/versions/latest/sdk/imagepicker/), [Location](https://docs.expo.dev/versions/latest/sdk/location/), [Haptics](https://docs.expo.dev/versions/latest/sdk/haptics/).
+Expo Go controla sus propios textos de permisos; el texto configurado en `app.json` se prueba en una build propia. El micrófono no es necesario. La ubicación se pide solo al pulsar **Usar mi ubicación** (Hoy → Cambiar → Automático o «Nunca le atino al clima» en el onboarding); basta la aproximada. Probar permitir, no permitir y **Abrir Ajustes**: sin permiso debe quedar disponible la búsqueda por nombre. iOS puede omitir haptics por bajo consumo, ajustes del sistema o cámara activa; comprobarlos fuera de captura. [ImagePicker](https://docs.expo.dev/versions/latest/sdk/imagepicker/), [Location](https://docs.expo.dev/versions/latest/sdk/location/), [Haptics](https://docs.expo.dev/versions/latest/sdk/haptics/).
 
 Las fotos se copian a documentos de la app antes de asociarlas a una prenda. El JSON se guarda con AsyncStorage y una cola de escrituras. Esperar el aviso distingue una escritura confirmada de un formulario visible. Si hay error de escritura, conservar la app abierta y reintentar: no interpretar el cierre del editor como éxito.
 

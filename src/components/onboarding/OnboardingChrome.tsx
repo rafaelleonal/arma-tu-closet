@@ -3,8 +3,9 @@ import { Pressable, Text, View } from 'react-native';
 import { AppLogo } from '../AppLogo';
 import { Button, useUI } from '../ui';
 
-export const STEP_NAMES = ['Tu estilo', 'Colores', 'Tu rutina', 'Apariencia'];
+export const STEP_NAMES = ['Hola', 'Tu estilo', 'Colores', 'Tu conjunto'];
 export const LAST_STEP = STEP_NAMES.length - 1;
+const NEXT_LABELS = ['Seguimos', 'Ahora los colores', 'Ver mi outfit'];
 
 export function OnboardingLogo() {
   return <AppLogo />;
@@ -79,7 +80,7 @@ export function StepHeader({
   );
 }
 
-/** Every step is optional: Ahora no and Continuar both move on. */
+/** Every step is optional: the skip link and the next button both move on. */
 export function StepFooter({
   step,
   onGo,
@@ -124,11 +125,11 @@ export function StepFooter({
               }}
             >
               <Text style={{ fontSize: 12, color: palette.muted }}>
-                Ahora no
+                Lo hago después
               </Text>
             </Pressable>
             <Button
-              label="Continuar"
+              label={NEXT_LABELS[step]}
               onPress={() => onGo(step + 1)}
               style={{ flex: 1 }}
             />

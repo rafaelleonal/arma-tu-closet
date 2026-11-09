@@ -15,6 +15,8 @@
 
 EAS construye binarios y permite distribuirlos; las Edge Functions tienen un runtime y límites propios. Esta combinación es una recomendación para reducir operación, no una prueba de compatibilidad del servidor existente. Si la adaptación de IA no resulta viable, evaluar un servicio Node gestionado y conservar el contrato del cliente. [EAS Build](https://docs.expo.dev/build/introduction/), [Edge Functions](https://supabase.com/docs/guides/functions), [límites](https://supabase.com/docs/guides/functions/limits), [EAS Hosting](https://docs.expo.dev/eas/hosting/introduction/), [SMTP](https://supabase.com/docs/guides/auth/auth-smtp), [Open-Meteo](https://open-meteo.com/en/pricing).
 
+El [plan del backend público](backend-publico.md) (9/11/2026) recomienda NestJS, Postgres y cuentas opcionales con Supabase, con la API en un contenedor en Cloud Run. Si se acepta, sustituye la fila de análisis con Edge Function de esta tabla.
+
 ## Entornos y configuración
 
 - **Local:** datos de prueba, Metro y servidor IA en loopback. Nunca exponer el proxy actual por un túnel público.
@@ -53,7 +55,7 @@ Se puede distribuir una beta solo local antes del paso cloud, indicando que no h
 1. Inscribir al titular correcto en Apple Developer Program; resolver identidad y, para organización, requisitos empresariales. La membresía figura en **99 USD/año**, con variación regional. [Inscripción](https://developer.apple.com/programs/enroll/).
 2. Crear Bundle ID y registro en App Store Connect; configurar firma y versiones. Probar la build en un iPhone físico. Expo Go no verifica los textos de permisos configurados para el binario propio.
 3. Subir a TestFlight. Empezar con testers internos; la distribución externa puede requerir revisión de beta. Preparar instrucciones de prueba y acceso del revisor si hay cuenta. [TestFlight](https://developer.apple.com/testflight/).
-4. Completar nombre, categoría, edad, capturas reales, soporte, política de privacidad y declaraciones de datos según el flujo implementado: cuenta, fotos, ciudad e intercambio con IA. Mantener el consentimiento específico antes de enviar una foto.
+4. Completar nombre, categoría, edad, capturas reales, soporte, política de privacidad y declaraciones de datos según el flujo implementado: cuenta, fotos, ciudad e intercambio con IA. Mantener el consentimiento específico antes de enviar una foto. Si se publica el análisis de la foto de una persona, declarar la foto y el tono de piel, nombrar a OpenAI y explicar el envío a IA de terceros (guía 5.1.2).
 5. Si hay creación de cuentas, permitir iniciar su eliminación dentro de la app. Si se añade login social, revisar la regla 4.8. Resolver preguntas de cifrado/exportación según la build efectiva. [Revisión](https://developer.apple.com/app-store/review/guidelines/), [eliminación](https://developer.apple.com/support/offering-account-deletion-in-your-app/).
 6. Enviar a App Review y liberar después de la aprobación. Las suscripciones digitales requerirán evaluar las reglas de compra vigentes por región antes de elegir un proveedor; no forman parte del piloto.
 

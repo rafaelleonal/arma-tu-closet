@@ -9,6 +9,7 @@ import { useAiOutfitChoice } from '../hooks/useAiOutfitChoice';
 import { DemoBanner, type Tab } from '../components/AppChrome';
 import { OutfitCard } from '../components/OutfitCard';
 import type { SwapTarget } from '../components/OutfitSheets';
+import { ExploreControl } from '../components/style-goal/ExploreControl';
 import { WeatherCard } from '../components/WeatherCard';
 import { Button, SectionLabel, useUI } from '../components/ui';
 import { withoutDemo, type OutfitActions } from './actions';
@@ -62,13 +63,14 @@ export function TodayScreen(props: TodayScreenProps) {
         weather={weather}
         onEdit={onEditContext}
       />
+      <ExploreControl data={data} update={update} context={recs.context} />
       <View
         style={[
           s.row,
           { justifyContent: 'space-between', marginTop: 30, marginBottom: 14 },
         ]}
       >
-        <SectionLabel>Conjuntos</SectionLabel>
+        <SectionLabel>Outfits</SectionLabel>
         <Text style={{ color: palette.muted, fontSize: 11 }}>
           {count ? `${count} ${count === 1 ? 'opción' : 'opciones'}` : ''}
         </Text>
@@ -111,14 +113,14 @@ function Recommendations({
       {wearMore ? (
         <Button
           secondary
-          label={`Volver a usar · ${wearMore.name}`}
+          label={`Otra vuelta · ${wearMore.name}`}
           onPress={() => onCombine(wearMore.id)}
           style={{ marginTop: 16 }}
         />
       ) : null}
       {others.length ? (
         <Text style={{ fontSize: 18, color: palette.ink, marginTop: 24 }}>
-          Otras opciones
+          Otras ideas
         </Text>
       ) : null}
       <View style={styles.alternatives}>
@@ -133,7 +135,7 @@ function Recommendations({
       </View>
       <Button
         secondary
-        label="Otra combinación"
+        label="Prefiero otro"
         style={{ marginTop: 16 }}
         onPress={() => {
           update((current) => ({
@@ -183,22 +185,22 @@ function NoOutfits({ data, update, recs, onTab }: TodayScreenProps) {
   return (
     <View style={[s.panel, { paddingVertical: 35 }]}>
       <Text style={{ fontSize: 28, marginBottom: 14, color: palette.ink }}>
-        Sin conjuntos
+        Todavía no hay outfits
       </Text>
       <Text style={s.subtitle}>
         {recs.result.outfits.length
-          ? 'No quedan opciones en esta selección.'
+          ? 'Ya no tengo más ideas para hoy.'
           : recs.result.message}
       </Text>
       <Text style={[s.subtitle, { marginTop: 12 }]}>
-        Revisa tus preferencias o agrega prendas.
+        Agrega ropa o ajusta tus gustos y armo otros.
       </Text>
       <View style={[s.row, { marginTop: 22, flexWrap: 'wrap' }]}>
         <Button label="Ir a mi clóset" onPress={() => onTab('closet')} />
         {data.dislikedOutfitIds.length ? (
           <Button
             secondary
-            label="Recuperar opciones"
+            label="Ver las anteriores"
             onPress={() =>
               update((current) => ({ ...current, dislikedOutfitIds: [] }))
             }

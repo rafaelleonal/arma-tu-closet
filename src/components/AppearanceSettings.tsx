@@ -241,7 +241,7 @@ function ThemeCard({
               fontSize: 8,
             }}
           >
-            Lo usé hoy
+            Hoy me lo puse
           </Text>
         </View>
       </View>

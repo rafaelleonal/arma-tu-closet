@@ -40,7 +40,7 @@ export function OutfitSheet({
 }) {
   const { palette, s } = useUI();
   return (
-    <Sheet title="Conjunto" onClose={onClose}>
+    <Sheet title="Tu outfit" onClose={onClose}>
       {saved ? (
         <Text style={[s.subtitle, { fontSize: 12, marginBottom: 14 }]}>
           Guardado con los detalles originales. Revisa disponibilidad y clima

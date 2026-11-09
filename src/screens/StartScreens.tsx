@@ -75,7 +75,10 @@ export function OnboardingScreen({
               ? next
               : withDemo(next);
           });
-          autosave.noticeAfterSave('Preferencias guardadas.');
+          const name = data.profile.name.trim();
+          autosave.noticeAfterSave(
+            name ? `Todo listo, ${name}.` : 'Todo listo.',
+          );
           onFinish(entry);
         }}
       />
