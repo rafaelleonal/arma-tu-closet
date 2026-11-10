@@ -114,11 +114,13 @@ export function NameField({
   onChange,
   category,
   colors,
+  onFocus,
 }: {
   value: string;
   onChange: (value: string) => void;
   category: Category;
   colors: string[];
+  onFocus?: () => void;
 }) {
   const { palette, s } = useUI();
   const suggested = suggestedItemName(category, colors);
@@ -140,6 +142,7 @@ export function NameField({
         value={value}
         maxLength={60}
         onChangeText={onChange}
+        onFocus={onFocus}
         style={s.input}
       />
     </>

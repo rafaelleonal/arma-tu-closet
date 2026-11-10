@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -112,18 +112,43 @@ export function RailWall({
   );
 }
 
-/** The dotted paper behind the rail and behind today's outfit. Fills its parent. */
+/**
+ * The dotted paper behind the rail and behind today's outfit. Fills its parent. The drawing is
+ * sized in points from the measured box: a percentage leaves a padded parent's padding out on
+ * native and does not follow a parent that grows after it mounts.
+ */
 export function Dots() {
   const { palette } = useUI();
+  const [size, setSize] = useState({ width: 0, height: 0 });
   return (
-    <Svg width="100%" height="100%" style={StyleSheet.absoluteFill} aria-hidden>
-      <Defs>
-        <Pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
-          <Circle cx="2" cy="2" r="1" fill={palette.line} />
-        </Pattern>
-      </Defs>
-      <Rect width="100%" height="100%" fill="url(#dots)" />
-    </Svg>
+    <View
+      pointerEvents="none"
+      style={StyleSheet.absoluteFill}
+      onLayout={(event) => {
+        const { width, height } = event.nativeEvent.layout;
+        setSize((current) =>
+          current.width === width && current.height === height
+            ? current
+            : { width, height },
+        );
+      }}
+    >
+      {size.width && size.height ? (
+        <Svg width={size.width} height={size.height} aria-hidden>
+          <Defs>
+            <Pattern
+              id="dots"
+              width="14"
+              height="14"
+              patternUnits="userSpaceOnUse"
+            >
+              <Circle cx="2" cy="2" r="1" fill={palette.line} />
+            </Pattern>
+          </Defs>
+          <Rect width={size.width} height={size.height} fill="url(#dots)" />
+        </Svg>
+      ) : null}
+    </View>
   );
 }
 

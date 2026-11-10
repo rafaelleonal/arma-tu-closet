@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -11,10 +12,7 @@ import {
   useWindowDimensions,
   type ScrollViewInstance,
 } from 'react-native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUI } from './ui';
 import type { Palette } from '../theme/ThemeProvider';
 import { useFeedback } from './Feedback';
@@ -33,6 +31,27 @@ export function useSheetStageHeight(taken: number, compact = false) {
   const insets = useSafeAreaInsets();
   const room = window.height * MAX_HEIGHT - insets.top - insets.bottom - taken;
   return Math.max(200, Math.min(compact ? 280 : 380, room));
+}
+
+/** True while the on-screen keyboard is up; it then covers the home indicator's area. */
+function useKeyboardUp() {
+  const [up, setUp] = useState(false);
+  useEffect(() => {
+    const ios = Platform.OS === 'ios';
+    const shown = Keyboard.addListener(
+      ios ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setUp(true),
+    );
+    const hidden = Keyboard.addListener(
+      ios ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setUp(false),
+    );
+    return () => {
+      shown.remove();
+      hidden.remove();
+    };
+  }, []);
+  return up;
 }
 
 export function Sheet({
@@ -55,6 +74,9 @@ export function Sheet({
   const { palette } = useUI();
   const { reduceMotion } = useFeedback();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  // Read here, outside the modal: inside it there is no provider, so a SafeAreaView reports none.
+  const insets = useSafeAreaInsets();
+  const keyboardUp = useKeyboardUp();
   return (
     <Modal
       animationType={reduceMotion ? 'none' : 'slide'}
@@ -65,7 +87,16 @@ export function Sheet({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.backdrop}
       >
-        <SafeAreaView style={styles.sheet} edges={['top', 'bottom']}>
+        <View
+          style={[
+            styles.sheet,
+            {
+              // Never under the status bar, even when the keyboard leaves little room.
+              marginTop: insets.top,
+              paddingBottom: keyboardUp ? 0 : insets.bottom,
+            },
+          ]}
+        >
           <View style={styles.header}>
             <Text accessibilityRole="header" style={styles.title}>
               {title}
@@ -87,13 +118,16 @@ export function Sheet({
             style={styles.scroll}
             contentContainerStyle={[
               styles.content,
-              footer ? { paddingBottom: 20 } : null,
+              {
+                // The home indicator's area already adds room under the last line.
+                paddingBottom: footer ? 20 : Math.max(16, 36 - insets.bottom),
+              },
             ]}
           >
             {children}
           </ScrollView>
           {footer ? <View style={styles.footer}>{footer}</View> : null}
-        </SafeAreaView>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );

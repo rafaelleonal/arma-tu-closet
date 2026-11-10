@@ -66,7 +66,7 @@ export function ItemEditor({
   const { palette } = useUI();
   const { reduceMotion } = useFeedback();
   const scroll = useRef<ScrollViewInstance>(null);
-  const fieldY = useRef({ colors: 0, details: 0 });
+  const fieldY = useRef({ colors: 0, name: 0, details: 0 });
   const [initial] = useState(() => initialForm(item));
   const [submitted, setSubmitted] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
@@ -176,12 +176,20 @@ export function ItemEditor({
           error={submitted ? errors.colors : undefined}
         />
       </View>
-      <NameField
-        value={name}
-        onChange={setName}
-        category={category}
-        colors={colors}
-      />
+      <View
+        onLayout={(event) => {
+          fieldY.current.name = event.nativeEvent.layout.y;
+        }}
+      >
+        <NameField
+          value={name}
+          onChange={setName}
+          category={category}
+          colors={colors}
+          // Once the keyboard is up, bring the whole field above the save button.
+          onFocus={() => setTimeout(() => scrollTo(fieldY.current.name), 350)}
+        />
+      </View>
       {item ? (
         <>
           <AvailabilityField value={available} onChange={setAvailable} />

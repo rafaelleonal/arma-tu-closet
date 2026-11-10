@@ -374,3 +374,29 @@ Recorrido en navegador con Expo web a 375 × 812 en `localhost:8093`, un origen 
 - A 320 × 568 el paso 2 no desborda en horizontal; «Lo hago después» pasa a dos líneas.
 
 Sin verificar: iOS y Android (movimiento de la bienvenida y de la burbuja, teclado en el paso 1, áreas seguras), la bienvenida en un tema distinto de Lino, **Vamos con mi ropa**, la ciudad y la ubicación del paso 1, un primer outfit con ropa propia, los temas Papel, Salvia, Chicle y Malva, Reducir movimiento, VoiceOver y teclado.
+
+## 9/11/2026 — Rediseño en el simulador de iOS
+
+Primera revisión nativa del rediseño de stickers. Simulador iPhone 17 Pro con iOS 26.5, build de desarrollo instalada el 28/10/2026 (`com.armatuoutfit.prototype`) conectada a Metro en `localhost:8093`. Se usó el clóset que ya tenía el simulador (10 prendas de ejemplo y una propia con foto con fondo) sin reiniciarlo; no se guardó ninguna prenda ni outfit, y un estilo marcado para la prueba se desmarcó.
+
+Tres fallos que el navegador no mostraba, corregidos:
+
+1. **Fondo de puntos corto.** En álbumes, tablero y franjas con margen interior, los puntos no llegaban al borde derecho ni al final. `Dots` ahora mide su contenedor y dibuja con ese tamaño.
+2. **Pie de las hojas pegado al borde inferior.** Dentro de un `Modal` no hay proveedor de áreas seguras, así que `SafeAreaView` no reservaba el indicador de inicio. `Sheet` lee los márgenes fuera del modal y los aplica.
+3. **Hoja y teclado.** Con el teclado arriba, la hoja subía bajo la barra de estado, sobraba un hueco entre el pie y el teclado, y el campo de nombre quedaba medio tapado por el botón de guardar. La hoja ya no pasa de la barra de estado, el pie queda pegado al teclado y el campo se desplaza a la vista.
+
+Comprobado después de los arreglos:
+
+- [Hoy](evidence/ios-hoy-stickers-iphone17pro.jpg): borde claro y sombra de los stickers, burbuja y acciones; deslizar con el dedo entre las tres ideas, también empezando sobre una prenda.
+- Cambiar: álbum con borde fino y puntos de borde a borde.
+- Mi clóset: álbum con recortes, la foto con fondo en su marco, giro y sombra.
+- [Editor](evidence/ios-editor-teclado-iphone17pro.jpg): sticker de dibujo, pie fijo, teclado con el campo de nombre visible, cerrar sin cambios.
+- Mi estilo: tablero con huecos punteados y un guardado como collage. Tu outfit desde el guardado.
+- Editar preferencias: pasos 1 y 2 con la prenda que habla como sticker; [elegir un estilo](evidence/ios-onboarding-estilos-iphone17pro.jpg) lo convierte en sticker con «✓».
+- [Armar outfit](evidence/ios-compositor-iphone17pro.jpg): mesa fija con huecos, palomita en la prenda elegida y pie fijo.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados tras los arreglos. En Expo web a 375 × 812, Hoy y Cambiar conservan sus puntos y la hoja no cambia.
+
+Observado: si se toca justo mientras una hoja se abre o se cierra, el toque no hace nada; visto solo con toques automáticos sin pausa.
+
+Sin verificar: Android, un iPhone real, la bienvenida del primer arranque (necesita una instalación sin datos), los pasos 3 y 4 del onboarding, Combínala, Medianoche y los demás temas, elegir o tomar foto y quitar fondo, Reducir movimiento, VoiceOver y Dynamic Type.

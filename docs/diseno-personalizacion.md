@@ -136,6 +136,8 @@ Las hojas siguen la misma base que las pestañas: la prenda como sticker sobre e
 | **Armar outfit** | Arriba, fija, una mesa pequeña con el outfit que se va formando: un sticker por prenda elegida y un hueco punteado con el nombre de cada categoría obligatoria que falta. Debajo, cada categoría es una fila de stickers que se desliza; tocar uno lo elige o lo quita, y el elegido lleva una palomita. **Guardar outfit** va al pie; si falta algo, dice qué categoría. |
 | **Agregar o editar prenda** | Arriba, la prenda como el sticker que verá el resto de la app, con su etiqueta de colores y nombre; cambia al elegir foto, categoría o color. **Guardar** va al pie. Al cerrar con cambios, la pregunta **¿Descartar cambios?** ocupa ese mismo pie. |
 
+En iPhone la hoja empieza bajo la barra de estado y su pie deja libre el indicador de inicio. Con el teclado arriba, el pie queda pegado al teclado y el campo de nombre del editor se desplaza para quedar a la vista. El fondo de puntos se dibuja con el tamaño medido de su contenedor, no con porcentajes: en nativo un porcentaje deja fuera el margen interior y no sigue a un contenedor que crece.
+
 El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. Las hojas de clima y ocasión, colorimetría y Cambiar mi estilo no cambian de contenido.
 
 ## Agregar prenda
