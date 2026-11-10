@@ -38,6 +38,7 @@ export function DetailsSection({
   open,
   onToggle,
   occasionError,
+  name,
 }: {
   value: Details;
   onChange: (patch: Partial<Details>) => void;
@@ -45,6 +46,8 @@ export function DetailsSection({
   open: boolean;
   onToggle: () => void;
   occasionError?: string;
+  /** The name field; it is optional, so it lives with the other refinements. */
+  name: React.ReactNode;
 }) {
   const { palette, s } = useUI();
   const [styleNotice, setStyleNotice] = useState('');
@@ -112,6 +115,7 @@ export function DetailsSection({
           <Text style={[s.subtitle, { fontSize: 12 }]}>
             Afinan las sugerencias. Puedes dejarlos como están.
           </Text>
+          {name}
           <FieldLabel>¿Para qué la usas?</FieldLabel>
           <View style={s.wrap}>
             {OCCASIONS.map((item) => (

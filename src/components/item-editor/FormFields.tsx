@@ -1,14 +1,8 @@
 import React from 'react';
 import { Switch, Text, TextInput, View } from 'react-native';
-import {
-  CATEGORIES,
-  categoryLabels,
-  COLOR_OPTIONS,
-  colorLabels,
-  type Category,
-} from '../../domain';
+import type { Category } from '../../domain';
 import { suggestedItemName } from '../itemForm';
-import { Button, Chip, colorHex, FieldLabel, useUI } from '../ui';
+import { Button, FieldLabel, useUI } from '../ui';
 
 /** Takes the place of the save button, so the question is in view wherever the form was. */
 export function DiscardPrompt({
@@ -35,76 +29,6 @@ export function DiscardPrompt({
         style={{ marginTop: 8 }}
       />
     </View>
-  );
-}
-
-export function CategoryField({
-  value,
-  onChange,
-}: {
-  value: Category;
-  onChange: (value: Category) => void;
-}) {
-  const { s } = useUI();
-  return (
-    <>
-      <FieldLabel>Categoría</FieldLabel>
-      <View style={s.wrap}>
-        {CATEGORIES.map((category) => (
-          <Chip
-            key={category}
-            label={categoryLabels[category]}
-            selected={value === category}
-            onPress={() => onChange(category)}
-          />
-        ))}
-      </View>
-    </>
-  );
-}
-
-export function ColorsField({
-  value,
-  onChange,
-  error,
-}: {
-  value: string[];
-  onChange: (colors: string[]) => void;
-  error?: string;
-}) {
-  const { palette, s } = useUI();
-  return (
-    <>
-      <FieldLabel>Colores</FieldLabel>
-      <Text style={[s.subtitle, { fontSize: 11, marginBottom: 12 }]}>
-        Incluye los detalles de color. Elige al menos uno.
-      </Text>
-      <View style={s.wrap}>
-        {COLOR_OPTIONS.map((color) => (
-          <Chip
-            key={color}
-            swatch={colorHex[color]}
-            label={colorLabels[color]}
-            selected={value.includes(color)}
-            onPress={() =>
-              onChange(
-                value.includes(color)
-                  ? value.filter((item) => item !== color)
-                  : [...value, color],
-              )
-            }
-          />
-        ))}
-      </View>
-      {error ? (
-        <Text
-          accessibilityRole="alert"
-          style={{ color: palette.rust, marginTop: 8, fontSize: 12 }}
-        >
-          {error}
-        </Text>
-      ) : null}
-    </>
   );
 }
 

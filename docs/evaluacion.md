@@ -440,3 +440,15 @@ Expo web a 375 × 812 en `127.0.0.1:8093`: hoja en [Manual](evidence/clima-ocasi
 Simulador iPhone 17 Pro (iOS 26.5): [hoja en Manual](evidence/ios-clima-ocasion-iphone17pro.jpg); mantener pulsado «+» sube la temperatura de forma continua y se detiene al soltar; el interruptor de lluvia quedó centrado tras un ajuste; se cerró sin aplicar.
 
 Sin verificar: aplicar un cambio de clima automático y ver el estado en Hoy, **Usar mi ubicación** dentro de la hoja nueva, la línea de respaldo desplegada, el clóset de ejemplo y el selector de prueba en iOS, Medianoche y los demás temas, un teléfono real, Android, VoiceOver y teclado.
+
+## 10/11/2026 — Agregar prenda con stickers y muestras
+
+El formulario sigue [la guía](diseno-personalizacion.md#agregar-prenda): la categoría se elige con los dibujos como stickers, los colores con muestras, y el nombre pasa a Más detalles. Sustituye seis chips de categoría, doce de color con texto y un campo de nombre a la vista. Lo que se guarda no cambia.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
+
+Expo web a 375 × 812 en `127.0.0.1:8093`: [formulario nuevo](evidence/agregar-prenda-stickers-web-375.jpg); elegir Calzado cambia el sticker de la vista previa; guardar sin color muestra «Elige al menos un color.»; elegir rojo y blanco los marca y la etiqueta dice «Calzado · rojo y blanco»; Más detalles se despliega; cerrar con cambios pregunta y descartar cierra sin guardar.
+
+Simulador iPhone 17 Pro (iOS 26.5): bajo la vista previa, [foto, categoría, colores y Más detalles caben en una pantalla](evidence/ios-agregar-prenda-iphone17pro.jpg); elegir categoría y color los marca; cerrar y descartar no guarda nada.
+
+Sin verificar: escribir el nombre dentro de Más detalles con el teclado en iOS, editar una prenda existente, elegir o tomar foto, Medianoche y los demás temas, un teléfono real, Android, VoiceOver y teclado.

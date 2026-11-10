@@ -11,11 +11,10 @@ import {
   suggestedItemName,
 } from './itemForm';
 import { DetailsSection, type Details } from './item-editor/DetailsSection';
+import { CategoryChoices, ColorChoices } from './item-editor/Choices';
 import {
   AvailabilityField,
   WearMoreField,
-  CategoryField,
-  ColorsField,
   DiscardPrompt,
   NameField,
 } from './item-editor/FormFields';
@@ -66,7 +65,7 @@ export function ItemEditor({
   const { palette } = useUI();
   const { reduceMotion } = useFeedback();
   const scroll = useRef<ScrollViewInstance>(null);
-  const fieldY = useRef({ colors: 0, name: 0, details: 0 });
+  const fieldY = useRef({ colors: 0, details: 0 });
   const [initial] = useState(() => initialForm(item));
   const [submitted, setSubmitted] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
@@ -164,30 +163,16 @@ export function ItemEditor({
           setColors([...confirmed.colors]);
         }}
       />
-      <CategoryField value={category} onChange={chooseCategory} />
+      <CategoryChoices value={category} onChange={chooseCategory} />
       <View
         onLayout={(event) => {
           fieldY.current.colors = event.nativeEvent.layout.y;
         }}
       >
-        <ColorsField
+        <ColorChoices
           value={colors}
           onChange={setColors}
           error={submitted ? errors.colors : undefined}
-        />
-      </View>
-      <View
-        onLayout={(event) => {
-          fieldY.current.name = event.nativeEvent.layout.y;
-        }}
-      >
-        <NameField
-          value={name}
-          onChange={setName}
-          category={category}
-          colors={colors}
-          // Once the keyboard is up, bring the whole field above the save button.
-          onFocus={() => setTimeout(() => scrollTo(fieldY.current.name), 350)}
         />
       </View>
       {item ? (
@@ -213,6 +198,18 @@ export function ItemEditor({
           open={detailsOpen}
           onToggle={() => setDetailsOpen((open) => !open)}
           occasionError={submitted ? errors.occasions : undefined}
+          name={
+            <NameField
+              value={name}
+              onChange={setName}
+              category={category}
+              colors={colors}
+              // Once the keyboard is up, bring the field above the save button.
+              onFocus={() =>
+                setTimeout(() => scrollTo(fieldY.current.details), 350)
+              }
+            />
+          }
         />
       </View>
     </Sheet>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, Platform, Text, View } from 'react-native';
 import type { GarmentSuggestion } from '../../ai/contracts';
 import { GarmentSuggestionReview } from '../GarmentSuggestionReview';
-import { Button, ComingSoon, FieldLabel, useUI } from '../ui';
+import { Button, ComingSoon, useUI } from '../ui';
 import { photoAnalysisAvailable } from './localPhoto';
 import type { GarmentPhoto } from './useGarmentPhoto';
 
@@ -17,8 +17,7 @@ export function PhotoSection({
   const { s } = useUI();
   return (
     <>
-      <FieldLabel>Foto · opcional</FieldLabel>
-      <View style={s.row}>
+      <View style={[s.row, { marginTop: 16 }]}>
         <Button
           secondary
           small

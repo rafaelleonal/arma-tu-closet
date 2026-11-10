@@ -148,13 +148,15 @@ El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar pr
 
 ## Agregar prenda
 
-Lo esencial va primero: foto opcional, categoría y colores. El nombre es opcional; si queda vacío se guarda «Categoría · color» (p. ej. «Capa exterior · café»), con separador para no forzar concordancia de género. Una prenda nueva empieza sin color para no guardar «Negro» por accidente.
+Lo esencial va primero y se elige mirando, no leyendo listas: la foto, que es opcional; **¿Qué es?**, con los seis dibujos de la app como stickers, donde el elegido queda a color con su palomita y los demás atenuados; y **¿De qué color?**, con las doce muestras en dos filas, cada una con su nombre debajo para no depender solo del color. Una prenda nueva empieza sin color para no guardar «Negro» por accidente.
+
+El nombre es opcional y vive en **Más detalles**, junto a las ocasiones, el abrigo, la lluvia y los estilos; si queda vacío se guarda «Categoría · color» (p. ej. «Capa exterior · café»), con separador para no forzar concordancia de género. La etiqueta bajo el sticker de la vista previa muestra el nombre que se va a guardar.
 
 La vista previa es un sticker sobre el fondo de puntos: el recorte con borde, la foto en su marco o, sin foto, el dibujo genérico de la categoría, que para lectores de pantalla sigue siendo «Ilustración genérica».
 
 Con una foto elegida, en iOS 17+ con la build de desarrollo aparece **Quitar fondo** (se hace en el teléfono; la foto no se envía). El resultado se ve en la vista previa; **Usar original** lo descarta. La cuadrícula, Hoy y el perchero prefieren el recorte. [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md).
 
-Ocasiones, abrigo, lluvia y estilos quedan en **Más detalles**, plegado y con un resumen de los valores actuales. El abrigo inicial depende de la categoría hasta que la persona elige uno. **Disponible** solo aparece al editar: una prenda nueva se agrega disponible y el clóset ya permite cambiarlo. No se añaden campos que el recomendador no use (marca, talla, material); cada uno es fricción sin efecto en las sugerencias.
+**Más detalles** va plegado y con un resumen de los valores actuales. El abrigo inicial depende de la categoría hasta que la persona elige uno. **Disponible** solo aparece al editar: una prenda nueva se agrega disponible y el clóset ya permite cambiarlo. No se añaden campos que el recomendador no use (marca, talla, material); cada uno es fricción sin efecto en las sugerencias.
 
 ## Texto e ilustraciones
 

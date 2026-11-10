@@ -11,7 +11,8 @@ export interface ColorChoices {
   excludedColors: string[];
 }
 
-const DARK_SWATCHES = ['negro', 'azul', 'cafe', 'rojo', 'morado'];
+/** Swatches dark enough to need a light check mark on them. */
+export const DARK_SWATCHES = ['negro', 'azul', 'cafe', 'rojo', 'morado'];
 
 /** A color is either preferred or avoided; choosing it in one group removes it from the other. */
 export function ColorPicker({
