@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { occasionLabels, type Context } from '../domain';
 import type { LocalData } from '../storage/local';
 import type { useWeather } from '../weather/useWeather';
-import { Button, useUI } from './ui';
+import { useUI } from './ui';
 
 type Weather = ReturnType<typeof useWeather>;
 
@@ -47,44 +47,43 @@ export function WeatherPill({
   );
 }
 
-/** How fresh the automatic weather is and a way to refresh it; the manual one needs no status. */
-export function WeatherStatus({
-  data,
-  context,
-  weather,
-}: {
-  data: LocalData;
-  context: Context;
-  weather: Weather;
-}) {
-  const { palette, s } = useUI();
-  const automatic = weather.effective?.source === 'automatic';
-  const place = weather.effective?.context.city || data.context.city;
+/**
+ * Shown only while automatic weather has no recent data: says the manual one is in use and lets
+ * the person ask again. With recent data the pill already says everything.
+ */
+export function WeatherNotice({ weather }: { weather: Weather }) {
+  const { palette } = useUI();
+  if (weather.effective?.source === 'automatic') return null;
+  const failed = !weather.loading && !!weather.error;
   return (
-    <View style={styles.status}>
-      <Text style={[s.subtitle, { fontSize: 11 }]}>
-        {automatic
-          ? `${place ? `${place} · ` : ''}Sensación ${Math.round(context.temperatureC)}° · ${context.raining ? 'Con precipitación' : 'Sin precipitación'} · Actualizado ${new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit' }).format(new Date(data.weather.snapshot!.fetchedAt))}`
-          : weather.loading
-            ? 'Consultando clima. Por ahora se usa el manual.'
-            : 'Sin clima reciente. Se usa el manual de respaldo.'}
+    <View style={styles.notice}>
+      <Text
+        accessibilityRole={failed ? 'alert' : undefined}
+        style={{
+          flex: 1,
+          fontSize: 12,
+          lineHeight: 18,
+          color: failed ? palette.rust : palette.muted,
+        }}
+      >
+        {weather.loading
+          ? 'Consultando el clima. Mientras, se usa el manual.'
+          : `${weather.error || 'Sin clima reciente.'} Se usa el clima manual.`}
       </Text>
-      {weather.error ? (
-        <Text
-          accessibilityRole="alert"
-          style={{ color: palette.rust, fontSize: 12 }}
+      {weather.loading ? null : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Actualizar clima"
+          onPress={weather.refresh}
+          style={styles.link}
         >
-          {weather.error}
-        </Text>
-      ) : null}
-      <Button
-        small
-        secondary
-        label={weather.loading ? 'Actualizando…' : 'Actualizar clima'}
-        disabled={weather.loading}
-        onPress={weather.refresh}
-        style={{ alignSelf: 'flex-start' }}
-      />
+          <Text
+            style={{ fontSize: 13, fontWeight: '600', color: palette.rust }}
+          >
+            Actualizar
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -99,5 +98,11 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
   },
-  status: { marginTop: 22, gap: 8 },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
+  link: { minHeight: 44, justifyContent: 'center' },
 });

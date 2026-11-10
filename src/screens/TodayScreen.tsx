@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import type { LocalData } from '../storage/local';
 import type { useWeather } from '../weather/useWeather';
 import type { UpdateData } from '../hooks/useLocalData';
@@ -12,7 +12,8 @@ import {
   ExploreToggle,
 } from '../components/style-goal/ExploreControl';
 import { OutfitDeck } from '../components/today/OutfitDeck';
-import { WeatherPill, WeatherStatus } from '../components/WeatherCard';
+import { WearMoreNudge } from '../components/today/WearMoreNudge';
+import { WeatherNotice, WeatherPill } from '../components/WeatherCard';
 import { Button, useUI } from '../components/ui';
 import { withoutDemo, type OutfitActions } from './actions';
 
@@ -78,7 +79,7 @@ export function TodayScreen(props: TodayScreenProps) {
       )}
       <ExploreGaps data={data} context={recs.context} />
       {data.weather.mode === 'automatic' ? (
-        <WeatherStatus data={data} context={recs.context} weather={weather} />
+        <WeatherNotice weather={weather} />
       ) : null}
     </>
   );
@@ -119,41 +120,50 @@ function Recommendations({
         trailing={<ExploreToggle data={data} update={update} />}
       />
       {wearMore ? (
-        <Button
-          secondary
-          label={`Otra vuelta · ${wearMore.name}`}
-          onPress={() => onCombine(wearMore.id)}
-          style={{ marginTop: 16 }}
-        />
+        <WearMoreNudge item={wearMore} onPress={() => onCombine(wearMore.id)} />
       ) : null}
       {ai.enabled ? <AiChoiceControl choice={ai} /> : null}
     </>
   );
 }
 
+/** A quiet link: the idea on screen stays the protagonist. A choice made by AI always says so. */
 function AiChoiceControl({
   choice,
 }: {
   choice: ReturnType<typeof useAiOutfitChoice>;
 }) {
-  const { s } = useUI();
+  const { palette, s } = useUI();
+  const note = [s.subtitle, { fontSize: 12 }];
+  const pending = choice.status === 'pending';
+  if (choice.status === 'ready')
+    return (
+      <Text accessibilityLiveRegion="polite" style={[note, { marginTop: 12 }]}>
+        Propuesta principal elegida con IA.
+      </Text>
+    );
   return (
-    <View style={{ marginTop: 12 }}>
-      <Button
-        secondary
-        small
-        label={choice.status === 'pending' ? 'Consultando…' : 'Elegir con IA'}
-        disabled={choice.status === 'pending' || choice.status === 'ready'}
+    <View style={[s.row, { marginTop: 4, gap: 12 }]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: pending }}
+        disabled={pending}
         onPress={() => void choice.request()}
-      />
-      {choice.status === 'ready' ? (
-        <Text accessibilityLiveRegion="polite" style={s.subtitle}>
-          Propuesta principal elegida con IA.
+        style={{ minHeight: 44, justifyContent: 'center' }}
+      >
+        <Text
+          style={{
+            fontSize: 13,
+            fontWeight: '600',
+            color: pending ? palette.muted : palette.rust,
+          }}
+        >
+          {pending ? 'Consultando…' : 'Elegir con IA'}
         </Text>
-      ) : null}
+      </Pressable>
       {choice.status === 'failed' ? (
-        <Text accessibilityRole="alert" style={s.subtitle}>
-          No se pudo consultar la IA. Puedes seguir con estas opciones.
+        <Text accessibilityRole="alert" style={[note, { flex: 1 }]}>
+          No se pudo consultar la IA.
         </Text>
       ) : null}
     </View>

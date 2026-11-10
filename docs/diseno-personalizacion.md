@@ -92,9 +92,17 @@ Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportac
 
 ## Hoy como mesa de stickers
 
-Las tres pestañas abren directo en su contenido, sin barra de marca; el gancho queda en la bienvenida, el onboarding y la pantalla de carga. Hoy abre en el outfit. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático, la hora del dato, Open-Meteo y **Actualizar clima** quedan al final de la pantalla.
+Las tres pestañas abren directo en su contenido, sin barra de marca; el gancho queda en la bienvenida, el onboarding y la pantalla de carga. Hoy abre en el outfit. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático y dato reciente no hay nada más que decir: la app lo renueva sola. Solo cuando falta el dato aparece, bajo las acciones, una línea sin personaje que dice por qué y que se usa el clima manual, con **Actualizar** al lado.
 
-Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre un fondo de puntos, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista. **Otra vuelta** y **Elegir con IA** quedan debajo, como acciones secundarias.
+Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre un fondo de puntos, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista.
+
+Bajo esas acciones queda lo menos posible, y nada con forma de botón que compita con la principal ([TodayScreen.tsx](../src/screens/TodayScreen.tsx)):
+
+- **Otra vuelta** es una fila con la prenda que la persona quiere usar más como sticker pequeño, su nombre y una flecha; abre Combínala ([WearMoreNudge.tsx](../src/components/today/WearMoreNudge.tsx)). Sin prenda marcada no aparece.
+- **Elegir con IA**, que solo existe en desarrollo, es un enlace de texto. Mientras consulta dice «Consultando…»; si la IA eligió, lo dice en una línea; si falló, también.
+- El aviso de clima descrito arriba, solo cuando falta el dato.
+
+Con clima manual y sin prenda marcada, la pantalla termina en **Hoy me lo puse**.
 
 | Prenda | Sticker |
 |---|---|

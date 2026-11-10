@@ -464,3 +464,15 @@ Expo web con ventana de 375 × 812 en `127.0.0.1:8093` (capturas reducidas por e
 Simulador iPhone 17 Pro (iOS 26.5): Mi estilo con el botón junto al título y [la hoja Ajustes](evidence/ios-ajustes-iphone17pro.jpg) hasta el final, con Vibración visible; se cerró sin cambiar nada.
 
 Sin verificar: cambiar un ajuste en iOS, abrir el enlace de crédito, Papel, Salvia, Chicle y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.
+
+## 10/11/2026 — Hoy: menos cosas bajo el botón
+
+Bajo **Hoy me lo puse** había un botón «Otra vuelta», un botón «Elegir con IA» y, con clima automático, un bloque fijo con ciudad, sensación, precipitación, hora del dato y un botón «Actualizar clima». Ahora, según [la guía](diseno-personalizacion.md#hoy-como-mesa-de-stickers): Otra vuelta es una fila con la prenda como sticker; Elegir con IA es un enlace de texto; y el clima solo aparece cuando falta el dato, en una línea con **Actualizar**. La píldora del título sigue diciendo «manual» cuando se usa el respaldo. No cambian las sugerencias ni lo que se guarda.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
+
+Expo web a 375 × 812 en `127.0.0.1:8093`, con dos prendas del clóset de ejemplo marcadas para usar más y luego desmarcadas: la fila Otra vuelta abre Combínala con el Vestido blanco fijo; Elegir con IA con el servidor local apagado pasa a «No se pudo consultar la IA.» y se puede reintentar; con Automático en Puebla y las llamadas al servicio de clima bloqueadas desde la consola, la píldora dice «22° manual» y aparece [el aviso con Actualizar](evidence/hoy-bajo-el-boton-sin-clima-web-375.jpg); al desbloquearlas y pulsar Actualizar, la píldora pasa a 24° sin «manual» y el aviso desaparece. [Medianoche con dato reciente](evidence/hoy-bajo-el-boton-medianoche-web-375.jpg). El origen de pruebas volvió a Lino, clima manual y sin prendas marcadas.
+
+Simulador iPhone 17 Pro (iOS 26.5): con clima manual y sin prenda marcada, la pantalla termina en el botón principal. Se marcó «Quiero usarla más» en el Vestido blanco de ejemplo desde el formulario nuevo: [aparece la fila Otra vuelta](evidence/ios-hoy-otra-vuelta-iphone17pro.jpg) y abre Combínala; después se desmarcó y la fila desapareció. De paso quedó comprobado editar una prenda existente con el formulario de stickers y muestras.
+
+Sin verificar: el aviso de clima en Medianoche y en iOS, Elegir con IA con el servidor encendido y en iOS (necesita `EXPO_PUBLIC_AI_API_URL`), Otra vuelta con una foto propia, Papel, Salvia, Chicle y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.
