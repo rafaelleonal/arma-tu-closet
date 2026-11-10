@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { OCCASIONS, occasionLabels } from '../../domain';
-import { AppearanceSettings } from '../AppearanceSettings';
+import { ThemeRow } from '../AppearanceSettings';
 import { Button, Chip, FieldLabel, useUI } from '../ui';
 import { FirstOutfitPreview } from './FirstOutfitPreview';
 import { Guide } from './Guide';
@@ -36,8 +36,8 @@ export function AppearanceStep({
           />
         ))}
       </View>
-      <FieldLabel>Apariencia</FieldLabel>
-      <AppearanceSettings
+      <FieldLabel>Tema</FieldLabel>
+      <ThemeRow
         bleed={24}
         value={data.appearance}
         onChange={(appearance) => onChange({ appearance })}
@@ -57,13 +57,10 @@ export function AppearanceStep({
               color: palette.ink,
               fontSize: 20,
               letterSpacing: -0.5,
-              marginBottom: 10,
+              marginBottom: 16,
             }}
           >
             ¿Con qué ropa empezamos?
-          </Text>
-          <Text style={[s.subtitle, { fontSize: 12, marginBottom: 17 }]}>
-            El ejemplo contiene prendas ficticias.
           </Text>
           <Button
             label="Vamos con mi ropa"
@@ -78,14 +75,6 @@ export function AppearanceStep({
           />
         </View>
       )}
-      <Text
-        style={[
-          s.subtitle,
-          { fontSize: 10, textAlign: 'center', marginTop: 21 },
-        ]}
-      >
-        Datos solo en este dispositivo.
-      </Text>
     </>
   );
 }

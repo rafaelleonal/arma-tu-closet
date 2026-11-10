@@ -75,9 +75,6 @@ export function ColorPicker({
           />
         ))}
       </View>
-      <Text style={[s.subtitle, { marginTop: 19, fontSize: 11 }]}>
-        Elegir un color lo quita del otro grupo.
-      </Text>
     </>
   );
 }

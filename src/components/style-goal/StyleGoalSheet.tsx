@@ -102,8 +102,7 @@ export function StyleGoalSheet({
         </>
       ) : (
         <Text style={[s.subtitle, { fontSize: 12 }]}>
-          Compara colores junto a tu cara para saber cuáles te van mejor. Tu
-          foto no sale del teléfono.
+          Compara colores junto a tu cara. Tu foto no sale del teléfono.
         </Text>
       )}
       <Button

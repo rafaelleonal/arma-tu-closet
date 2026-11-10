@@ -506,3 +506,30 @@ Para verlo a medio camino se alargó la duración a 40 s en la copia de trabajo 
 Simulador iPhone 17 Pro (iOS 26.5): [Hoy a medias](evidence/ios-stickers-entrada-a-medias-iphone17pro.jpg) con el driver nativo; a velocidad real, tocar un sticker ya asentado abre su hoja Cambiar.
 
 Sin verificar: Reducir movimiento activado, la fluidez real en un teléfono (el simulador no la representa), el álbum y Armar outfit en iOS, un clóset de 400 prendas en el teléfono, Android, VoiceOver y teclado.
+
+## 10/11/2026 — Auditoría de texto en toda la app
+
+Se aplicó a todas las pantallas y hojas el criterio con el que se simplificó Clima y ocasión, ahora escrito en [la guía](diseno-personalizacion.md#texto-e-ilustraciones). No cambia el dominio, lo que se guarda ni ningún aviso de privacidad.
+
+| Dónde | Antes | Ahora |
+|---|---|---|
+| Onboarding, paso 4 | Temas, Vista, Explicaciones y Vibración; «El ejemplo contiene prendas ficticias.»; «Datos solo en este dispositivo.» | Solo **Tema**. El ejemplo sigue identificado en la etiqueta del collage y en el botón; la frase de datos ya está en la bienvenida y en Ajustes. |
+| Colores (onboarding y Mi estilo) | «Elegir un color lo quita del otro grupo.» | Se quitó; cada muestra ya dice «Lo evitas» o «Te gusta». |
+| Editor · foto | «Se mostrará sin fondo. La foto original se conserva.» + **Usar original** | Solo el botón **Usar la foto con fondo**. |
+| Editor · analizar | Aviso de envío a OpenAI + «Es opcional; puedes completar los datos a mano.»; durante el análisis, «Puedes seguir editando a mano. El análisis no cambiará el formulario.» | Queda el aviso de envío, completo. Durante el análisis, solo **Cancelar análisis**. |
+| Editor · revisar análisis | «Todavía no se aplicó al formulario. Corrige lo que haga falta.» y, al pie, «Aplicar reemplaza nombre, categoría y colores. Después debes guardar la prenda.» | «Corrige lo que haga falta antes de aplicarlo.» |
+| Editor · Más detalles | «Afinan las sugerencias. Puedes dejarlos como están.» | Se quitó. |
+| Cambiar | «En lugar de X. Solo prendas disponibles, sin los colores que evitas.» | «En lugar de X.» Sin opciones: «No hay otra disponible sin los colores que evitas. Agrega una en Mi clóset.», y la parte de los colores solo si la persona evita alguno. |
+| Combínala | «X se queda. Toca otra prenda para cambiarla.» | «X se queda.» |
+| Tu outfit (guardado) | «Guardado con los detalles originales. Revisa disponibilidad y clima antes de usarlo.» | «Guardado tal como estaba; no considera el clima de hoy.» La disponibilidad se sigue comprobando al confirmar el uso. |
+| Hoy sin ideas | Mensaje + «Agrega ropa o ajusta tus gustos y armo otros.» + dos botones | Mensaje + los dos botones, que ya dicen eso. |
+| Aviso al elegir el ejemplo | «Listo, ya puedes ver el clóset de ejemplo. Quítalo cuando agregues tu ropa.» | «Listo, este es el clóset de ejemplo.» |
+| Colorimetría y Cambiar mi estilo | Dos frases de presentación | Una; «Tu foto no sale del teléfono» se conserva. |
+
+Revisados y sin cambio: bienvenida, pasos 1 a 3, Hoy, Mi clóset y su vacío, Ajustes, Clima y ocasión, Armar outfit, los consejos de la selfie, el aviso de ubicación y los errores de carga y guardado.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (103 pruebas) aprobados.
+
+Expo web a 375 × 812 en `localhost:8093`, con un origen recién creado: [paso 4 de primera vez](evidence/onboarding-paso4-solo-tema-web-375.jpg), elegir el clóset de ejemplo, Cambiar con y sin opciones, Colores sin la nota, un outfit guardado con su aviso de una línea y el editor de una prenda existente. Simulador iPhone 17 Pro (iOS 26.5): Hoy abre y la hoja Cambiar muestra «En lugar de Camisa de mezclilla.» sobre el álbum.
+
+Sin verificar: los textos del análisis de foto y su revisión (hace falta el servidor local con clave), quitar fondo y **Usar la foto con fondo** (necesita una foto propia en el teléfono), Combínala, Hoy sin ideas, la colorimetría, el paso 4 en iOS, un teléfono real, Android y VoiceOver.

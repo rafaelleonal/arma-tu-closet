@@ -55,7 +55,7 @@ function Intro({
         title="Tu colorimetría"
       />
       <Text style={[s.subtitle, { fontSize: 14 }]}>
-        Son 9 comparaciones rápidas, como en una prueba con telas.
+        Son 9 comparaciones rápidas.
       </Text>
       <View style={[s.panel, { marginTop: 16 }]}>
         {TIPS.map((tip) => (

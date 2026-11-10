@@ -183,9 +183,6 @@ function NoOutfits({ data, update, recs, onTab }: TodayScreenProps) {
             ? 'Ya no tengo más ideas para hoy.'
             : recs.result.message}
         </Text>
-        <Text style={[s.subtitle, { marginTop: 12 }]}>
-          Agrega ropa o ajusta tus gustos y armo otros.
-        </Text>
         <View style={[s.row, { marginTop: 22, flexWrap: 'wrap' }]}>
           <Button label="Ir a mi clóset" onPress={() => onTab('closet')} />
           {data.dislikedOutfitIds.length ? (

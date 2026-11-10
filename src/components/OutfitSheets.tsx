@@ -21,8 +21,8 @@ export interface SwapTarget {
 
 /** Header, a bubble of three lines, the gap under the table, the actions and the padding. */
 const AROUND_STAGE = 310;
-/** The note that a saved outfit keeps its original details. */
-const SAVED_NOTE = 54;
+/** The one-line note that a saved outfit ignores today's weather. */
+const SAVED_NOTE = 36;
 
 export function OutfitSheet({
   data,
@@ -53,8 +53,7 @@ export function OutfitSheet({
     <Sheet title="Tu outfit" onClose={onClose}>
       {saved ? (
         <Text style={[s.subtitle, { fontSize: 12, marginBottom: 14 }]}>
-          Guardado con los detalles originales. Revisa disponibilidad y clima
-          antes de usarlo.
+          Guardado tal como estaba; no considera el clima de hoy.
         </Text>
       ) : null}
       {saveError ? (
@@ -111,10 +110,9 @@ export function SwapSheet({
       title={`Cambiar · ${categoryLabels[swap.category]}`}
       onClose={onClose}
     >
-      <Text style={s.subtitle}>
-        {current ? `En lugar de ${current.name}. ` : ''}
-        Solo prendas disponibles, sin los colores que evitas.
-      </Text>
+      {current && options.length ? (
+        <Text style={s.subtitle}>En lugar de {current.name}.</Text>
+      ) : null}
       {options.length ? (
         <StickerAlbum
           items={options}
@@ -132,8 +130,13 @@ export function SwapSheet({
           }
         />
       ) : (
-        <Text style={[s.subtitle, { marginTop: 20 }]}>
-          No hay otra prenda disponible. Agrega una en Mi clóset.
+        // The rule about colors is said only when it may be why nothing is left to choose.
+        <Text style={s.subtitle}>
+          No hay otra disponible
+          {data.preferences.excludedColors.length
+            ? ' sin los colores que evitas'
+            : ''}
+          . Agrega una en Mi clóset.
         </Text>
       )}
     </Sheet>

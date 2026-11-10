@@ -33,7 +33,7 @@ export function GarmentSuggestionReview({
         Revisar análisis
       </Text>
       <Text style={[s.subtitle, { fontSize: 12 }]}>
-        Todavía no se aplicó al formulario. Corrige lo que haga falta.
+        Corrige lo que haga falta antes de aplicarlo.
       </Text>
       <FieldLabel>Nombre propuesto</FieldLabel>
       <TextInput
@@ -107,10 +107,6 @@ export function GarmentSuggestionReview({
         style={{ marginTop: 8 }}
         onPress={onDismiss}
       />
-      <Text style={[s.subtitle, { fontSize: 11, marginTop: 12 }]}>
-        Aplicar reemplaza nombre, categoría y colores. Después debes guardar la
-        prenda.
-      </Text>
     </View>
   );
 }

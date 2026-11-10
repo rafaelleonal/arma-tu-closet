@@ -99,17 +99,12 @@ function CutoutControls({ photo }: { photo: GarmentPhoto }) {
   return (
     <View style={{ marginTop: 14 }}>
       {photo.cutoutUri ? (
-        <View style={[s.row, { justifyContent: 'space-between' }]}>
-          <Text style={[s.subtitle, { fontSize: 12, flex: 1 }]}>
-            Se mostrará sin fondo. La foto original se conserva.
-          </Text>
-          <Button
-            secondary
-            small
-            label="Usar original"
-            onPress={photo.keepOriginal}
-          />
-        </View>
+        <Button
+          secondary
+          small
+          label="Usar la foto con fondo"
+          onPress={photo.keepOriginal}
+        />
       ) : (
         <>
           <Button
@@ -146,7 +141,6 @@ function AnalysisControls({ photo }: { photo: GarmentPhoto }) {
     <View style={{ marginTop: 18 }}>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
         Se enviará esta foto a OpenAI para proponer nombre, categoría y colores.
-        Es opcional; puedes completar los datos a mano.
       </Text>
       <Button
         secondary
@@ -155,22 +149,13 @@ function AnalysisControls({ photo }: { photo: GarmentPhoto }) {
         onPress={() => void photo.analyze()}
       />
       {photo.analyzing ? (
-        <>
-          <Text
-            accessibilityLiveRegion="polite"
-            style={[s.subtitle, { fontSize: 11, marginTop: 10 }]}
-          >
-            Puedes seguir editando a mano. El análisis no cambiará el
-            formulario.
-          </Text>
-          <Button
-            secondary
-            small
-            label="Cancelar análisis"
-            onPress={photo.cancelAnalysis}
-            style={{ marginTop: 8 }}
-          />
-        </>
+        <Button
+          secondary
+          small
+          label="Cancelar análisis"
+          onPress={photo.cancelAnalysis}
+          style={{ marginTop: 8 }}
+        />
       ) : null}
       <ErrorText message={photo.analysisError} />
       {photo.analysisNotice ? (

@@ -29,9 +29,9 @@ En el primer arranque, antes del paso 1, la bienvenida muestra las prendas salud
 | 1. Hola | Nombre opcional y qué le cuesta más al vestirse. | La respuesta no se guarda. Cada opción responde con lo que la app hace de verdad: «Nunca le atino al clima» muestra la ciudad y «Quiero cambiar de estilo» activa **Algo nuevo** al elegir un objetivo. La ubicación se pide solo al pulsar **Usar mi ubicación**. |
 | 2. Tu estilo | Hasta tres estilos actuales y hasta tres a los que quiere acercarse. | Se puede continuar sin elegir. No convertir estilos en identidades fijas. |
 | 3. Colores | Preferir y evitar, ambos opcionales. | Una misma opción no puede quedar en ambos grupos. Explicar que evitar un color puede reducir las combinaciones. |
-| 4. Tu conjunto | Ve un conjunto con lo que eligió, ocasión habitual, apariencia y clóset propio o demo. | Con clóset vacío usa prendas de ejemplo identificadas y no las escribe en el documento. Elecciones explícitas «Vamos con mi ropa» y «Ver el clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
+| 4. Tu conjunto | Ve un conjunto con lo que eligió, ocasión habitual, tema y clóset propio o demo. | Con clóset vacío usa prendas de ejemplo identificadas y no las escribe en el documento. Elecciones explícitas «Vamos con mi ropa» y «Ver el clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
 
-La rotación ya no se pregunta aquí: parte de 3 días y se cambia en Mi estilo → Ajustes.
+La rotación ya no se pregunta aquí: parte de 3 días y se cambia en Mi estilo → Ajustes. Tampoco la vista, las explicaciones ni la vibración: el paso 4 pide solo el tema, y lo demás vive en Ajustes con un valor inicial razonable.
 
 Mostrar «n de 4», acción principal y «Atrás». Las elecciones anteriores se conservan al volver. No bloquear por nombre, estilo o ciudad vacíos; no añadir una pantalla obligatoria de confirmación. Sin ciudad, el clima sigue siendo manual.
 
@@ -154,7 +154,7 @@ Las hojas siguen la misma base que las pestañas: la prenda como sticker sobre e
 
 | Hoja | Qué muestra |
 |---|---|
-| **Tu outfit** | La misma mesa de Hoy con una sola idea: burbuja con los motivos, stickers que abren su cambio, Guardar y **Hoy me lo puse**. Sin **Prefiero otro**, porque no hay otra idea que la reemplace. Un guardado conserva su aviso de detalles originales. |
+| **Tu outfit** | La misma mesa de Hoy con una sola idea: burbuja con los motivos, stickers que abren su cambio, Guardar y **Hoy me lo puse**. Sin **Prefiero otro**, porque no hay otra idea que la reemplace. Un guardado avisa en una línea que se muestra tal como estaba y no considera el clima de hoy. |
 | **Cambiar** | Un álbum de stickers de tres columnas con las prendas que pueden entrar. Arriba dice a cuál reemplazan y que solo hay prendas disponibles, sin los colores que la persona evita. |
 | **Combínala** | Las ideas en páginas, como en Hoy. La prenda elegida lleva la etiqueta invertida y no se toca; las demás abren su cambio. Al cerrar un cambio se vuelve a la idea que estaba a la vista. |
 | **Armar outfit** | Arriba, fija, una mesa pequeña con el outfit que se va formando: un sticker por prenda elegida y un hueco punteado con el nombre de cada categoría obligatoria que falta. Debajo, cada categoría es una fila de stickers que se desliza; tocar uno lo elige o lo quita, y el elegido lleva una palomita. **Guardar outfit** va al pie; si falta algo, dice qué categoría. |
@@ -174,13 +174,20 @@ El nombre es opcional y vive en **Más detalles**, junto a las ocasiones, el abr
 
 La vista previa es un sticker sobre el fondo de puntos: el recorte con borde, la foto en su marco o, sin foto, el dibujo genérico de la categoría, que para lectores de pantalla sigue siendo «Ilustración genérica».
 
-Con una foto elegida, en iOS 17+ con la build de desarrollo aparece **Quitar fondo** (se hace en el teléfono; la foto no se envía). El resultado se ve en la vista previa; **Usar original** lo descarta. La cuadrícula, Hoy y el perchero prefieren el recorte. [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md).
+Con una foto elegida, en iOS 17+ con la build de desarrollo aparece **Quitar fondo** (se hace en el teléfono; la foto no se envía). El resultado se ve en la vista previa; **Usar la foto con fondo** lo descarta. El álbum y Hoy prefieren el recorte. [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md).
 
 **Más detalles** va plegado y con un resumen de los valores actuales. El abrigo inicial depende de la categoría hasta que la persona elige uno. **Disponible** solo aparece al editar: una prenda nueva se agrega disponible y el clóset ya permite cambiarlo. No se añaden campos que el recomendador no use (marca, talla, material); cada uno es fricción sin efecto en las sugerencias.
 
 ## Texto e ilustraciones
 
-Usar títulos, acciones y ayudas breves. Se retiraron eslóganes, títulos promocionales de conjuntos y descripciones decorativas de estilos y temas. Los errores, restricciones y advertencias que ayudan a decidir permanecen visibles.
+Usar títulos, acciones y ayudas breves. Antes de dejar una frase en pantalla, pasarla por estas preguntas, que salieron de simplificar Clima y ocasión y se aplicaron después a toda la app:
+
+1. **¿Cambia lo que la persona hace o lo que recibe?** Si solo explica cómo funciona por dentro («Elegir un color lo quita del otro grupo», «El análisis no cambiará el formulario»), sobra.
+2. **¿Lo dice ya un control?** Una etiqueta, un botón o un estado visible sustituyen a la frase («Lo evitas» en la muestra, la prenda fija con su etiqueta invertida).
+3. **¿Se pide algo que el resultado no usa, o que tiene un valor inicial razonable?** Entonces no se pregunta en el recorrido principal; va a Ajustes o no va.
+4. **¿La regla solo importa en un caso?** Se dice en ese caso: la hoja Cambiar nombra los colores evitados solo cuando no queda nada que elegir y la persona evita alguno.
+
+Se quedan, aunque sean texto: permisos y privacidad (qué foto sale del teléfono y a quién), que un clima es manual, que algo es de ejemplo, los errores que afectan datos y los créditos que exige una licencia. Se retiraron eslóganes, títulos promocionales de conjuntos y descripciones decorativas de estilos y temas. Los errores, restricciones y advertencias que ayudan a decidir permanecen visibles.
 
 Las nueve ilustraciones de prendas siguen las referencias de Café Sinónimo aportadas por el usuario: una tinta, trazo redondo e irregular, espacios transparentes y caras pequeñas. Comparten recursos entre el clóset, los conjuntos y las vistas de apariencia. La tinta adapta el dibujo al tema; las muestras de color describen la prenda. Las fotos se muestran sin tintado.
 

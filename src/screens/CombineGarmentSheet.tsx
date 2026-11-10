@@ -98,7 +98,7 @@ export function CombineGarmentSheet({
         <>
           {item ? (
             <Text style={[s.subtitle, { marginBottom: 14 }]}>
-              {item.name} se queda. Toca otra prenda para cambiarla.
+              {item.name} se queda.
             </Text>
           ) : null}
           <OutfitDeck

@@ -103,7 +103,7 @@ export function HomeShell(props: HomeShellProps) {
                 onManual={() => setManualOpen(true)}
                 onDemoReady={() =>
                   autosave.noticeAfterSave(
-                    'Listo, ya puedes ver el clóset de ejemplo. Quítalo cuando agregues tu ropa.',
+                    'Listo, este es el clóset de ejemplo.',
                   )
                 }
               />

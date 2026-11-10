@@ -113,9 +113,6 @@ export function DetailsSection({
       {open ? null : errorText(occasionError)}
       {open ? (
         <>
-          <Text style={[s.subtitle, { fontSize: 12 }]}>
-            Afinan las sugerencias. Puedes dejarlos como están.
-          </Text>
           {name}
           <FieldLabel>¿Para qué la usas?</FieldLabel>
           <View style={s.wrap}>

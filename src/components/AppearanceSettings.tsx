@@ -28,47 +28,58 @@ export interface AppearanceSettingsProps {
   bleed?: number;
 }
 
-/** These are rendered app elements in each palette, not screenshots. */
+/** The themes in a row that scrolls; each card is a small Hoy screen drawn in its palette. */
+export function ThemeRow({
+  value,
+  onChange,
+  bleed = 0,
+}: AppearanceSettingsProps) {
+  const themes = useRef<ScrollViewInstance>(null);
+  const placed = useRef(false);
+  return (
+    <ScrollView
+      ref={themes}
+      horizontal
+      // Opens on the theme in use, with a little of the one before it in view.
+      onLayout={() => {
+        if (placed.current) return;
+        placed.current = true;
+        const index = THEME_OPTIONS.findIndex(
+          (option) => option.id === value.themeId,
+        );
+        if (index > 0)
+          themes.current?.scrollTo({
+            x: index * (CARD_WIDTH + CARD_GAP) - CARD_PEEK,
+            animated: false,
+          });
+      }}
+      showsHorizontalScrollIndicator={false}
+      style={{ marginHorizontal: -bleed }}
+      contentContainerStyle={{ gap: CARD_GAP, paddingHorizontal: bleed }}
+    >
+      {THEME_OPTIONS.map((option) => (
+        <ThemeCard
+          key={option.id}
+          option={option}
+          selected={value.themeId === option.id}
+          value={value}
+          onSelect={() => onChange({ ...value, themeId: option.id })}
+        />
+      ))}
+    </ScrollView>
+  );
+}
+
+/** Theme, layout, reasons and haptics: what Ajustes offers about how the app looks and feels. */
 export function AppearanceSettings({
   value,
   onChange,
   bleed = 0,
 }: AppearanceSettingsProps) {
   const { s, palette } = useUI();
-  const themes = useRef<ScrollViewInstance>(null);
-  const placed = useRef(false);
   return (
     <View>
-      <ScrollView
-        ref={themes}
-        horizontal
-        // Opens on the theme in use, with a little of the one before it in view.
-        onLayout={() => {
-          if (placed.current) return;
-          placed.current = true;
-          const index = THEME_OPTIONS.findIndex(
-            (option) => option.id === value.themeId,
-          );
-          if (index > 0)
-            themes.current?.scrollTo({
-              x: index * (CARD_WIDTH + CARD_GAP) - CARD_PEEK,
-              animated: false,
-            });
-        }}
-        showsHorizontalScrollIndicator={false}
-        style={{ marginHorizontal: -bleed }}
-        contentContainerStyle={{ gap: CARD_GAP, paddingHorizontal: bleed }}
-      >
-        {THEME_OPTIONS.map((option) => (
-          <ThemeCard
-            key={option.id}
-            option={option}
-            selected={value.themeId === option.id}
-            value={value}
-            onSelect={() => onChange({ ...value, themeId: option.id })}
-          />
-        ))}
-      </ScrollView>
+      <ThemeRow value={value} onChange={onChange} bleed={bleed} />
       <FieldLabel>Vista</FieldLabel>
       <View style={s.wrap}>
         <Chip
