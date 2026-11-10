@@ -46,6 +46,15 @@ const RING = [
   [0, -1],
   [0.71, -0.71],
 ] as const;
+/** Four diagonal copies are enough for a thin border and keep a long album light. */
+const THIN_RING = [
+  [1, 1],
+  [-1, 1],
+  [-1, -1],
+  [1, -1],
+] as const;
+/** From this size up the border is thick enough to need the full ring. */
+const LARGE = 140;
 const FALLBACK_ASPECT = 0.8;
 
 // iOS has no drop-shadow filter; its view shadow follows the picture when there is no background.
@@ -119,23 +128,25 @@ function CutoutSticker({
   };
   return (
     <View style={[lifted, box, style]}>
-      {RING.map(([x, y]) => (
-        <Image
-          key={`${x},${y}`}
-          accessible={false}
-          source={source}
-          resizeMode="contain"
-          style={[
-            styles.layer,
-            picture,
-            {
-              left: edge + x * edge,
-              top: edge + y * edge,
-              tintColor: PAPER,
-            },
-          ]}
-        />
-      ))}
+      {(Math.min(maxWidth, maxHeight) < LARGE ? THIN_RING : RING).map(
+        ([x, y]) => (
+          <Image
+            key={`${x},${y}`}
+            accessible={false}
+            source={source}
+            resizeMode="contain"
+            style={[
+              styles.layer,
+              picture,
+              {
+                left: edge + x * edge,
+                top: edge + y * edge,
+                tintColor: PAPER,
+              },
+            ]}
+          />
+        ),
+      )}
       <Image
         accessible={false}
         source={source}

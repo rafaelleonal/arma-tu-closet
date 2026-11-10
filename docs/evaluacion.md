@@ -324,3 +324,15 @@ Rediseño de Mi estilo según [la guía](diseno-personalizacion.md#mi-estilo-com
 Recorrido en navegador con Expo web en `127.0.0.1:8093`, clóset de ejemplo y un nombre sintético, a 375 × 812: [tablero en Lino](evidence/mi-estilo-tablero-lino-web-375.jpg) y [en Medianoche](evidence/mi-estilo-tablero-medianoche-web-375.jpg), huecos punteados sin estilos, abrir un guardado, abrir Cambiar mi estilo, abrir Editar preferencias y su paso de colores con el selector compartido, marcar y desmarcar un color con el documento guardado, cambiar de tema, y 320 × 640 sin desborde horizontal. Mi clóset se ve completo sin la barra.
 
 Sin verificar: iOS y Android, deslizar las filas con el dedo, guardados creados a mano o con fotos propias, muchos guardados, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.
+
+## 9/11/2026 — Mi clóset como álbum de stickers
+
+La cuadrícula de ropa propia pasa a ser un álbum de stickers y el clóset vacío usa la burbuja y tres stickers de dibujo, según [la guía](diseno-personalizacion.md#mi-clóset-como-perchero). El perchero del clóset de ejemplo no cambia. La burbuja de Hoy se extrajo a un componente compartido.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados. No hay pruebas nuevas: el cambio es de presentación.
+
+Recorrido en navegador con Expo web en `127.0.0.1:8093` a 375 × 812, con los clósets de prueba de desarrollo: [peor caso](evidence/closet-album-peor-caso-web-375.jpg) con nombres largos y prendas en lavandería, [vacío](evidence/closet-vacio-web-375.jpg) y 400 prendas sin desborde horizontal. Con el clóset de ejemplo más una prenda propia sin foto añadida al documento de QA: stickers de foto recortada con borde, [Medianoche](evidence/closet-album-medianoche-web-375.jpg), filtro por categoría y abrir el editor al tocar. Esa prenda se retiró después y el clóset de ejemplo volvió a mostrar el perchero. Hoy conserva su burbuja.
+
+Observado: en el servidor de desarrollo las fotos recortadas tardan unos segundos en aparecer y, mientras tanto, se ven los nombres sin sticker.
+
+Sin verificar: iOS y Android, fotos propias con y sin recorte, rendimiento del álbum con muchas fotos recortadas en teléfono, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.

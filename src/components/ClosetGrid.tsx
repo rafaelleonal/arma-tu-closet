@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   CATEGORIES,
   categoryLabels,
   type Category,
   type WardrobeItem,
 } from '../domain';
-import { Garment, useGarmentImages } from './Garment';
+import type { Palette } from '../theme/ThemeProvider';
+import { demoPhotoFor } from './demoPhotos';
+import { garmentArtLabel } from './Garment';
+import { Dots } from './rail';
+import { Sticker } from './Sticker';
 import { Chip, useUI } from './ui';
 
-const GAP = 10;
+const GAP = 12;
+/** Same as the horizontal padding of the screen, so the album reaches both edges. */
+const BLEED = 24;
+/** Repeats every six stickers so neighbours in a row of three never lean the same way. */
+const TILTS = [-3, 2, -1.5, 3, -2, 1.5];
 
-/** A person's own garments as a photo album: square tiles that tolerate any photo background. */
+/** A person's own garments as a sticker album: any photo fits, with or without background. */
 export function ClosetGrid({
   items,
   onEdit,
@@ -19,7 +27,8 @@ export function ClosetGrid({
   items: WardrobeItem[];
   onEdit: (item: WardrobeItem) => void;
 }) {
-  const { s } = useUI();
+  const { palette, s } = useUI();
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [width, setWidth] = useState(0);
   const present = CATEGORIES.filter((value) =>
@@ -34,8 +43,8 @@ export function ClosetGrid({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginBottom: 16 }}
-        contentContainerStyle={{ gap: 8 }}
+        style={styles.filters}
+        contentContainerStyle={styles.filterRow}
       >
         <Chip
           label={`Todo · ${items.length}`}
@@ -51,112 +60,109 @@ export function ClosetGrid({
           />
         ))}
       </ScrollView>
-      <View
-        onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: GAP }}
-      >
-        {tile
-          ? visible.map((item) => (
-              <GridTile
-                key={item.id}
-                item={item}
-                size={tile}
-                onPress={() => onEdit(item)}
-              />
-            ))
-          : null}
+      <View style={styles.album}>
+        <Dots />
+        <View
+          onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+          style={styles.sheet}
+        >
+          {tile
+            ? visible.map((item, index) => (
+                <AlbumSticker
+                  key={item.id}
+                  item={item}
+                  size={tile}
+                  tilt={TILTS[index % TILTS.length]}
+                  onPress={() => onEdit(item)}
+                />
+              ))
+            : null}
+        </View>
+        {!visible.length ? (
+          <Text style={s.subtitle}>No tienes prendas en esta categoría.</Text>
+        ) : null}
       </View>
-      {!visible.length ? (
-        <Text style={s.subtitle}>No tienes prendas en esta categoría.</Text>
-      ) : null}
     </View>
   );
 }
 
-function GridTile({
+function AlbumSticker({
   item,
   size,
+  tilt,
   onPress,
 }: {
   item: WardrobeItem;
   size: number;
+  tilt: number;
   onPress: () => void;
 }) {
   const { palette } = useUI();
-  const { cutoutUri, photoUri, fail } = useGarmentImages(item);
-  const opacity = item.available ? 1 : 0.45;
+  const styles = useMemo(() => createStyles(palette), [palette]);
+  const art = garmentArtLabel(
+    Boolean(item.cutoutUri || item.photoUri),
+    Boolean(demoPhotoFor(item)),
+  );
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}`}
+      accessibilityLabel={`Editar ${item.name}${item.available ? '' : ', en lavandería'}. ${art}`}
       onPress={onPress}
-      style={({ pressed }) => ({
-        width: size,
-        opacity: pressed ? 0.75 : 1,
-      })}
+      style={({ pressed }) => ({ width: size, opacity: pressed ? 0.75 : 1 })}
     >
-      <View
-        style={{
-          width: size,
-          height: size,
-          borderRadius: 14,
-          overflow: 'hidden',
-          backgroundColor: palette.wash,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {cutoutUri ? (
-          <Image
-            accessible={false}
-            source={{ uri: cutoutUri }}
-            onError={fail(cutoutUri)}
-            style={{ width: size * 0.84, height: size * 0.84, opacity }}
-            resizeMode="contain"
+      <View style={[styles.cell, { width: size, height: size }]}>
+        <View style={{ opacity: item.available ? 1 : 0.45 }}>
+          <Sticker
+            item={item}
+            maxWidth={size - 10}
+            maxHeight={size - 10}
+            rotate={tilt}
           />
-        ) : photoUri ? (
-          <Image
-            accessible={false}
-            source={{ uri: photoUri }}
-            onError={fail(photoUri)}
-            style={{ width: size, height: size, opacity }}
-            resizeMode="cover"
-          />
-        ) : (
-          // Also the fallback when a photo file no longer loads, so the drawing skips that file.
-          <View style={{ opacity }}>
-            <Garment
-              item={{ ...item, photoUri: undefined, cutoutUri: undefined }}
-              size={Math.round(size * 0.62)}
-            />
-          </View>
-        )}
+        </View>
         {!item.available ? (
-          <Text
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              left: 6,
-              fontSize: 10,
-              color: palette.ink,
-              backgroundColor: palette.floating,
-              borderRadius: 8,
-              paddingHorizontal: 6,
-              paddingVertical: 2,
-              overflow: 'hidden',
-            }}
-          >
-            Lavandería
-          </Text>
+          <Text style={styles.laundry}>Lavandería</Text>
         ) : null}
       </View>
       {/* Two lines: similar names often differ only at the end. */}
-      <Text
-        numberOfLines={2}
-        style={{ fontSize: 12, color: palette.ink, marginTop: 6 }}
-      >
+      <Text numberOfLines={2} style={styles.name}>
         {item.name}
       </Text>
     </Pressable>
   );
 }
+
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
+    filters: { marginHorizontal: -BLEED, marginBottom: 6 },
+    filterRow: { gap: 8, paddingHorizontal: BLEED },
+    album: {
+      marginHorizontal: -BLEED,
+      paddingHorizontal: BLEED,
+      paddingVertical: 18,
+    },
+    sheet: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      columnGap: GAP,
+      rowGap: 18,
+    },
+    cell: { alignItems: 'center', justifyContent: 'center' },
+    laundry: {
+      position: 'absolute',
+      bottom: 4,
+      fontSize: 10,
+      color: palette.ink,
+      backgroundColor: palette.floating,
+      borderRadius: 8,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      overflow: 'hidden',
+    },
+    name: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: palette.ink,
+      textAlign: 'center',
+      marginTop: 4,
+    },
+  });

@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reasonInVoice, type Outfit, type WardrobeItem } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
+import { Bubble } from '../Bubble';
 import { useFeedback } from '../Feedback';
 import { useUI } from '../ui';
 import { OutfitStage } from './OutfitStage';
@@ -139,12 +140,7 @@ function OutfitNotes({
   return (
     <View style={styles.notes}>
       {reasons.length ? (
-        <View style={styles.bubble}>
-          <Text style={styles.bubbleText}>
-            {reasons.map(reasonInVoice).join(' ')}
-          </Text>
-          <View style={styles.tail} />
-        </View>
+        <Bubble>{reasons.map(reasonInVoice).join(' ')}</Bubble>
       ) : null}
       {outfit.warnings.map((warning) => (
         <Text key={warning} style={styles.warning}>
@@ -159,24 +155,6 @@ const createStyles = (palette: Palette) =>
   StyleSheet.create({
     pager: { marginHorizontal: -BLEED },
     notes: { paddingHorizontal: BLEED, paddingBottom: 14, gap: 6 },
-    bubble: {
-      backgroundColor: palette.white,
-      borderRadius: 20,
-      paddingHorizontal: 18,
-      paddingVertical: 14,
-      marginBottom: 4,
-    },
-    bubbleText: { fontSize: 16, lineHeight: 23, color: palette.ink },
-    tail: {
-      position: 'absolute',
-      left: 80,
-      bottom: -6,
-      width: 14,
-      height: 14,
-      borderRadius: 3,
-      backgroundColor: palette.white,
-      transform: [{ rotate: '45deg' }],
-    },
     warning: { color: palette.rust, fontSize: 12, lineHeight: 18 },
     pages: {
       flexDirection: 'row',

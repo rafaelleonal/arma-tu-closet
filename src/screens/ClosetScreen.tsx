@@ -1,10 +1,13 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { WardrobeItem } from '../domain';
 import type { UpdateData } from '../hooks/useLocalData';
 import { DemoBanner } from '../components/AppChrome';
+import { Bubble } from '../components/Bubble';
 import { ClosetGrid } from '../components/ClosetGrid';
 import { ClosetRail } from '../components/ClosetRail';
+import { Dots } from '../components/rail';
+import { DrawingSticker } from '../components/Sticker';
 import { Button, useUI } from '../components/ui';
 import { withDemo, withoutDemo } from './actions';
 
@@ -23,7 +26,7 @@ export function ClosetScreen({
   onManual: () => void;
   onDemoReady: () => void;
 }) {
-  const { s } = useUI();
+  const { palette, s } = useUI();
   const available = items.filter((item) => item.available).length;
   const toggle = (item: WardrobeItem) =>
     update((current) => ({
@@ -36,17 +39,20 @@ export function ClosetScreen({
     }));
   return (
     <>
-      <View style={s.pageHeading}>
-        <View>
-          <Text accessibilityRole="header" style={s.title}>
-            Mi clóset
-          </Text>
-          <Text style={[s.subtitle, { marginTop: 8 }]}>
-            {items.length} {items.length === 1 ? 'prenda' : 'prendas'} ·{' '}
-            {available} {available === 1 ? 'disponible' : 'disponibles'}
-          </Text>
-        </View>
-        <Button label="+ Agregar prenda" onPress={onAdd} small />
+      <Text style={{ color: palette.muted, fontSize: 12 }}>
+        {items.length} {items.length === 1 ? 'prenda' : 'prendas'} · {available}{' '}
+        {available === 1 ? 'disponible' : 'disponibles'}
+      </Text>
+      <View style={[s.pageHeading, { columnGap: 12, rowGap: 8 }]}>
+        <Text accessibilityRole="header" style={s.title}>
+          Mi clóset
+        </Text>
+        <Button
+          label="+ Agregar prenda"
+          onPress={onAdd}
+          small
+          style={{ borderRadius: 22 }}
+        />
       </View>
       {items.some((item) => item.isDemo) ? (
         <View style={{ marginBottom: 16 }}>
@@ -54,27 +60,17 @@ export function ClosetScreen({
         </View>
       ) : null}
       {!items.length ? (
-        <View style={[s.panel, { paddingVertical: 35 }]}>
-          <Text style={s.sectionTitle}>Agrega tus prendas</Text>
-          <Text style={[s.subtitle, { marginBottom: 24 }]}>
-            Para un outfit necesitas una parte de arriba, una de abajo y
-            calzado; o una prenda completa y calzado.
-          </Text>
-          <Button label="Agregar prenda" onPress={onAdd} />
-          <Button
-            secondary
-            label="Ver el clóset de ejemplo"
-            onPress={() => {
-              // An existing closet is never replaced by the example.
-              update((current) =>
-                current.items.length ? current : withDemo(current),
-              );
-              onDemoReady();
-            }}
-            style={{ marginTop: 10 }}
-          />
-        </View>
-      ) : // The rail needs cut-out photos, so it only presents the example closet; a person's own garments use the album grid.
+        <EmptyCloset
+          onAdd={onAdd}
+          onDemo={() => {
+            // An existing closet is never replaced by the example.
+            update((current) =>
+              current.items.length ? current : withDemo(current),
+            );
+            onDemoReady();
+          }}
+        />
+      ) : // The rail needs cut-out photos, so it only presents the example closet; a person's own garments use the sticker album.
       items.every((item) => item.isDemo) ? (
         <ClosetRail items={items} onEdit={onEdit} onToggle={toggle} />
       ) : (
@@ -89,3 +85,67 @@ export function ClosetScreen({
     </>
   );
 }
+
+/** An empty closet says what an outfit needs and shows the three places still to fill. */
+function EmptyCloset({
+  onAdd,
+  onDemo,
+}: {
+  onAdd: () => void;
+  onDemo: () => void;
+}) {
+  return (
+    <>
+      <View style={styles.board}>
+        <Dots />
+        <Bubble>
+          Para un outfit necesitas una parte de arriba, una de abajo y calzado;
+          o una prenda completa y calzado.
+        </Bubble>
+        <View style={styles.blanks}>
+          <DrawingSticker
+            kind="tee"
+            maxWidth={104}
+            maxHeight={104}
+            style={{ transform: [{ rotate: '-4deg' }] }}
+          />
+          <DrawingSticker
+            kind="trousers"
+            maxWidth={104}
+            maxHeight={120}
+            style={{ transform: [{ rotate: '3deg' }] }}
+          />
+          <DrawingSticker
+            kind="sneakers"
+            maxWidth={104}
+            maxHeight={104}
+            style={{ transform: [{ rotate: '-5deg' }] }}
+          />
+        </View>
+      </View>
+      <Button label="Agregar prenda" onPress={onAdd} />
+      <Button
+        secondary
+        label="Ver el clóset de ejemplo"
+        onPress={onDemo}
+        style={{ marginTop: 10 }}
+      />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  board: {
+    marginHorizontal: -24,
+    paddingHorizontal: 24,
+    paddingVertical: 22,
+    marginBottom: 18,
+    gap: 22,
+  },
+  blanks: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+});
