@@ -452,3 +452,15 @@ Expo web a 375 × 812 en `127.0.0.1:8093`: [formulario nuevo](evidence/agregar-p
 Simulador iPhone 17 Pro (iOS 26.5): bajo la vista previa, [foto, categoría, colores y Más detalles caben en una pantalla](evidence/ios-agregar-prenda-iphone17pro.jpg); elegir categoría y color los marca; cerrar y descartar no guarda nada.
 
 Sin verificar: escribir el nombre dentro de Más detalles con el teclado en iOS, editar una prenda existente, elegir o tomar foto, Medianoche y los demás temas, un teléfono real, Android, VoiceOver y teclado.
+
+## 10/11/2026 — Mi estilo sin ajustes; hoja Ajustes
+
+Mi estilo queda en lo que describe a la persona, según [la guía](diseno-personalizacion.md#mi-estilo-como-tablero): estilos, guardados y colores. Tema, Vista, Explicaciones, Vibración, la espera para repetir una prenda y el aviso de datos pasan a la hoja **Ajustes**, que se abre con un botón junto al título. El aviso de almacenamiento baja de cinco frases a tres y conserva el crédito de Open-Meteo. Lo que se guarda no cambia.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
+
+Expo web con ventana de 375 × 812 en `127.0.0.1:8093` (capturas reducidas por el panel): [Mi estilo](evidence/mi-estilo-sin-ajustes-web-375.jpg) y [la hoja](evidence/ajustes-hoja-web-375.jpg) en Lino; elegir Medianoche cambia la app con la hoja abierta y se revisó Mi estilo en ese tema; elegir 7 días quedó en el documento local (versión 3, mismas prendas y guardados); se devolvieron Lino y 3 días; Escape cierra la hoja; consola sin errores.
+
+Simulador iPhone 17 Pro (iOS 26.5): Mi estilo con el botón junto al título y [la hoja Ajustes](evidence/ios-ajustes-iphone17pro.jpg) hasta el final, con Vibración visible; se cerró sin cambiar nada.
+
+Sin verificar: cambiar un ajuste en iOS, abrir el enlace de crédito, Papel, Salvia, Chicle y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.

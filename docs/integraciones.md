@@ -12,7 +12,7 @@ La búsqueda envía el nombre consultado al geocodificador; el pronóstico enví
 
 La app guarda una caché por ciudad, refresca después de 30 minutos y comprueba cada minuto mientras está activa, además de al recuperar actividad. Tras un fallo automático espera al menos cinco minutos para reintentar; el botón Actualizar permite reintentar antes. El límite de cada consulta es diez segundos. A las tres horas —edad de descarga o dato meteorológico— la caché deja de usarse. La pantalla identifica el respaldo manual. Cambiar a Manual conserva los valores que introdujiste y la última ciudad automática.
 
-Open-Meteo gratuito se usa para este prototipo no comercial. Revisar [planes y condiciones de uso](https://open-meteo.com/en/pricing) antes de monetizar; la UI incluye atribución: un enlace «Clima automático: datos de Open-Meteo» en Mi estilo → Almacenamiento. Es el único lugar de la app que lo nombra; no quitarlo sin revisar la licencia de los datos.
+Open-Meteo gratuito se usa para este prototipo no comercial. Revisar [planes y condiciones de uso](https://open-meteo.com/en/pricing) antes de monetizar; la UI incluye atribución: un enlace «Clima automático: datos de Open-Meteo» en Mi estilo → Ajustes → Tus datos. Es el único lugar de la app que lo nombra; no quitarlo sin revisar la licencia de los datos.
 
 ## Análisis de una foto
 

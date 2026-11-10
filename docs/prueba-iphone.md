@@ -38,7 +38,7 @@ El servidor de análisis no está iniciado ni expuesto. La prueba de cámara y a
 | Validación | Quitar el único color, o abrir Más detalles y quitar la única ocasión, y guardar | Error junto al campo y desplazamiento hacia él. El nombre es opcional: vacío se guarda como «Categoría · color». | Web comprobado; nativo pendiente |
 | Cierre accidental | Escribir nombre/cambiar foto → Cerrar → Seguir editando | Conserva cambios. Descartar cambios cierra sin modificar el clóset guardado. Un editor intacto cierra directamente. | Web comprobado; nativo pendiente |
 | Guardar y cerrar | Guardar una prenda con foto y esperar **Prenda guardada**. Cerrar Expo Go desde el selector de apps; abrir el mismo proyecto | Nombre, atributos y foto siguen presentes. Repetir editando disponibilidad. | Pendiente en iPhone |
-| Vibración | Cambiar pestaña o tema; guardar una prenda. Mi estilo → Apariencia → Vibración: desactivar y repetir | Selección al cambiar valor; éxito al terminar la escritura; desactivada no vibra. No vibrar por cada letra ni al tocar de nuevo la misma pestaña. | Pendiente en iPhone |
+| Vibración | Cambiar pestaña o tema; guardar una prenda. Mi estilo → Ajustes → Vibración: desactivar y repetir | Selección al cambiar valor; éxito al terminar la escritura; desactivada no vibra. No vibrar por cada letra ni al tocar de nuevo la misma pestaña. | Pendiente en iPhone |
 | Movimiento | Comparar con Reducir movimiento de iOS activado/desactivado | Con reducción, no hay desplazamiento de entrada, escala al pulsar ni slide de hojas. Los controles siguen respondiendo. | Pendiente en iPhone |
 | Accesibilidad | VoiceOver, texto ampliado y teclado visible | Nombres y selecciones comprensibles, acciones alcanzables y sin texto cortado. | Pendiente en iPhone |
 

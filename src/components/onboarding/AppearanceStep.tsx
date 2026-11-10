@@ -38,7 +38,6 @@ export function AppearanceStep({
       </View>
       <FieldLabel>Apariencia</FieldLabel>
       <AppearanceSettings
-        compact
         bleed={24}
         value={data.appearance}
         onChange={(appearance) => onChange({ appearance })}

@@ -18,7 +18,6 @@ type Appearance = LocalData['appearance'];
 export interface AppearanceSettingsProps {
   value: Appearance;
   onChange: (next: Appearance) => void;
-  compact?: boolean;
   /** Horizontal padding of the screen, so the themes scroll from edge to edge. */
   bleed?: number;
 }
@@ -27,24 +26,11 @@ export interface AppearanceSettingsProps {
 export function AppearanceSettings({
   value,
   onChange,
-  compact = false,
   bleed = 0,
 }: AppearanceSettingsProps) {
   const { s, palette } = useUI();
   return (
     <View>
-      {!compact ? (
-        <Text
-          style={{
-            color: palette.ink,
-            fontSize: 20,
-            letterSpacing: -0.5,
-            marginBottom: 18,
-          }}
-        >
-          Apariencia
-        </Text>
-      ) : null}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

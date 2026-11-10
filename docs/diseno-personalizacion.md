@@ -31,7 +31,7 @@ En el primer arranque, antes del paso 1, la bienvenida muestra las prendas salud
 | 3. Colores | Preferir y evitar, ambos opcionales. | Una misma opción no puede quedar en ambos grupos. Explicar que evitar un color puede reducir las combinaciones. |
 | 4. Tu conjunto | Ve un conjunto con lo que eligió, ocasión habitual, apariencia y clóset propio o demo. | Con clóset vacío usa prendas de ejemplo identificadas y no las escribe en el documento. Elecciones explícitas «Vamos con mi ropa» y «Ver el clóset de ejemplo». Sin solicitudes de cámara o ubicación. |
 
-La rotación ya no se pregunta aquí: parte de 3 días y se cambia en Mi estilo.
+La rotación ya no se pregunta aquí: parte de 3 días y se cambia en Mi estilo → Ajustes.
 
 Mostrar «n de 4», acción principal y «Atrás». Las elecciones anteriores se conservan al volver. No bloquear por nombre, estilo o ciudad vacíos; no añadir una pantalla obligatoria de confirmación. Sin ciudad, el clima sigue siendo manual.
 
@@ -116,7 +116,16 @@ Mi estilo deja de ser una lista de paneles con botón. Arriba, sobre el mismo fo
 
 Debajo, **Guardados** es una fila que se desliza con cada outfit como collage pequeño; tocar uno abre el outfit. A ese tamaño los recortes van sin borde, porque mediría menos de un píxel.
 
-**Colores** usa el mismo selector del onboarding ([ColorPicker.tsx](../src/components/ColorPicker.tsx)): una pestaña para «Me gustan» y otra para «Prefiero evitar» sobre una sola cuadrícula, en lugar de dos listas de doce. **Apariencia** muestra los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers. Repetición de prendas y Almacenamiento cierran la pantalla sin cambios de contenido.
+**Colores** usa el mismo selector del onboarding ([ColorPicker.tsx](../src/components/ColorPicker.tsx)): una pestaña para «Me gustan» y otra para «Prefiero evitar» sobre una sola cuadrícula, en lugar de dos listas de doce.
+
+La pantalla termina ahí: estilos, guardados y colores son lo que describe a la persona. Lo que solo cambia cómo se ve o se comporta la app va en la hoja **Ajustes** ([SettingsSheet.tsx](../src/screens/SettingsSheet.tsx)), que se abre con el botón redondo junto al título:
+
+- **Tema**: los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers.
+- **Vista**, **Explicaciones** y, en el teléfono, **Vibración**.
+- **Esperar para repetir una prenda**: Nada, 3, 7 o 14 días. La etiqueta sustituye al párrafo que lo explicaba.
+- **Tus datos**: tres frases sin personaje sobre dónde se guarda todo, qué pasa al borrar la app y que solo Analizar foto envía la foto de una prenda a OpenAI. Debajo, cuántas prendas propias y usos hay, y el crédito de Open-Meteo que pide su licencia.
+
+Un cambio en la hoja se guarda al tocarlo, como antes en la pantalla; no hay botón de aplicar.
 
 ## Mi clóset como álbum
 
