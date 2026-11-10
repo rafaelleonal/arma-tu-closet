@@ -6,6 +6,7 @@ import { demoPhotoFor } from './demoPhotos';
 import { garmentArtLabel } from './Garment';
 import { Dots } from './Dots';
 import { Sticker } from './Sticker';
+import { StickerIn } from './StickerIn';
 import { useUI } from './ui';
 
 const GAP = 12;
@@ -13,6 +14,8 @@ const GAP = 12;
 const BLEED = 24;
 /** Repeats every six stickers so neighbours in a row of three never lean the same way. */
 const TILTS = [-3, 2, -1.5, 3, -2, 1.5];
+/** Stickers that land one by one when the album shows: about what fits on a screen. */
+const LANDING = 12;
 
 export function tiltFor(index: number) {
   return TILTS[index % TILTS.length];
@@ -53,6 +56,7 @@ export function StickerAlbum({
                 item={item}
                 size={tile}
                 tilt={tiltFor(index)}
+                order={index < LANDING ? index : undefined}
                 label={labelFor(item)}
                 onPress={() => onPress(item)}
               />
@@ -68,6 +72,7 @@ export function StickerTile({
   item,
   size,
   tilt,
+  order,
   label,
   selected,
   onPress,
@@ -75,12 +80,22 @@ export function StickerTile({
   item: WardrobeItem;
   size: number;
   tilt: number;
+  /** Its turn to land when the album shows; without it the sticker is simply there. */
+  order?: number;
   label: string;
   selected?: boolean;
   onPress: () => void;
 }) {
   const { palette } = useUI();
   const tile = useMemo(() => createStyles(palette), [palette]);
+  const sticker = (
+    <Sticker
+      item={item}
+      maxWidth={size - 10}
+      maxHeight={size - 10}
+      rotate={tilt}
+    />
+  );
   return (
     <Pressable
       accessibilityRole="button"
@@ -92,12 +107,11 @@ export function StickerTile({
     >
       <View style={[tile.cell, { width: size, height: size }]}>
         <View style={{ opacity: item.available ? 1 : 0.45 }}>
-          <Sticker
-            item={item}
-            maxWidth={size - 10}
-            maxHeight={size - 10}
-            rotate={tilt}
-          />
+          {order === undefined ? (
+            sticker
+          ) : (
+            <StickerIn order={order}>{sticker}</StickerIn>
+          )}
         </View>
         {!item.available ? <Text style={tile.laundry}>Lavandería</Text> : null}
         {selected ? (

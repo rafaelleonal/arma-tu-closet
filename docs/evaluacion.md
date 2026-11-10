@@ -494,3 +494,15 @@ Expo web a 375 × 812 en `127.0.0.1:8093`. Chicle: Hoy, Mi clóset, Mi estilo, C
 Simulador iPhone 17 Pro (iOS 26.5): se eligió Chicle en Ajustes, se cerró y [al reabrir la fila ya estaba en Chicle](evidence/ios-ajustes-chicle-iphone17pro.jpg); después se devolvió a Lino.
 
 Sin verificar: la marca en su nuevo color en iOS (el clóset del simulador no tiene estilos elegidos), Papel, Salvia y Malva en iOS, las demás hojas en Papel, Salvia y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.
+
+## 10/11/2026 — Los stickers se asientan al aparecer
+
+Cada sticker llega un poco más grande y girado y se asienta, según [la guía](diseno-personalizacion.md#hoy-como-mesa-de-stickers): en la mesa de Hoy y las hojas que la reutilizan, en los primeros doce del álbum y al elegir una prenda en Armar outfit. Es la única animación nueva; no cambia disposición, toques ni datos.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (103 pruebas) aprobados.
+
+Para verlo a medio camino se alargó la duración a 40 s en la copia de trabajo y después se devolvió a 280 ms. Expo web a 375 × 812 en `127.0.0.1:8093`: [Hoy a medias](evidence/stickers-entrada-a-medias-web-375.jpg), con los tres stickers girados y translúcidos, y el álbum de Mi clóset a medias con los nombres ya en su sitio. A velocidad real: Hoy termina igual que antes y en Armar outfit elegir una prenda y cambiarla por otra deja el sticker asentado en su hueco. El almacenamiento del panel del navegador apareció vacío al empezar, así que el origen de pruebas se rehízo con el onboarding y el clóset de ejemplo; de paso se recorrieron la bienvenida y los cuatro pasos.
+
+Simulador iPhone 17 Pro (iOS 26.5): [Hoy a medias](evidence/ios-stickers-entrada-a-medias-iphone17pro.jpg) con el driver nativo; a velocidad real, tocar un sticker ya asentado abre su hoja Cambiar.
+
+Sin verificar: Reducir movimiento activado, la fluidez real en un teléfono (el simulador no la representa), el álbum y Armar outfit en iOS, un clóset de 400 prendas en el teléfono, Android, VoiceOver y teclado.

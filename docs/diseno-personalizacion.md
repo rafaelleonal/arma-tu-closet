@@ -105,6 +105,8 @@ Bajo esas acciones queda lo menos posible, y nada con forma de botón que compit
 
 Con clima manual y sin prenda marcada, la pantalla termina en **Hoy me lo puse**.
 
+Al aparecer, cada sticker «se pega»: llega un poco más grande y girado, y se asienta en unos 0,3 s ([StickerIn.tsx](../src/components/StickerIn.tsx)). En un grupo caen en orden, uno cada 60 ms. Ocurre una vez, cuando el sticker se muestra por primera vez: al abrir Hoy o una hoja con su mesa, al pedir otras ideas, al cambiar una prenda y al elegir una en Armar outfit. En el álbum solo se mueven los primeros doce, lo que cabe en una pantalla, para que un clóset largo no cueste nada. Deslizar entre ideas no lo repite. Con Reducir movimiento los stickers simplemente están. Solo se mueve el dibujo: el botón que lo rodea no cambia de lugar.
+
 | Prenda | Sticker |
 |---|---|
 | Con recorte (propio o de ejemplo) | La foto sin fondo con un borde claro alrededor. |

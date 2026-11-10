@@ -5,6 +5,7 @@ import type { Palette } from '../../theme/ThemeProvider';
 import { slotForCategory } from '../outfitLayout';
 import { Dots } from '../Dots';
 import { Sticker } from '../Sticker';
+import { StickerIn } from '../StickerIn';
 import { useUI } from '../ui';
 
 const MAX_WIDTH = 300;
@@ -71,12 +72,15 @@ export function BuilderStage({
                 ]}
               >
                 {item ? (
-                  <Sticker
-                    item={item}
-                    maxWidth={box.width}
-                    maxHeight={box.height}
-                    rotate={slot.rotate}
-                  />
+                  // Keyed by garment, so choosing another one puts a new sticker down.
+                  <StickerIn key={item.id}>
+                    <Sticker
+                      item={item}
+                      maxWidth={box.width}
+                      maxHeight={box.height}
+                      rotate={slot.rotate}
+                    />
+                  </StickerIn>
                 ) : (
                   <View
                     style={[

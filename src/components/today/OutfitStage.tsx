@@ -5,6 +5,7 @@ import { NameTag } from '../NameTag';
 import { slotFor } from '../outfitLayout';
 import { Dots } from '../Dots';
 import { Sticker } from '../Sticker';
+import { StickerIn } from '../StickerIn';
 import { stickerArt } from '../StickerAlbum';
 
 const TAG_HEIGHT = 20;
@@ -39,7 +40,7 @@ export function OutfitStage({
   return (
     <View style={{ width, height }}>
       <Dots />
-      {outfit.items.map((item) => {
+      {outfit.items.map((item, index) => {
         const slot = slotFor(outfit.items, item);
         const box = { width: slot.w * inner, height: slot.h * height };
         const pinned = item.id === pinnedItemId;
@@ -61,17 +62,19 @@ export function OutfitStage({
               pressed && { opacity: 0.8 },
             ]}
           >
-            <Sticker
-              item={item}
-              maxWidth={box.width}
-              maxHeight={box.height - TAG_HEIGHT}
-              rotate={slot.rotate}
-            />
-            <NameTag
-              item={item}
-              fixed={pinned}
-              style={{ maxWidth: box.width, marginTop: -8 }}
-            />
+            <StickerIn order={index} style={styles.landed}>
+              <Sticker
+                item={item}
+                maxWidth={box.width}
+                maxHeight={box.height - TAG_HEIGHT}
+                rotate={slot.rotate}
+              />
+              <NameTag
+                item={item}
+                fixed={pinned}
+                style={{ maxWidth: box.width, marginTop: -8 }}
+              />
+            </StickerIn>
           </Pressable>
         );
       })}
@@ -85,4 +88,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  landed: { alignItems: 'center', justifyContent: 'center' },
 });
