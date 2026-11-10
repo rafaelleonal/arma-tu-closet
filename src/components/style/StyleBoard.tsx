@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { STYLE_OPTIONS, type StyleId } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { useUI } from '../ui';
 import { WordSticker, wordTilt } from '../WordSticker';
 

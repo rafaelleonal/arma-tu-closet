@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Animated, Platform, StyleSheet, Text, View } from 'react-native';
 import { Bubble } from '../Bubble';
 import { useFeedback } from '../Feedback';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { useUI } from '../ui';
 import { CrewSticker, type CrewKind } from './CrewSticker';
 

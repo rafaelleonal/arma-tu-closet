@@ -4,7 +4,7 @@ import type { WardrobeItem } from '../domain';
 import type { Palette } from '../theme/ThemeProvider';
 import { demoPhotoFor } from './demoPhotos';
 import { garmentArtLabel } from './Garment';
-import { Dots } from './rail';
+import { Dots } from './Dots';
 import { Sticker } from './Sticker';
 import { useUI } from './ui';
 

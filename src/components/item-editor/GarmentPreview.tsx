@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colorLabels, type WardrobeItem } from '../../domain';
 import { NameTag } from '../NameTag';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { SHEET_BLEED } from '../Sheet';
 import { Sticker } from '../Sticker';
 import { stickerArt } from '../StickerAlbum';

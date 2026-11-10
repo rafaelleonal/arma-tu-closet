@@ -8,7 +8,7 @@ import {
 } from '../../domain';
 import type { LocalData } from '../../storage/schema';
 import { OutfitCollage } from '../OutfitCollage';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { useUI } from '../ui';
 
 /** Same as the horizontal padding of the step, so the table reaches both edges. */

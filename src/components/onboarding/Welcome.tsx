@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MotionIn } from '../Feedback';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { Button, useUI } from '../ui';
 import { Crew } from './Crew';
 import { OnboardingLogo } from './OnboardingChrome';

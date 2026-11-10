@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { Linking, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { OCCASIONS, occasionLabels } from '../domain';
 import type { LocalData } from '../storage/schema';
+import type { Palette } from '../theme/ThemeProvider';
 import type { WeatherSettings } from '../weather/types';
-import { CityPicker } from './CityPicker';
+import { CityPicker, placeLabel } from './CityPicker';
+import {
+  ManualWeather,
+  MAX_TEMPERATURE,
+  MIN_TEMPERATURE,
+} from './context-editor/ManualWeather';
+import { Segmented } from './Segmented';
 import { Sheet } from './Sheet';
 import { Button, Chip, FieldLabel, useUI } from './ui';
 
@@ -14,124 +21,67 @@ interface Props {
   onClose: () => void;
 }
 
+const MODES = [
+  { id: 'automatic', label: 'Automático' },
+  { id: 'manual', label: 'Manual' },
+] as const;
+
+/**
+ * The occasion and the weather, in the order they change most. The manual city and the season
+ * are no longer asked: no suggestion uses them, and their saved values are left as they are.
+ */
 export function ContextEditor({ value, weather, onSave, onClose }: Props) {
-  const { palette, s } = useUI();
+  const { palette } = useUI();
+  const styles = createStyles(palette);
   const [draft, setDraft] = useState(value);
   const [settings, setSettings] = useState(weather);
-  const [temperature, setTemperature] = useState(String(value.temperatureC));
+  const [cityOpen, setCityOpen] = useState(!weather.location);
+  const [backupOpen, setBackupOpen] = useState(false);
   const [error, setError] = useState('');
   const automatic = settings.mode === 'automatic';
+  const manual = (
+    <ManualWeather
+      temperatureC={draft.temperatureC}
+      raining={draft.raining}
+      onTemperature={(delta) =>
+        setDraft((current) => ({
+          ...current,
+          temperatureC: Math.max(
+            MIN_TEMPERATURE,
+            Math.min(MAX_TEMPERATURE, Math.round(current.temperatureC) + delta),
+          ),
+        }))
+      }
+      onRaining={(raining) => setDraft((current) => ({ ...current, raining }))}
+    />
+  );
   return (
-    <Sheet title="Clima y ocasión" onClose={onClose}>
-      <View style={s.wrap}>
-        <Chip
-          label="Automático"
-          selected={automatic}
-          onPress={() => {
-            setSettings((current) => ({ ...current, mode: 'automatic' }));
-            setError('');
-          }}
-        />
-        <Chip
-          label="Manual"
-          selected={!automatic}
-          onPress={() => {
-            setSettings((current) => ({ ...current, mode: 'manual' }));
-            setError('');
-          }}
-        />
-      </View>
-      {automatic ? (
+    <Sheet
+      title="Clima y ocasión"
+      onClose={onClose}
+      footer={
         <>
-          <FieldLabel>Ciudad</FieldLabel>
-          <CityPicker
-            value={settings.location}
-            onSelect={(place) => {
-              setSettings((current) => ({
-                ...current,
-                location: place,
-                snapshot:
-                  current.location?.id === place.id
-                    ? current.snapshot
-                    : undefined,
-              }));
-              setError('');
+          {error ? (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {error}
+            </Text>
+          ) : null}
+          <Button
+            label="Aplicar"
+            onPress={() => {
+              if (automatic && !settings.location) {
+                setCityOpen(true);
+                setError('Elige una ciudad para el clima automático.');
+                return;
+              }
+              onSave(draft, settings);
             }}
           />
-          <Text style={[s.subtitle, { fontSize: 12, marginTop: 12 }]}>
-            Se consulta el clima actual de esa ciudad. Si el dato caduca, se usa
-            el clima manual.
-          </Text>
-          <Text
-            accessibilityRole="link"
-            onPress={() => void Linking.openURL('https://open-meteo.com/')}
-            style={{
-              color: palette.green,
-              textDecorationLine: 'underline',
-              marginTop: 12,
-            }}
-          >
-            Datos de Open-Meteo
-          </Text>
         </>
-      ) : (
-        <>
-          <FieldLabel>Ciudad · opcional</FieldLabel>
-          <TextInput
-            accessibilityLabel="Ciudad"
-            placeholder="Ciudad"
-            placeholderTextColor={palette.muted}
-            value={draft.city}
-            onChangeText={(city) =>
-              setDraft((current) => ({ ...current, city }))
-            }
-            maxLength={60}
-            style={s.input}
-          />
-        </>
-      )}
-      <FieldLabel>
-        {automatic
-          ? 'Temperatura manual de respaldo · °C'
-          : 'Temperatura en °C'}
-      </FieldLabel>
-      <TextInput
-        accessibilityLabel="Temperatura en grados Celsius"
-        keyboardType="numbers-and-punctuation"
-        value={temperature}
-        onChangeText={setTemperature}
-        style={s.input}
-      />
-      <View style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}>
-        <Text style={{ color: palette.ink }}>
-          {automatic ? 'Lluvia manual de respaldo' : '¿Hay lluvia?'}
-        </Text>
-        <Switch
-          accessibilityLabel="Hay lluvia"
-          value={draft.raining}
-          onValueChange={(raining) =>
-            setDraft((current) => ({ ...current, raining }))
-          }
-          trackColor={{ true: palette.green }}
-        />
-      </View>
-      {!automatic ? (
-        <>
-          <FieldLabel>Estación</FieldLabel>
-          <View style={s.wrap}>
-            {['Primavera', 'Verano', 'Otoño', 'Invierno'].map((season) => (
-              <Chip
-                key={season}
-                label={season}
-                selected={draft.season === season}
-                onPress={() => setDraft((current) => ({ ...current, season }))}
-              />
-            ))}
-          </View>
-        </>
-      ) : null}
+      }
+    >
       <FieldLabel>Ocasión</FieldLabel>
-      <View style={s.wrap}>
+      <View style={styles.wrap}>
         {OCCASIONS.map((occasion) => (
           <Chip
             key={occasion}
@@ -141,35 +91,110 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
           />
         ))}
       </View>
-      {error ? (
-        <Text
-          accessibilityRole="alert"
-          style={{ color: palette.rust, marginTop: 20 }}
-        >
-          {error}
-        </Text>
-      ) : null}
-      <Button
-        label="Aplicar"
-        style={{ marginTop: 28 }}
-        onPress={() => {
-          const temp = Number(temperature.replace(',', '.'));
-          if (
-            !temperature.trim() ||
-            !Number.isFinite(temp) ||
-            temp < -30 ||
-            temp > 55
-          ) {
-            setError('Escribe una temperatura válida entre −30 y 55 °C.');
-            return;
-          }
-          if (automatic && !settings.location) {
-            setError('Elige una ciudad para el clima automático.');
-            return;
-          }
-          onSave({ ...draft, temperatureC: temp }, settings);
+      <FieldLabel>Clima</FieldLabel>
+      <Segmented
+        options={MODES}
+        value={settings.mode}
+        onChange={(mode) => {
+          setSettings((current) => ({ ...current, mode }));
+          setError('');
         }}
       />
+      <View style={{ marginTop: 14 }}>
+        {!automatic ? manual : null}
+        {automatic && settings.location && !cityOpen ? (
+          <View style={styles.city}>
+            <Text numberOfLines={2} style={styles.cityName}>
+              {placeLabel(settings.location)}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Cambiar de ciudad"
+              onPress={() => setCityOpen(true)}
+              style={styles.link}
+            >
+              <Text style={styles.linkText}>Cambiar</Text>
+            </Pressable>
+          </View>
+        ) : null}
+        {automatic && (cityOpen || !settings.location) ? (
+          <CityPicker
+            hideSelected
+            value={settings.location}
+            onSelect={(place) => {
+              setSettings((current) => ({
+                ...current,
+                location: place,
+                // A cached forecast only applies to the same city.
+                snapshot:
+                  current.location?.id === place.id
+                    ? current.snapshot
+                    : undefined,
+              }));
+              setCityOpen(false);
+              setError('');
+            }}
+          />
+        ) : null}
+        {automatic && !backupOpen ? (
+          <View style={styles.backup}>
+            <Text style={styles.backupText}>
+              Sin dato reciente se usa el clima manual:{' '}
+              {Math.round(draft.temperatureC)}°,{' '}
+              {draft.raining ? 'con lluvia' : 'sin lluvia'}.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Cambiar el clima manual de respaldo"
+              onPress={() => setBackupOpen(true)}
+              style={styles.link}
+            >
+              <Text style={styles.linkText}>Cambiar</Text>
+            </Pressable>
+          </View>
+        ) : null}
+        {automatic && backupOpen ? (
+          <View style={{ marginTop: 18 }}>
+            <Text style={[styles.backupText, { marginBottom: 10 }]}>
+              Clima manual, para cuando no hay dato reciente
+            </Text>
+            {manual}
+          </View>
+        ) : null}
+      </View>
     </Sheet>
   );
 }
+
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
+    wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    error: { color: palette.rust, fontSize: 13, marginBottom: 10 },
+    city: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      minHeight: 60,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: palette.line,
+      backgroundColor: palette.white,
+    },
+    cityName: { flex: 1, fontSize: 15, color: palette.ink },
+    link: { minHeight: 44, justifyContent: 'center' },
+    linkText: { fontSize: 13, fontWeight: '600', color: palette.rust },
+    backup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginTop: 10,
+    },
+    backupText: {
+      flex: 1,
+      fontSize: 12,
+      lineHeight: 18,
+      color: palette.muted,
+    },
+  });

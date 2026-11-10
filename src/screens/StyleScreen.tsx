@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 import type { Outfit } from '../domain';
 import type { LocalData } from '../storage/local';
 import type { UpdateData } from '../hooks/useLocalData';
@@ -123,6 +123,17 @@ export function StyleScreen({
             ? 'uso registrado'
             : 'usos registrados'}{' '}
           · {data.items.filter((item) => !item.isDemo).length} prendas propias
+        </Text>
+        {/* The weather data's license asks for credit; this is the one place that gives it. */}
+        <Text
+          accessibilityRole="link"
+          onPress={() => void Linking.openURL('https://open-meteo.com/')}
+          style={[
+            s.subtitle,
+            { fontSize: 12, marginTop: 10, textDecorationLine: 'underline' },
+          ]}
+        >
+          Clima automático: datos de Open-Meteo
         </Text>
       </View>
     </>

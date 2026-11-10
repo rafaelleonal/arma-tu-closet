@@ -5,8 +5,7 @@ import type { UpdateData } from '../hooks/useLocalData';
 import { DemoBanner } from '../components/AppChrome';
 import { Bubble } from '../components/Bubble';
 import { ClosetGrid } from '../components/ClosetGrid';
-import { ClosetRail } from '../components/ClosetRail';
-import { Dots } from '../components/rail';
+import { Dots } from '../components/Dots';
 import { DrawingSticker } from '../components/Sticker';
 import { Button, useUI } from '../components/ui';
 import { withDemo, withoutDemo } from './actions';
@@ -28,15 +27,6 @@ export function ClosetScreen({
 }) {
   const { palette, s } = useUI();
   const available = items.filter((item) => item.available).length;
-  const toggle = (item: WardrobeItem) =>
-    update((current) => ({
-      ...current,
-      items: current.items.map((value) =>
-        value.id === item.id
-          ? { ...value, available: !value.available }
-          : value,
-      ),
-    }));
   return (
     <>
       <Text style={{ color: palette.muted, fontSize: 12 }}>
@@ -70,10 +60,8 @@ export function ClosetScreen({
             onDemoReady();
           }}
         />
-      ) : // The rail needs cut-out photos, so it only presents the example closet; a person's own garments use the sticker album.
-      items.every((item) => item.isDemo) ? (
-        <ClosetRail items={items} onEdit={onEdit} onToggle={toggle} />
       ) : (
+        // The example closet and a person's own garments look the same: a sticker album.
         <ClosetGrid items={items} onEdit={onEdit} />
       )}
       <Button

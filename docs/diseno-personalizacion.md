@@ -94,7 +94,7 @@ Separar evidencia de **código**, **tests** y **uso real**. Typecheck o exportac
 
 Las tres pestañas abren directo en su contenido, sin barra de marca; el gancho queda en la bienvenida, el onboarding y la pantalla de carga. Hoy abre en el outfit. Arriba van la fecha, el título y una píldora con el clima y la ocasión, que abre el mismo editor y sigue diciendo «manual» cuando lo es. Con clima automático, la hora del dato, Open-Meteo y **Actualizar clima** quedan al final de la pantalla.
 
-Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre el mismo fondo de puntos del perchero, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista. **Otra vuelta** y **Elegir con IA** quedan debajo, como acciones secundarias.
+Cada idea ocupa una página: se desliza o se tocan los puntos de «1 de 3». Las prendas van como stickers sobre un fondo de puntos, un poco giradas y grandes; tocar una abre su cambio. Debajo hay una sola acción principal, **Hoy me lo puse**, con Guardar y **Prefiero otro** como botones de icono. Los tres actúan sobre la idea que está a la vista. **Otra vuelta** y **Elegir con IA** quedan debajo, como acciones secundarias.
 
 | Prenda | Sticker |
 |---|---|
@@ -118,13 +118,15 @@ Debajo, **Guardados** es una fila que se desliza con cada outfit como collage pe
 
 **Colores** usa el mismo selector del onboarding ([ColorPicker.tsx](../src/components/ColorPicker.tsx)): una pestaña para «Me gustan» y otra para «Prefiero evitar» sobre una sola cuadrícula, en lugar de dos listas de doce. **Apariencia** muestra los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers. Repetición de prendas y Almacenamiento cierran la pantalla sin cambios de contenido.
 
-## Mi clóset como perchero
+## Mi clóset como álbum
 
-Inspirado en el perchero del portafolio de Batch Merch (Inspora, «portfolio website»): fondo claro con puntos, un tubo cromado y prendas colgadas de canto. La prenda elegida gira de frente (`rotateY` con perspectiva, 320 ms, sin animación con Reducir movimiento) y debajo aparece su nombre, categoría, colores, «Ejemplo» si aplica, el interruptor de disponibilidad y **Editar prenda**. Arriba, capas, prendas completas y abajo cuelgan del tubo con un largo aproximado por categoría; calzado y accesorios van en una repisa.
+Toda la ropa, de ejemplo o propia, se ve como un álbum de stickers de 3 columnas con filtros por categoría, sobre el fondo de puntos: el recorte con borde claro, la foto con cualquier fondo en un marco, o el dibujo sin carita si la prenda no tiene foto. Los stickers van un poco girados, el nombre ocupa hasta dos líneas y una prenda en lavandería se ve atenuada con su etiqueta. Tocar un sticker abre la prenda. Para que un clóset largo no pese, el borde de los recortes pequeños se dibuja con cuatro copias de la imagen en lugar de ocho. Recortar una foto propia en el teléfono requiere un módulo nativo y una build de desarrollo.
 
-Todas las prendas cuelgan giradas hacia el mismo lado. Así, al elegir otra solo giran dos, la que sale y la que entra, y las de en medio solo se deslizan; cuando las de cada lado miraban hacia la elegida, las de en medio tenían que voltearse pasando de frente y se encimaban a medio camino. El giro y el desplazamiento de cada prenda son transformaciones que corren en el hilo nativo ([HangingGarment.tsx](../src/components/HangingGarment.tsx)); el lugar de cada una en el tubo se calcula de antemano, así que elegir una prenda no recalcula el diseño en cada cuadro. La zona táctil va fuera de la vista animada: dentro de ella, en iOS el toque no llegaba.
+El clóset de ejemplo usó hasta el 10/11/2026 un perchero con prendas colgadas de canto que giraban de frente al elegirlas. Se retiró a petición de la persona después de probarlo en su teléfono: la animación no convencía y era la única pantalla que no seguía la base de stickers. Con él se fueron el panel de la prenda elegida y su interruptor de disponibilidad en esa vista; la disponibilidad se cambia en el editor.
 
-El perchero se usa mientras el clóset tiene únicamente prendas de ejemplo. En cuanto hay ropa propia, Mi clóset cambia a un álbum de stickers de 3 columnas con filtros por categoría, sobre el mismo fondo de puntos: el recorte con borde claro, la foto con cualquier fondo en un marco, o el dibujo sin carita si la prenda no tiene foto. Los stickers van un poco girados, el nombre ocupa hasta dos líneas y una prenda en lavandería se ve atenuada con su etiqueta. Tocar un sticker abre la prenda. Para que un clóset largo no pese, el borde de los recortes pequeños se dibuja con cuatro copias de la imagen en lugar de ocho. El efecto del perchero depende de fotos sin fondo. El clóset de ejemplo usa fotos de Unsplash recortadas con Apple Vision ([créditos](../assets/demo/README.md)). Una prenda propia sin foto usa su dibujo con un gancho dibujado; una foto propia con fondo se ve, pero no tan limpia: recortarla en el teléfono requiere un módulo nativo y una build de desarrollo. El clóset vacío muestra, en una burbuja, lo que necesita un outfit y tres stickers de dibujo (arriba, abajo y calzado); debajo van **Agregar prenda** y **Ver el clóset de ejemplo**, que sigue siendo una elección explícita. La cuenta de prendas va sobre el título y **+ Agregar prenda** a su lado.
+El clóset vacío muestra, en una burbuja, lo que necesita un outfit y tres stickers de dibujo (arriba, abajo y calzado); debajo van **Agregar prenda** y **Ver el clóset de ejemplo**, que sigue siendo una elección explícita. La cuenta de prendas va sobre el título y **+ Agregar prenda** a su lado.
+
+En desarrollo, abajo a la izquierda hay una etiqueta pequeña «Prueba: Actual» que abre el selector de clósets de prueba ([CONTRIBUTING](../CONTRIBUTING.md)). Una app publicada no la muestra.
 
 ## Las hojas
 
@@ -140,7 +142,9 @@ Las hojas siguen la misma base que las pestañas: la prenda como sticker sobre e
 
 En iPhone la hoja empieza bajo la barra de estado y su pie deja libre el indicador de inicio. Con el teclado arriba, el pie queda pegado al teclado y el campo de nombre del editor se desplaza para quedar a la vista. El fondo de puntos se dibuja con el tamaño medido de su contenedor, no con porcentajes: en nativo un porcentaje deja fuera el margen interior y no sigue a un contenedor que crece.
 
-El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. Las hojas de clima y ocasión, colorimetría y Cambiar mi estilo no cambian de contenido.
+El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. Las hojas de colorimetría y Cambiar mi estilo no cambian de contenido.
+
+**Clima y ocasión** pide solo lo que cambia una sugerencia, en el orden en que más se toca: primero la ocasión; después el clima, con dos pestañas. En **Manual** hay una tarjeta con la temperatura, que se sube o baja con dos botones y sigue cambiando si se mantienen pulsados, y el interruptor de lluvia. En **Automático** va la ciudad en una fila con **Cambiar**, que despliega la búsqueda y **Usar mi ubicación** con su aviso de privacidad, y una línea que dice qué clima manual se usa cuando no hay dato reciente, con **Cambiar** para ajustarlo. **Aplicar** va al pie. Ya no se preguntan la ciudad en modo manual ni la estación: ninguna sugerencia las usa, y sus valores guardados se conservan. La hoja tampoco nombra al proveedor del clima; su crédito, que la licencia de los datos exige, está una sola vez en Mi estilo → Almacenamiento.
 
 ## Agregar prenda
 

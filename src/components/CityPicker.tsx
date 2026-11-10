@@ -12,9 +12,12 @@ import { Button, useUI } from './ui';
 export function CityPicker({
   value,
   onSelect,
+  hideSelected,
 }: {
   value?: WeatherLocation;
   onSelect: (place: WeatherLocation) => void;
+  /** For a caller that already shows the chosen city itself. */
+  hideSelected?: boolean;
 }) {
   const { palette, s } = useUI();
   const [query, setQuery] = useState('');
@@ -109,7 +112,7 @@ export function CityPicker({
 
   return (
     <View>
-      {value ? (
+      {value && !hideSelected ? (
         <Text style={[s.subtitle, { marginBottom: 12 }]}>
           Seleccionada:{' '}
           <Text style={{ color: palette.ink }}>{placeLabel(value)}</Text>

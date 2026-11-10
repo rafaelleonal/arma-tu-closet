@@ -1,42 +1,17 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { colorLabels, type WardrobeItem } from '../domain';
-import { useTheme } from '../theme/ThemeProvider';
-import { colorHex } from './ui';
-import { demoPhotoFor } from './demoPhotos';
+import { useState } from 'react';
+import type { WardrobeItem } from '../domain';
 
-const illustrations = {
-  tee: require('../../assets/garments/tee.png'),
-  shirt: require('../../assets/garments/shirt.png'),
-  sweater: require('../../assets/garments/sweater.png'),
-  trousers: require('../../assets/garments/trousers.png'),
-  dress: require('../../assets/garments/dress.png'),
-  sneakers: require('../../assets/garments/sneakers.png'),
-  boots: require('../../assets/garments/boots.png'),
-  jacket: require('../../assets/garments/jacket.png'),
-  scarf: require('../../assets/garments/scarf.png'),
-};
-export type IllustrationKind = keyof typeof illustrations;
-
-/** Decorative, tintable ink drawing. User photos never pass through this component. */
-export function GarmentIllustration({
-  kind,
-  size = 100,
-  ink,
-}: {
-  kind: IllustrationKind;
-  size?: number;
-  ink: string;
-}) {
-  return (
-    <Image
-      accessible={false}
-      source={illustrations[kind]}
-      resizeMode="contain"
-      style={{ width: size, height: size, tintColor: ink }}
-    />
-  );
-}
+/** The kinds of generic drawing; each has a sticker in assets/garments/stickers. */
+export type IllustrationKind =
+  | 'tee'
+  | 'shirt'
+  | 'sweater'
+  | 'trousers'
+  | 'dress'
+  | 'sneakers'
+  | 'boots'
+  | 'jacket'
+  | 'scarf';
 
 export function illustrationFor(item: WardrobeItem): IllustrationKind {
   const name = item.name
@@ -85,104 +60,3 @@ export function garmentArtLabel(hasOwnPhoto: boolean, hasDemoPhoto: boolean) {
   if (hasOwnPhoto) return 'Foto';
   return hasDemoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica';
 }
-
-const SWATCH_SLOT = 13;
-const MORE_WIDTH = 18;
-
-export function Garment({
-  item,
-  size = 100,
-}: {
-  item: WardrobeItem;
-  size?: number;
-}) {
-  const { palette } = useTheme();
-  const { cutoutUri, photoUri, fail } = useGarmentImages(item);
-  const colors = item.colors
-    .map((color) => colorLabels[color] || color)
-    .join(', ');
-  const demoPhoto = item.photoUri ? undefined : demoPhotoFor(item);
-  // One row of swatches; the rest are counted, and the label still names every color.
-  const fits = Math.floor((size + 4) / SWATCH_SLOT);
-  const shown =
-    item.colors.length > fits
-      ? Math.max(1, Math.floor((size + 4 - MORE_WIDTH) / SWATCH_SLOT))
-      : item.colors.length;
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${garmentArtLabel(Boolean(cutoutUri || photoUri), Boolean(demoPhoto))} de ${item.name}${colors ? `. Colores: ${colors}` : ''}`}
-      style={styles.art}
-    >
-      {cutoutUri ? (
-        <Image
-          accessible={false}
-          source={{ uri: cutoutUri }}
-          onError={fail(cutoutUri)}
-          style={{ width: size, height: size }}
-          resizeMode="contain"
-        />
-      ) : photoUri ? (
-        <Image
-          accessible={false}
-          source={{ uri: photoUri }}
-          onError={fail(photoUri)}
-          style={{
-            width: size,
-            height: size,
-            borderRadius: 10,
-            backgroundColor: palette.art,
-          }}
-          resizeMode="contain"
-        />
-      ) : demoPhoto ? (
-        <Image
-          accessible={false}
-          source={demoPhoto}
-          style={{ width: size, height: size }}
-          resizeMode="contain"
-        />
-      ) : (
-        <GarmentIllustration
-          kind={illustrationFor(item)}
-          size={size}
-          ink={palette.green}
-        />
-      )}
-      {item.colors.length ? (
-        <View style={[styles.colors, { maxWidth: size }]}>
-          {item.colors.slice(0, shown).map((color) => (
-            <View
-              key={color}
-              style={[
-                styles.swatch,
-                {
-                  backgroundColor: colorHex[color] || palette.muted,
-                  borderColor: palette.swatchBorder,
-                },
-              ]}
-            />
-          ))}
-          {shown < item.colors.length ? (
-            <Text style={[styles.more, { color: palette.muted }]}>
-              +{item.colors.length - shown}
-            </Text>
-          ) : null}
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  art: { alignItems: 'center', justifyContent: 'center' },
-  colors: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    marginTop: 7,
-  },
-  swatch: { width: 9, height: 9, borderRadius: 5, borderWidth: 1 },
-  more: { fontSize: 9, lineHeight: 10, fontWeight: '600' },
-});

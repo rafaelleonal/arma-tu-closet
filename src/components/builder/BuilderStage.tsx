@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { categoryLabels, type Category, type WardrobeItem } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
 import { slotForCategory } from '../outfitLayout';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { Sticker } from '../Sticker';
 import { useUI } from '../ui';
 

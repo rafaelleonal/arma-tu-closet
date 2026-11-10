@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { COLOR_OPTIONS, colorLabels } from '../domain';
 import { useFeedback } from './Feedback';
+import { Segmented } from './Segmented';
 import { colorHex, useUI } from './ui';
 
 export type ColorMode = 'favorite' | 'avoid';
@@ -24,7 +25,7 @@ export function ColorPicker({
   mode: ColorMode;
   onMode: (mode: ColorMode) => void;
 }) {
-  const { s, palette } = useUI();
+  const { s } = useUI();
   const feedback = useFeedback();
   const { preferredColors, excludedColors } = value;
   const current = mode === 'favorite' ? preferredColors : excludedColors;
@@ -46,43 +47,15 @@ export function ColorPicker({
   ] as const;
   return (
     <>
-      <View
-        style={{
-          backgroundColor: palette.wash,
-          borderRadius: 14,
-          padding: 5,
-          flexDirection: 'row',
-          marginBottom: 22,
-        }}
-      >
-        {modes.map((option) => (
-          <Pressable
-            key={option.id}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: mode === option.id }}
-            aria-selected={mode === option.id}
-            onPress={() => onMode(option.id)}
-            style={{
-              flex: 1,
-              minHeight: 47,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-              backgroundColor:
-                mode === option.id ? palette.white : 'transparent',
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 12,
-                color: palette.ink,
-                fontWeight: mode === option.id ? '600' : '400',
-              }}
-            >
-              {option.label} · {option.count}
-            </Text>
-          </Pressable>
-        ))}
+      <View style={{ marginBottom: 22 }}>
+        <Segmented
+          options={modes.map((option) => ({
+            id: option.id,
+            label: `${option.label} · ${option.count}`,
+          }))}
+          value={mode}
+          onChange={onMode}
+        />
       </View>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 20 }]}>
         {mode === 'favorite'

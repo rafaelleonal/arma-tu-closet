@@ -42,7 +42,10 @@ export function useQaCloset() {
   return { enabled: __DEV__, mode, items, setMode: change };
 }
 
-/** Plain, theme-independent chrome: it is a test tool, not part of the design under test. */
+/**
+ * Development only; a published build never shows it. Plain, theme-independent chrome: it is a
+ * test tool, not part of the design under test. Closed, it is one small label out of the way.
+ */
 export function QaClosetToggle({
   mode,
   onChange,
@@ -50,54 +53,75 @@ export function QaClosetToggle({
   mode: QaMode;
   onChange: (mode: QaMode) => void;
 }) {
+  const [open, setOpen] = useState(false);
   if (!__DEV__) return null;
+  const current = MODES.find((option) => option.mode === mode)?.label;
   return (
     <View
       pointerEvents="box-none"
-      style={{
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 12,
-        alignItems: 'center',
-      }}
+      style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}
     >
-      <View
-        accessibilityRole="radiogroup"
-        accessibilityLabel="Datos de prueba del clóset"
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          maxWidth: '94%',
-          gap: 2,
-          padding: 3,
-          borderRadius: 10,
-          backgroundColor: '#e4e4e7',
-        }}
-      >
-        {MODES.map((option) => {
-          const selected = option.mode === mode;
-          return (
-            <Pressable
-              key={option.mode}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: selected }}
-              onPress={() => onChange(option.mode)}
-              style={{
-                paddingHorizontal: 9,
-                paddingVertical: 7,
-                borderRadius: 8,
-                backgroundColor: selected ? '#ffffff' : 'transparent',
-              }}
-            >
-              <Text style={{ fontSize: 12, color: '#18181b' }}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      {open ? (
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            padding: 8,
+            borderRadius: 10,
+            backgroundColor: '#e4e4e7',
+          }}
+        >
+          <Text style={{ fontSize: 11, color: '#3f3f46', marginBottom: 6 }}>
+            Datos de prueba · solo en desarrollo, no se guardan
+          </Text>
+          <View
+            accessibilityRole="radiogroup"
+            accessibilityLabel="Datos de prueba del clóset"
+            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 2 }}
+          >
+            {MODES.map((option) => {
+              const selected = option.mode === mode;
+              return (
+                <Pressable
+                  key={option.mode}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selected }}
+                  onPress={() => {
+                    onChange(option.mode);
+                    setOpen(false);
+                  }}
+                  style={{
+                    paddingHorizontal: 9,
+                    paddingVertical: 7,
+                    borderRadius: 8,
+                    backgroundColor: selected ? '#ffffff' : 'transparent',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: '#18181b' }}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Datos de prueba del clóset: ${current}. Solo en desarrollo`}
+          onPress={() => setOpen(true)}
+          style={{
+            alignSelf: 'flex-start',
+            paddingHorizontal: 9,
+            paddingVertical: 6,
+            borderRadius: 8,
+            backgroundColor: '#e4e4e7',
+          }}
+        >
+          <Text style={{ fontSize: 11, color: '#18181b' }}>
+            Prueba: {current}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }

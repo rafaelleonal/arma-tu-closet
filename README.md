@@ -12,7 +12,7 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 - Agregar prendas con lo esencial (categoría y colores; foto y nombre opcionales) y ajustar en **Más detalles** ocasiones, abrigo, lluvia y estilos. Editar también la disponibilidad.
 - Obtener hasta tres sugerencias con clima automático de Open-Meteo o clima manual, y la ocasión elegida; cambiar una prenda o pedir otra combinación.
 - Armar conjuntos por categorías, guardarlos y registrar cuándo los usaste. Guardar y usar son acciones distintas.
-- Ver tu ropa en **Mi clóset** como cuadrícula de fotos; el clóset de ejemplo y la bienvenida usan un perchero donde la prenda elegida gira de frente.
+- Ver tu ropa en **Mi clóset** como álbum de stickers, igual para el clóset de ejemplo y para la ropa propia.
 - En iOS 17+ con la build de desarrollo, **Quitar fondo** recorta la foto de una prenda en el teléfono y conserva la original ([ADR-006](docs/adr/0006-recorte-de-fondo-en-dispositivo.md)).
 - Conservar el clóset, preferencias, fotos y uso en el dispositivo. Puedes empezar con ropa propia o elegir una demo identificada como ejemplo, con fotos de prendas recortadas ([créditos](assets/demo/README.md)).
 

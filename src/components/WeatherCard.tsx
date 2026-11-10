@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { occasionLabels, type Context } from '../domain';
 import type { LocalData } from '../storage/local';
 import type { useWeather } from '../weather/useWeather';
@@ -47,7 +47,7 @@ export function WeatherPill({
   );
 }
 
-/** Where the automatic forecast comes from and how fresh it is; the manual one needs no status. */
+/** How fresh the automatic weather is and a way to refresh it; the manual one needs no status. */
 export function WeatherStatus({
   data,
   context,
@@ -77,32 +77,14 @@ export function WeatherStatus({
           {weather.error}
         </Text>
       ) : null}
-      <View
-        style={[s.row, { justifyContent: 'space-between', flexWrap: 'wrap' }]}
-      >
-        <Pressable
-          accessibilityRole="link"
-          onPress={() => void Linking.openURL('https://open-meteo.com/')}
-          style={{ paddingVertical: 10 }}
-        >
-          <Text
-            style={{
-              color: palette.green,
-              fontSize: 11,
-              textDecorationLine: 'underline',
-            }}
-          >
-            Open-Meteo
-          </Text>
-        </Pressable>
-        <Button
-          small
-          secondary
-          label={weather.loading ? 'Actualizando…' : 'Actualizar clima'}
-          disabled={weather.loading}
-          onPress={weather.refresh}
-        />
-      </View>
+      <Button
+        small
+        secondary
+        label={weather.loading ? 'Actualizando…' : 'Actualizar clima'}
+        disabled={weather.loading}
+        onPress={weather.refresh}
+        style={{ alignSelf: 'flex-start' }}
+      />
     </View>
   );
 }

@@ -423,3 +423,20 @@ La persona confirmó después que se refería al perchero. Con la animación ral
 `pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
 
 Sin verificar: cómo se ve y qué tan fluida va en el teléfono de la persona, porque un simulador no mide fluidez; el aviso de iOS sobre la sombra sigue apareciendo aunque el sticker esté rasterizado, así que tampoco sirve de confirmación. Tampoco Android, un iPhone real, la bienvenida del primer arranque, los temas Papel, Salvia, Chicle y Malva, elegir o tomar foto, Reducir movimiento, VoiceOver ni Dynamic Type.
+
+## 10/11/2026 — Clima y ocasión más corta y clóset sin perchero
+
+Tras probar en su teléfono, la persona pidió simplificar Clima y ocasión, quitar las referencias a Open-Meteo, retirar el perchero de Mi clóset y dijo no entender el selector «Actual, Peor caso, 400…».
+
+- **Clima y ocasión**, según [la guía](diseno-personalizacion.md#las-hojas): ocasión primero, pestañas Automático/Manual, temperatura con botones en lugar de campo de texto, y sin ciudad manual ni estación, que no influían en ninguna sugerencia. El documento guardado no cambia de forma y conserva esos dos valores.
+- **Open-Meteo**: se quitó de la hoja y del estado del clima en Hoy. Queda un enlace en Mi estilo → Almacenamiento, porque la licencia de los datos pide crédito.
+- **Mi clóset**: el clóset de ejemplo usa el mismo álbum de stickers que la ropa propia. Se borraron `ClosetRail.tsx`, `HangingGarment.tsx` y los dibujos teñidos que solo usaba el perchero; el fondo de puntos pasó a `Dots.tsx`.
+- **Selector de prueba**: es una herramienta de desarrollo que una app publicada no muestra. Ahora está plegado en una etiqueta «Prueba: Actual» y, al abrirlo, dice que es solo de desarrollo.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
+
+Expo web a 375 × 812 en `127.0.0.1:8093`: hoja en [Manual](evidence/clima-ocasion-manual-web-375.jpg), sin desplazamiento; subir y bajar la temperatura; Automático sin ciudad, buscar «Puebla», elegirla y ver [la fila de ciudad y la línea de respaldo](evidence/clima-ocasion-automatico-web-375.jpg); cerrar sin aplicar. [Clóset de ejemplo como álbum](evidence/closet-ejemplo-album-web-375.jpg), selector de prueba plegado y abierto, y enlace de crédito presente en Mi estilo.
+
+Simulador iPhone 17 Pro (iOS 26.5): [hoja en Manual](evidence/ios-clima-ocasion-iphone17pro.jpg); mantener pulsado «+» sube la temperatura de forma continua y se detiene al soltar; el interruptor de lluvia quedó centrado tras un ajuste; se cerró sin aplicar.
+
+Sin verificar: aplicar un cambio de clima automático y ver el estado en Hoy, **Usar mi ubicación** dentro de la hoja nueva, la línea de respaldo desplegada, el clóset de ejemplo y el selector de prueba en iOS, Medianoche y los demás temas, un teléfono real, Android, VoiceOver y teclado.

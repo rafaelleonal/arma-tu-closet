@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { colorLabels, type Outfit, type WardrobeItem } from '../../domain';
 import { NameTag } from '../NameTag';
 import { slotFor } from '../outfitLayout';
-import { Dots } from '../rail';
+import { Dots } from '../Dots';
 import { Sticker } from '../Sticker';
 import { stickerArt } from '../StickerAlbum';
 
