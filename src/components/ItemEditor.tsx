@@ -19,6 +19,7 @@ import {
   DiscardPrompt,
   NameField,
 } from './item-editor/FormFields';
+import { GarmentPreview } from './item-editor/GarmentPreview';
 import { PhotoSection } from './item-editor/PhotoSection';
 import { useGarmentPhoto } from './item-editor/useGarmentPhoto';
 
@@ -107,7 +108,6 @@ export function ItemEditor({
       return;
     }
     setConfirmClose(true);
-    scrollTo(0);
   }
   function chooseCategory(value: Category) {
     setCategory(value);
@@ -129,25 +129,34 @@ export function ItemEditor({
       title={item ? 'Editar prenda' : 'Agregar prenda'}
       onClose={closeEditor}
       scrollRef={scroll}
+      footer={
+        confirmClose ? (
+          <DiscardPrompt
+            onKeep={() => setConfirmClose(false)}
+            onDiscard={discardAndClose}
+          />
+        ) : (
+          <Button
+            label={item ? 'Guardar cambios' : 'Agregar prenda'}
+            disabled={photo.busy}
+            onPress={save}
+          />
+        )
+      }
     >
-      {confirmClose ? (
-        <DiscardPrompt
-          onKeep={() => setConfirmClose(false)}
-          onDiscard={discardAndClose}
-        />
-      ) : null}
-      {item && onCombine && !hasChanges && !confirmClose ? (
+      <GarmentPreview draft={draft} />
+      {item && onCombine && !hasChanges ? (
         <Button
+          secondary
           label="Combínala"
           onPress={() => {
             discardAndClose();
             onCombine(item);
           }}
-          style={{ marginBottom: 16 }}
+          style={{ marginTop: 16 }}
         />
       ) : null}
       <PhotoSection
-        draft={draft}
         photo={photo}
         onApply={(confirmed) => {
           setName(confirmed.name);
@@ -198,12 +207,6 @@ export function ItemEditor({
           occasionError={submitted ? errors.occasions : undefined}
         />
       </View>
-      <Button
-        label={item ? 'Guardar cambios' : 'Agregar prenda'}
-        disabled={photo.busy}
-        style={{ marginTop: 26 }}
-        onPress={save}
-      />
     </Sheet>
   );
 }

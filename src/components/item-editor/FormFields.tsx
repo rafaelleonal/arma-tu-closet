@@ -10,6 +10,7 @@ import {
 import { suggestedItemName } from '../itemForm';
 import { Button, Chip, colorHex, FieldLabel, useUI } from '../ui';
 
+/** Takes the place of the save button, so the question is in view wherever the form was. */
 export function DiscardPrompt({
   onKeep,
   onDiscard,
@@ -17,12 +18,12 @@ export function DiscardPrompt({
   onKeep: () => void;
   onDiscard: () => void;
 }) {
-  const { palette, s } = useUI();
+  const { palette } = useUI();
   return (
-    <View style={[s.panel, { marginTop: 16 }]}>
+    <View>
       <Text
         accessibilityRole="alert"
-        style={{ color: palette.ink, fontSize: 18, marginBottom: 16 }}
+        style={{ color: palette.ink, fontSize: 16, marginBottom: 12 }}
       >
         ¿Descartar cambios?
       </Text>

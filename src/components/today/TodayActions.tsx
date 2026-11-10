@@ -44,7 +44,8 @@ export function TodayActions({
   saved: boolean;
   onFavorite: () => void;
   onWorn: () => void;
-  onDismiss: () => void;
+  /** Without it there is no «Prefiero otro»: a single outfit has nothing to replace it. */
+  onDismiss?: () => void;
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
@@ -57,7 +58,9 @@ export function TodayActions({
         onPress={onFavorite}
       />
       <Button label="Hoy me lo puse" onPress={onWorn} style={styles.main} />
-      <IconButton icon="↻" label="Prefiero otro" onPress={onDismiss} />
+      {onDismiss ? (
+        <IconButton icon="↻" label="Prefiero otro" onPress={onDismiss} />
+      ) : null}
     </View>
   );
 }

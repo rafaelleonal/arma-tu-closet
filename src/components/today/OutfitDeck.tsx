@@ -29,8 +29,15 @@ interface OutfitDeckProps {
   isSaved: (outfit: Outfit) => boolean;
   onFavorite: (outfit: Outfit) => void;
   onWorn: (outfit: Outfit) => void;
-  onDismiss: (outfit: Outfit) => void;
+  /** Without it the deck offers no «Prefiero otro». */
+  onDismiss?: (outfit: Outfit) => void;
   onItem: (outfit: Outfit, item: WardrobeItem) => void;
+  /** The garment every outfit is built around; it cannot be swapped. */
+  pinnedItemId?: string;
+  /** Height of the table when the deck is not a whole screen, as in a sheet. */
+  stageHeight?: number;
+  /** Page to open on, to come back to the idea that was in view. */
+  initialIndex?: number;
   /** Height already taken above the deck by something optional, such as a banner. */
   reserved?: number;
   /** Sits to the right of the page indicator. */
@@ -48,14 +55,18 @@ export function OutfitDeck(props: OutfitDeckProps) {
   const scroll = useRef<ScrollViewInstance>(null);
   // The pager spans the screen up to the content's maximum width; onLayout corrects the guess.
   const [width, setWidth] = useState(Math.min(window.width, MAX_CONTENT));
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(props.initialIndex ?? 0);
+  const placed = useRef(!props.initialIndex);
   const current = outfits[Math.min(index, outfits.length - 1)];
   // What is left of a phone screen after the heading, the reasons, the actions and the tab bar.
   const room =
     window.height - insets.top - insets.bottom - 405 - (props.reserved ?? 0);
-  const stageHeight = compact
-    ? Math.max(220, Math.min(320, room - 60))
-    : Math.max(260, Math.min(460, room));
+  const stageHeight =
+    props.stageHeight ??
+    (compact
+      ? Math.max(220, Math.min(320, room - 60))
+      : Math.max(260, Math.min(460, room)));
+  const { onDismiss } = props;
   return (
     <>
       <ScrollView
@@ -65,9 +76,15 @@ export function OutfitDeck(props: OutfitDeckProps) {
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={32}
         style={styles.pager}
-        onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        onLayout={(event) => {
+          const measured = event.nativeEvent.layout.width;
+          setWidth(measured);
+          if (placed.current) return;
+          placed.current = true;
+          scroll.current?.scrollTo({ x: index * measured, animated: false });
+        }}
         onScroll={(event) => {
-          if (!width) return;
+          if (!width || !placed.current) return;
           const page = Math.round(event.nativeEvent.contentOffset.x / width);
           if (page !== index && page >= 0 && page < outfits.length)
             setIndex(page);
@@ -81,13 +98,14 @@ export function OutfitDeck(props: OutfitDeckProps) {
                   outfit={outfit}
                   width={width}
                   height={stageHeight}
+                  pinnedItemId={props.pinnedItemId}
                   onItem={(item) => props.onItem(outfit, item)}
                 />
               </View>
             ))
           : null}
       </ScrollView>
-      <View style={styles.pages}>
+      <View style={outfits.length > 1 || trailing ? styles.pages : styles.gap}>
         <View style={styles.dots}>
           {outfits.length > 1
             ? outfits.map((outfit, page) => (
@@ -120,7 +138,7 @@ export function OutfitDeck(props: OutfitDeckProps) {
         saved={props.isSaved(current)}
         onFavorite={() => props.onFavorite(current)}
         onWorn={() => props.onWorn(current)}
-        onDismiss={() => props.onDismiss(current)}
+        onDismiss={onDismiss ? () => onDismiss(current) : undefined}
       />
     </>
   );
@@ -163,6 +181,7 @@ const createStyles = (palette: Palette) =>
       minHeight: 44,
       marginVertical: 4,
     },
+    gap: { height: 14 },
     dots: { flexDirection: 'row', alignItems: 'center' },
     dotArea: {
       width: 32,

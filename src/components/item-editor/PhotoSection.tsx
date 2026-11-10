@@ -1,38 +1,23 @@
 import React from 'react';
 import { Linking, Platform, Text, View } from 'react-native';
-import type { WardrobeItem } from '../../domain';
 import type { GarmentSuggestion } from '../../ai/contracts';
-import { Garment } from '../Garment';
 import { GarmentSuggestionReview } from '../GarmentSuggestionReview';
 import { Button, ComingSoon, FieldLabel, useUI } from '../ui';
 import { photoAnalysisAvailable } from './localPhoto';
 import type { GarmentPhoto } from './useGarmentPhoto';
 
-/** Photo preview, picker, background removal and the optional analysis. */
+/** Photo picker, background removal and the optional analysis. The preview sits above it. */
 export function PhotoSection({
-  draft,
   photo,
   onApply,
 }: {
-  draft: WardrobeItem;
   photo: GarmentPhoto;
   onApply: (suggestion: GarmentSuggestion) => void;
 }) {
-  const { palette, s } = useUI();
+  const { s } = useUI();
   return (
     <>
       <FieldLabel>Foto · opcional</FieldLabel>
-      <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: palette.wash,
-          padding: 20,
-          borderRadius: 20,
-          marginVertical: 18,
-        }}
-      >
-        <Garment item={draft} size={150} />
-      </View>
       <View style={s.row}>
         <Button
           secondary

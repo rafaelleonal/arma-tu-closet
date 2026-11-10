@@ -20,7 +20,8 @@ const SEPARATES: Layout = {
 const SEPARATES_WITH_LAYER: Layout = {
   layer: { x: 0.46, y: 0, w: 0.52, h: 0.46, rotate: 6, z: 0 },
   top: { x: 0, y: 0.06, w: 0.5, h: 0.46, rotate: -4, z: 2 },
-  bottom: { x: 0.54, y: 0.4, w: 0.38, h: 0.58, rotate: 5, z: 1 },
+  // Starts where the layer's name tag ends, so the tag is never covered.
+  bottom: { x: 0.54, y: 0.46, w: 0.38, h: 0.54, rotate: 5, z: 1 },
   shoes: { x: 0.04, y: 0.6, w: 0.44, h: 0.32, rotate: -6, z: 3 },
   accessory: { x: 0.3, y: 0.46, w: 0.26, h: 0.2, rotate: 8, z: 4 },
 };
@@ -32,14 +33,23 @@ const ONE_PIECE: Layout = {
 };
 const SPARE: Slot = { x: 0.3, y: 0.3, w: 0.4, h: 0.4, rotate: 0, z: 5 };
 
-function layoutFor(items: WardrobeItem[]): Layout {
-  if (items.some((item) => item.category === 'one-piece')) return ONE_PIECE;
-  return items.some((item) => item.category === 'layer')
-    ? SEPARATES_WITH_LAYER
-    : SEPARATES;
+function layoutFor(categories: readonly Category[]): Layout {
+  if (categories.includes('one-piece')) return ONE_PIECE;
+  return categories.includes('layer') ? SEPARATES_WITH_LAYER : SEPARATES;
+}
+
+/** The place of a category on a table that holds `categories`, filled or still empty. */
+export function slotForCategory(
+  categories: readonly Category[],
+  category: Category,
+): Slot {
+  return layoutFor(categories)[category] ?? SPARE;
 }
 
 /** The place of one garment among the rest of its outfit. */
 export function slotFor(items: WardrobeItem[], item: WardrobeItem): Slot {
-  return layoutFor(items)[item.category] ?? SPARE;
+  return slotForCategory(
+    items.map((value) => value.category),
+    item.category,
+  );
 }

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import {
   generateRecommendations,
   isItemEligible,
@@ -7,11 +7,14 @@ import {
   type Outfit,
 } from '../domain';
 import type { LocalData } from '../storage/local';
-import { OutfitCard } from '../components/OutfitCard';
 import { SwapSheet, type SwapTarget } from '../components/OutfitSheets';
-import { Sheet } from '../components/Sheet';
+import { Sheet, useSheetStageHeight } from '../components/Sheet';
+import { OutfitDeck } from '../components/today/OutfitDeck';
 import { Button, useUI } from '../components/ui';
 import type { OutfitActions } from './actions';
+
+/** Header, the line about the chosen garment, a bubble, the page dots, the actions and padding. */
+const AROUND_STAGE = 390;
 
 export function CombineGarmentSheet({
   data,
@@ -37,6 +40,10 @@ export function CombineGarmentSheet({
     (SwapTarget & { proposalId: string }) | null
   >(null);
   const [adjusted, setAdjusted] = useState<Record<string, Outfit>>({});
+  // The idea in view when a swap opened, to come back to it.
+  const [page, setPage] = useState(0);
+  const compact = data.appearance.outfitLayout === 'compact';
+  const stageHeight = useSheetStageHeight(AROUND_STAGE, compact);
   const result = useMemo(
     () =>
       generateRecommendations(data.items, context, {
@@ -53,6 +60,7 @@ export function CombineGarmentSheet({
       proposals.set(outfit.id, { proposalId: proposal.id, outfit });
     }
   }
+  const outfits = [...proposals.values()].map(({ outfit }) => outfit);
 
   if (swap) {
     return (
@@ -78,9 +86,6 @@ export function CombineGarmentSheet({
 
   return (
     <Sheet title="Combínala" onClose={onClose}>
-      {item ? (
-        <Text style={[s.sectionTitle, { marginBottom: 12 }]}>{item.name}</Text>
-      ) : null}
       {saveError ? (
         <Text
           accessibilityRole="alert"
@@ -89,29 +94,36 @@ export function CombineGarmentSheet({
           {saveError}
         </Text>
       ) : null}
-      {proposals.size ? (
-        <View style={{ gap: 14 }}>
-          {[...proposals.values()].map(({ proposalId, outfit }) => (
-            <OutfitCard
-              key={proposalId}
-              outfit={outfit}
-              pinnedItemId={itemId}
-              primary
-              compact={data.appearance.outfitLayout === 'compact'}
-              showReasons={data.appearance.showReasons}
-              saved={actions.isSaved(outfit)}
-              onFavorite={() => actions.favorite(outfit)}
-              onWorn={() => actions.worn(outfit)}
-              onItem={(piece) =>
-                setSwap({
-                  outfit,
-                  category: piece.category,
-                  proposalId,
-                })
-              }
-            />
-          ))}
-        </View>
+      {outfits.length ? (
+        <>
+          {item ? (
+            <Text style={[s.subtitle, { marginBottom: 14 }]}>
+              {item.name} se queda. Toca otra prenda para cambiarla.
+            </Text>
+          ) : null}
+          <OutfitDeck
+            key={outfits.map((outfit) => outfit.id).join('|')}
+            outfits={outfits}
+            compact={compact}
+            showReasons={data.appearance.showReasons}
+            stageHeight={stageHeight}
+            pinnedItemId={itemId}
+            initialIndex={Math.min(page, outfits.length - 1)}
+            isSaved={actions.isSaved}
+            onFavorite={actions.favorite}
+            onWorn={actions.worn}
+            onItem={(outfit, piece) => {
+              const proposal = proposals.get(outfit.id);
+              if (!proposal) return;
+              setPage(outfits.indexOf(outfit));
+              setSwap({
+                outfit,
+                category: piece.category,
+                proposalId: proposal.proposalId,
+              });
+            }}
+          />
+        </>
       ) : (
         <>
           <Text style={s.subtitle}>{result.message}</Text>

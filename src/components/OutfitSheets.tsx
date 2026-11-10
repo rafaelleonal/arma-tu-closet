@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
 import {
   categoryLabels,
   swapOutfitItem,
@@ -9,15 +9,20 @@ import {
   type WardrobeItem,
 } from '../domain';
 import type { LocalData } from '../storage/local';
-import { Garment } from './Garment';
-import { OutfitCard } from './OutfitCard';
-import { Sheet } from './Sheet';
+import { Sheet, useSheetStageHeight } from './Sheet';
+import { StickerAlbum } from './StickerAlbum';
+import { OutfitDeck } from './today/OutfitDeck';
 import { useUI } from './ui';
 
 export interface SwapTarget {
   outfit: Outfit;
   category: Category;
 }
+
+/** Header, a bubble of three lines, the gap under the table, the actions and the padding. */
+const AROUND_STAGE = 310;
+/** The note that a saved outfit keeps its original details. */
+const SAVED_NOTE = 54;
 
 export function OutfitSheet({
   data,
@@ -39,6 +44,11 @@ export function OutfitSheet({
   onItem: (item: WardrobeItem) => void;
 }) {
   const { palette, s } = useUI();
+  const compact = data.appearance.outfitLayout === 'compact';
+  const stageHeight = useSheetStageHeight(
+    AROUND_STAGE + (saved ? SAVED_NOTE : 0),
+    compact,
+  );
   return (
     <Sheet title="Tu outfit" onClose={onClose}>
       {saved ? (
@@ -55,15 +65,15 @@ export function OutfitSheet({
           {saveError}
         </Text>
       ) : null}
-      <OutfitCard
-        compact={data.appearance.outfitLayout === 'compact'}
+      <OutfitDeck
+        outfits={[outfit]}
+        compact={compact}
         showReasons={data.appearance.showReasons}
-        outfit={outfit}
-        primary
-        saved={saved}
+        stageHeight={stageHeight}
+        isSaved={() => saved}
         onFavorite={onFavorite}
         onWorn={onWorn}
-        onItem={onItem}
+        onItem={(_, item) => onItem(item)}
       />
     </Sheet>
   );
@@ -83,11 +93,14 @@ export function SwapSheet({
   onClose: () => void;
   onResult: (change: ReturnType<typeof swapOutfitItem>) => void;
 }) {
-  const { palette, s } = useUI();
+  const { s } = useUI();
+  const current = swap.outfit.items.find(
+    (item) => item.category === swap.category,
+  );
   const options = data.items.filter(
     (item) =>
       item.category === swap.category &&
-      !swap.outfit.items.some((current) => current.id === item.id) &&
+      !swap.outfit.items.some((worn) => worn.id === item.id) &&
       item.available &&
       !item.colors.some((color) =>
         data.preferences.excludedColors.includes(color),
@@ -99,46 +112,30 @@ export function SwapSheet({
       onClose={onClose}
     >
       <Text style={s.subtitle}>
-        Prendas disponibles de esta categoría, sin los colores excluidos.
+        {current ? `En lugar de ${current.name}. ` : ''}
+        Solo prendas disponibles, sin los colores que evitas.
       </Text>
-      {!options.length ? (
+      {options.length ? (
+        <StickerAlbum
+          items={options}
+          labelFor={(item) => `Cambiar por ${item.name}`}
+          onPress={(item) =>
+            onResult(
+              swapOutfitItem(
+                swap.outfit,
+                swap.category,
+                item.id,
+                data.items,
+                context,
+              ),
+            )
+          }
+        />
+      ) : (
         <Text style={[s.subtitle, { marginTop: 20 }]}>
           No hay otra prenda disponible. Agrega una en Mi clóset.
         </Text>
-      ) : null}
-      <View style={[s.wrap, { marginTop: 20 }]}>
-        {options.map((item) => (
-          <Pressable
-            key={item.id}
-            accessibilityRole="button"
-            accessibilityLabel={`Cambiar por ${item.name}`}
-            onPress={() =>
-              onResult(
-                swapOutfitItem(
-                  swap.outfit,
-                  swap.category,
-                  item.id,
-                  data.items,
-                  context,
-                ),
-              )
-            }
-            style={[
-              styles.option,
-              { backgroundColor: palette.white, borderColor: palette.line },
-            ]}
-          >
-            <Garment item={item} size={110} />
-            <Text style={{ color: palette.ink, fontSize: 12, marginTop: 10 }}>
-              {item.name}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      )}
     </Sheet>
   );
 }
-
-const styles = StyleSheet.create({
-  option: { padding: 14, borderRadius: 14, borderWidth: 1, width: 145 },
-});

@@ -336,3 +336,21 @@ Recorrido en navegador con Expo web en `127.0.0.1:8093` a 375 × 812, con los cl
 Observado: en el servidor de desarrollo las fotos recortadas tardan unos segundos en aparecer y, mientras tanto, se ven los nombres sin sticker.
 
 Sin verificar: iOS y Android, fotos propias con y sin recorte, rendimiento del álbum con muchas fotos recortadas en teléfono, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.
+
+## 9/11/2026 — Hojas con la base de stickers
+
+Tu outfit, Cambiar, Combínala, Armar outfit y el editor de prenda siguen [la guía de las hojas](diseno-personalizacion.md#las-hojas). `Sheet` admite una zona fija bajo el título y un pie con la acción principal. Tu outfit y Combínala reutilizan la mesa y las acciones de Hoy, por lo que `OutfitCard.tsx` se eliminó. El álbum de Mi clóset se extrajo a `StickerAlbum.tsx`, que también usan Cambiar y el compositor. En la disposición con capa, la parte de abajo empieza más abajo para no tapar la etiqueta de la capa; el ajuste también aplica a Hoy.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados. No hay pruebas nuevas: el cambio es de presentación y las reglas de intercambio, guardado y uso no cambian.
+
+Recorrido en navegador con Expo web en `127.0.0.1:8093` a 375 × 812 con el clóset de ejemplo:
+
+- Hoy: tocar una prenda abre Cambiar como álbum; elegir otra abre Tu outfit con la prenda cambiada. Una categoría sin alternativas muestra su mensaje.
+- Mi estilo: un guardado abre Tu outfit con su aviso.
+- [Armar outfit](evidence/hojas-compositor-web-375.jpg): los huecos se llenan al elegir, guardar incompleto dice «Falta elegir calzado.», y guardar completo añade un outfit «Creado por ti» sin registrar uso. Ese outfit se retiró después del documento de QA.
+- [Editor](evidence/hojas-editor-web-375.jpg): en una prenda nueva el sticker cambia con la categoría y la etiqueta aparece con el color; guardar sin color lleva al error; cerrar con cambios pregunta en el pie y descartar cierra.
+- Combínala: dos ideas con la prenda elegida fija; cerrar un cambio abierto desde la segunda idea vuelve a la segunda.
+- Medianoche: [compositor](evidence/hojas-compositor-medianoche-web-375.jpg), editor y [Combínala](evidence/hojas-combinala-medianoche-web-375.jpg).
+- A 320 × 568, Combínala no desborda en horizontal; la mesa queda en su altura mínima y las acciones se alcanzan desplazando la hoja.
+
+Sin verificar: iOS y Android (teclado sobre el pie fijo, áreas seguras, deslizar con el dedo), elegir o tomar una foto, quitar fondo y analizar foto en el editor nuevo, fotos propias, un outfit con accesorio, la disposición Compacta, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.

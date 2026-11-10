@@ -122,9 +122,25 @@ Inspirado en el perchero del portafolio de Batch Merch (Inspora, «portfolio web
 
 El perchero se usa mientras el clóset tiene únicamente prendas de ejemplo. En cuanto hay ropa propia, Mi clóset cambia a un álbum de stickers de 3 columnas con filtros por categoría, sobre el mismo fondo de puntos: el recorte con borde claro, la foto con cualquier fondo en un marco, o el dibujo sin carita si la prenda no tiene foto. Los stickers van un poco girados, el nombre ocupa hasta dos líneas y una prenda en lavandería se ve atenuada con su etiqueta. Tocar un sticker abre la prenda. Para que un clóset largo no pese, el borde de los recortes pequeños se dibuja con cuatro copias de la imagen en lugar de ocho. El efecto del perchero depende de fotos sin fondo. El clóset de ejemplo usa fotos de Unsplash recortadas con Apple Vision ([créditos](../assets/demo/README.md)). Una prenda propia sin foto usa su dibujo con un gancho dibujado; una foto propia con fondo se ve, pero no tan limpia: recortarla en el teléfono requiere un módulo nativo y una build de desarrollo. El clóset vacío muestra, en una burbuja, lo que necesita un outfit y tres stickers de dibujo (arriba, abajo y calzado); debajo van **Agregar prenda** y **Ver el clóset de ejemplo**, que sigue siendo una elección explícita. La cuenta de prendas va sobre el título y **+ Agregar prenda** a su lado.
 
+## Las hojas
+
+Las hojas siguen la misma base que las pestañas: la prenda como sticker sobre el fondo de puntos y una acción principal. Usan el mismo margen lateral que una pantalla, para que la mesa y los álbumes lleguen a los dos bordes. Cuando la acción principal cierra un formulario o una selección larga, va fija al pie de la hoja y no al final del contenido.
+
+| Hoja | Qué muestra |
+|---|---|
+| **Tu outfit** | La misma mesa de Hoy con una sola idea: burbuja con los motivos, stickers que abren su cambio, Guardar y **Hoy me lo puse**. Sin **Prefiero otro**, porque no hay otra idea que la reemplace. Un guardado conserva su aviso de detalles originales. |
+| **Cambiar** | Un álbum de stickers de tres columnas con las prendas que pueden entrar. Arriba dice a cuál reemplazan y que solo hay prendas disponibles, sin los colores que la persona evita. |
+| **Combínala** | Las ideas en páginas, como en Hoy. La prenda elegida lleva la etiqueta invertida y no se toca; las demás abren su cambio. Al cerrar un cambio se vuelve a la idea que estaba a la vista. |
+| **Armar outfit** | Arriba, fija, una mesa pequeña con el outfit que se va formando: un sticker por prenda elegida y un hueco punteado con el nombre de cada categoría obligatoria que falta. Debajo, cada categoría es una fila de stickers que se desliza; tocar uno lo elige o lo quita, y el elegido lleva una palomita. **Guardar outfit** va al pie; si falta algo, dice qué categoría. |
+| **Agregar o editar prenda** | Arriba, la prenda como el sticker que verá el resto de la app, con su etiqueta de colores y nombre; cambia al elegir foto, categoría o color. **Guardar** va al pie. Al cerrar con cambios, la pregunta **¿Descartar cambios?** ocupa ese mismo pie. |
+
+El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. Las hojas de clima y ocasión, colorimetría y Cambiar mi estilo no cambian de contenido.
+
 ## Agregar prenda
 
 Lo esencial va primero: foto opcional, categoría y colores. El nombre es opcional; si queda vacío se guarda «Categoría · color» (p. ej. «Capa exterior · café»), con separador para no forzar concordancia de género. Una prenda nueva empieza sin color para no guardar «Negro» por accidente.
+
+La vista previa es un sticker sobre el fondo de puntos: el recorte con borde, la foto en su marco o, sin foto, el dibujo genérico de la categoría, que para lectores de pantalla sigue siendo «Ilustración genérica».
 
 Con una foto elegida, en iOS 17+ con la build de desarrollo aparece **Quitar fondo** (se hace en el teléfono; la foto no se envía). El resultado se ve en la vista previa; **Usar original** lo descarta. La cuadrícula, Hoy y el perchero prefieren el recorte. [ADR-006](adr/0006-recorte-de-fondo-en-dispositivo.md).
 

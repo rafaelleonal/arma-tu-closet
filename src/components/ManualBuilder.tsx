@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
 import {
+  categoryLabels,
   type Category,
   type Outfit,
   type WardrobeItem,
-  categoryLabels,
 } from '../domain';
-import { Garment } from './Garment';
+import { BuilderStage, type Chosen } from './builder/BuilderStage';
+import { SlotShelf } from './builder/SlotShelf';
 import { Sheet } from './Sheet';
-import { Button, Chip, FieldLabel, useUI } from './ui';
+import { Button, Chip, useUI } from './ui';
 
+type Shape = 'separates' | 'one-piece';
+
+const REQUIRED: Record<Shape, Category[]> = {
+  separates: ['top', 'bottom', 'shoes'],
+  'one-piece': ['one-piece', 'shoes'],
+};
+const OPTIONAL: Category[] = ['layer', 'accessory'];
+
+/** "Parte de abajo y calzado": the categories still missing, as one phrase. */
+function missingPhrase(categories: Category[]) {
+  const names = categories.map((category) =>
+    categoryLabels[category].toLowerCase(),
+  );
+  return names.length > 1
+    ? `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`
+    : names[0];
+}
+
+/** Any available garment can be chosen here: the person decides, so excluded colors still show. */
 export function ManualBuilder({
   items,
   onSave,
@@ -20,112 +40,94 @@ export function ManualBuilder({
   onClose: () => void;
 }) {
   const { palette, s } = useUI();
-  const [shape, setShape] = useState<'separates' | 'one-piece'>('separates');
+  const window = useWindowDimensions();
+  const [shape, setShape] = useState<Shape>('separates');
   const [selected, setSelected] = useState<Partial<Record<Category, string>>>(
     {},
   );
   const [error, setError] = useState('');
-  const slots: Category[] =
-    shape === 'separates'
-      ? ['top', 'bottom', 'shoes', 'layer', 'accessory']
-      : ['one-piece', 'shoes', 'layer', 'accessory'];
+  const required = REQUIRED[shape];
+  const slots = [...required, ...OPTIONAL];
+  const available = items.filter((item) => item.available);
+  const chosen: Chosen = {};
+  for (const slot of slots) {
+    const item = available.find((value) => value.id === selected[slot]);
+    if (item && item.category === slot) chosen[slot] = item;
+  }
+  const missing = required.filter((slot) => !chosen[slot]);
+
+  function choose(next: Shape) {
+    setShape(next);
+    setError('');
+  }
   return (
-    <Sheet title="Armar outfit" onClose={onClose}>
-      <View style={[s.wrap, { marginTop: 20 }]}>
+    <Sheet
+      title="Armar outfit"
+      onClose={onClose}
+      pinned={
+        <BuilderStage
+          required={required}
+          chosen={chosen}
+          height={Math.max(150, Math.min(210, window.height * 0.25))}
+        />
+      }
+      footer={
+        <>
+          {error ? (
+            <Text
+              accessibilityRole="alert"
+              style={{ color: palette.rust, fontSize: 13, marginBottom: 10 }}
+            >
+              {error}
+            </Text>
+          ) : null}
+          <Button
+            label="Guardar outfit"
+            onPress={() => {
+              if (missing.length) {
+                setError(`Falta elegir ${missingPhrase(missing)}.`);
+                return;
+              }
+              onSave({
+                id: `manual-${Date.now()}`,
+                items: slots.flatMap((slot) => chosen[slot] ?? []),
+                score: 0,
+                reasons: [],
+                warnings: [],
+              });
+            }}
+          />
+        </>
+      }
+    >
+      <View style={[s.wrap, { marginTop: 14 }]}>
         <Chip
           label="Arriba + abajo"
           selected={shape === 'separates'}
-          onPress={() => setShape('separates')}
+          onPress={() => choose('separates')}
         />
         <Chip
           label="Prenda completa"
           selected={shape === 'one-piece'}
-          onPress={() => setShape('one-piece')}
+          onPress={() => choose('one-piece')}
         />
       </View>
       {slots.map((slot) => (
-        <View key={slot}>
-          <FieldLabel>
-            {categoryLabels[slot]}
-            {slot === 'layer' || slot === 'accessory' ? ' · opcional' : ''}
-          </FieldLabel>
-          <View style={s.wrap}>
-            {items
-              .filter((item) => item.available && item.category === slot)
-              .map((item) => (
-                <Pressable
-                  key={item.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.name}
-                  accessibilityState={{ selected: selected[slot] === item.id }}
-                  aria-pressed={selected[slot] === item.id}
-                  onPress={() =>
-                    setSelected((current) => ({
-                      ...current,
-                      [slot]: current[slot] === item.id ? undefined : item.id,
-                    }))
-                  }
-                  style={{
-                    width: 105,
-                    backgroundColor:
-                      selected[slot] === item.id ? palette.sand : palette.white,
-                    borderRadius: 14,
-                    padding: 10,
-                    borderWidth: 1,
-                    borderColor:
-                      selected[slot] === item.id ? palette.rust : palette.line,
-                  }}
-                >
-                  <Garment item={item} size={80} />
-                  <Text
-                    style={{ fontSize: 12, color: palette.ink, marginTop: 7 }}
-                  >
-                    {item.name}
-                  </Text>
-                </Pressable>
-              ))}
-          </View>
-          {!items.some((item) => item.available && item.category === slot) ? (
-            <Text style={s.subtitle}>
-              Aún no hay prendas disponibles en esta categoría.
-            </Text>
-          ) : null}
-        </View>
+        <SlotShelf
+          key={slot}
+          category={slot}
+          optional={OPTIONAL.includes(slot)}
+          items={available.filter((item) => item.category === slot)}
+          selectedId={chosen[slot]?.id}
+          onToggle={(item) => {
+            setError('');
+            setSelected((current) => ({
+              ...current,
+              [slot]: current[slot] === item.id ? undefined : item.id,
+            }));
+          }}
+        />
       ))}
-      {error ? (
-        <Text
-          accessibilityRole="alert"
-          style={{ color: palette.rust, marginTop: 18 }}
-        >
-          {error}
-        </Text>
-      ) : null}
-      <Button
-        label="Guardar outfit"
-        style={{ marginTop: 25 }}
-        onPress={() => {
-          const required: Category[] =
-            shape === 'separates'
-              ? ['top', 'bottom', 'shoes']
-              : ['one-piece', 'shoes'];
-          if (required.some((slot) => !selected[slot])) {
-            setError('Complétalo y elige calzado para guardarlo.');
-            return;
-          }
-          const chosen = slots.flatMap((slot) =>
-            items.filter(
-              (item) => item.id === selected[slot] && item.available,
-            ),
-          );
-          onSave({
-            id: `manual-${Date.now()}`,
-            items: chosen,
-            score: 0,
-            reasons: [],
-            warnings: [],
-          });
-        }}
-      />
     </Sheet>
   );
 }
