@@ -58,6 +58,8 @@ const LARGE = 140;
 const FALLBACK_ASPECT = 0.8;
 
 // iOS has no drop-shadow filter; its view shadow follows the picture when there is no background.
+// That shadow is costly to work out on every frame, so each sticker is rasterized: drawn once,
+// border and shadow included, and reused while it scrolls or moves.
 export const lifted: ViewStyle =
   Platform.OS === 'ios'
     ? {
@@ -127,7 +129,7 @@ function CutoutSticker({
     height: box.height - edge * 2,
   };
   return (
-    <View style={[lifted, box, style]}>
+    <View shouldRasterizeIOS style={[lifted, box, style]}>
       {(Math.min(maxWidth, maxHeight) < LARGE ? THIN_RING : RING).map(
         ([x, y]) => (
           <Image
@@ -192,6 +194,7 @@ export function Sticker({
     const side = Math.min(maxWidth, maxHeight);
     return (
       <View
+        shouldRasterizeIOS
         style={[lifted, styles.frame, turned, { width: side, height: side }]}
       >
         <Image
@@ -239,6 +242,7 @@ export function DrawingSticker({
   const drawing = drawings[kind];
   return (
     <View
+      shouldRasterizeIOS
       style={[Math.min(maxWidth, maxHeight) < SMALL ? null : lifted, style]}
     >
       <Image

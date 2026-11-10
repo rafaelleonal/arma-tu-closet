@@ -31,7 +31,7 @@ export function CrewSticker({
       ? { width: size, height: size / aspect }
       : { width: size * aspect, height: size };
   return (
-    <View style={[lifted, style]}>
+    <View shouldRasterizeIOS style={[lifted, style]}>
       <Image
         accessible={false}
         source={crew[kind]}

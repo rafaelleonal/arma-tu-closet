@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Animated,
-  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,6 +9,7 @@ import {
 } from 'react-native';
 import { categoryLabels, colorLabels, type WardrobeItem } from '../domain';
 import { useFeedback } from './Feedback';
+import { FRONT_GAP, HangingGarment, SIDE_WIDTH } from './HangingGarment';
 import {
   GarmentImage,
   HANGING,
@@ -23,7 +22,26 @@ import {
 } from './rail';
 import { Button, useUI } from './ui';
 
-const SIDE_WIDTH = 40;
+/** Each garment's width and place on the rod, so choosing one moves the rest without a new layout. */
+function placeOnRod(hanging: WardrobeItem[], selectedIndex: number) {
+  const places: {
+    width: number;
+    x: number;
+    room: { left: number; width: number };
+  }[] = [];
+  let rodWidth = 0;
+  hanging.forEach((item, index) => {
+    const width = garmentWidth(item, LENGTH[item.category]);
+    const room = index === selectedIndex ? width + FRONT_GAP : SIDE_WIDTH;
+    places.push({
+      width,
+      x: rodWidth + (room - width) / 2,
+      room: { left: rodWidth, width: room },
+    });
+    rodWidth += room;
+  });
+  return { places, rodWidth };
+}
 
 interface Props {
   items: WardrobeItem[];
@@ -50,6 +68,7 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
   }
   const railHeight =
     ROD_TOP + Math.max(0, ...hanging.map((item) => LENGTH[item.category])) + 12;
+  const { places, rodWidth } = placeOnRod(hanging, selectedIndex);
 
   return (
     <View>
@@ -60,13 +79,7 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 18, minWidth: '100%' }}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                height: railHeight,
-              }}
-            >
+            <View style={{ width: rodWidth, height: railHeight }}>
               <Rod />
               <View style={[railStyles.cap, { left: -10 }]} />
               <View style={[railStyles.cap, { right: -10 }]} />
@@ -74,9 +87,11 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
                 <HangingGarment
                   key={item.id}
                   item={item}
-                  position={
-                    index < selectedIndex ? -1 : index > selectedIndex ? 1 : 0
-                  }
+                  chosen={index === selectedIndex}
+                  x={places[index].x}
+                  width={places[index].width}
+                  room={places[index].room}
+                  height={LENGTH[item.category]}
                   onPress={() => select(item)}
                 />
               ))}
@@ -174,69 +189,6 @@ export function ClosetRail({ items, onEdit, onToggle }: Props) {
         </View>
       ) : null}
     </View>
-  );
-}
-
-export function HangingGarment({
-  item,
-  position,
-  onPress,
-}: {
-  item: WardrobeItem;
-  position: -1 | 0 | 1;
-  onPress: () => void;
-}) {
-  const { reduceMotion } = useFeedback();
-  const [progress] = useState(() => new Animated.Value(position));
-  useEffect(() => {
-    progress.stopAnimation();
-    if (reduceMotion) {
-      progress.setValue(position);
-      return;
-    }
-    const animation = Animated.timing(progress, {
-      toValue: position,
-      duration: 320,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    });
-    animation.start();
-    return () => animation.stop();
-  }, [position, reduceMotion, progress]);
-  const height = LENGTH[item.category];
-  const width = garmentWidth(item, height);
-  const slot = progress.interpolate({
-    inputRange: [-1, 0, 1],
-    outputRange: [SIDE_WIDTH, width + 24, SIDE_WIDTH],
-  });
-  const rotateY = progress.interpolate({
-    inputRange: [-1, 0, 1],
-    outputRange: ['76deg', '0deg', '-76deg'],
-  });
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${item.name}${item.available ? '' : ', en lavandería'}`}
-      accessibilityState={{ selected: position === 0 }}
-      onPress={onPress}
-      style={{ zIndex: position === 0 ? 2 : 1 }}
-    >
-      <Animated.View
-        style={{ width: slot, height: ROD_TOP + height, alignItems: 'center' }}
-      >
-        <Animated.View
-          style={{
-            width,
-            height,
-            marginTop: ROD_TOP - 10,
-            opacity: item.available ? 1 : 0.4,
-            transform: [{ perspective: 900 }, { rotateY }],
-          }}
-        >
-          <GarmentImage item={item} width={width} height={height} />
-        </Animated.View>
-      </Animated.View>
-    </Pressable>
   );
 }
 

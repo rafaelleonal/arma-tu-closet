@@ -24,6 +24,7 @@ export function WordSticker({
 }) {
   return (
     <View
+      shouldRasterizeIOS
       style={[
         lifted,
         styles.sticker,

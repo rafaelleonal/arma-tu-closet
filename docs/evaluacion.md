@@ -400,3 +400,26 @@ Comprobado después de los arreglos:
 Observado: si se toca justo mientras una hoja se abre o se cierra, el toque no hace nada; visto solo con toques automáticos sin pausa.
 
 Sin verificar: Android, un iPhone real, la bienvenida del primer arranque (necesita una instalación sin datos), los pasos 3 y 4 del onboarding, Combínala, Medianoche y los demás temas, elegir o tomar foto y quitar fondo, Reducir movimiento, VoiceOver y Dynamic Type.
+
+## 10/11/2026 — Resto de la revisión en iOS y animación del perchero
+
+Mismo simulador y build que la entrada anterior (iPhone 17 Pro, iOS 26.5, Metro en `localhost:8093`), con el clóset que ya tenía. No se guardó nada; el tema se cambió a Medianoche para la revisión y se devolvió a Lino.
+
+Comprobado:
+
+- [Combínala](evidence/ios-combinala-iphone17pro.jpg): prenda elegida con la etiqueta invertida y deslizar entre las dos ideas dentro de la hoja.
+- Onboarding en modo edición, paso 3 (colores) y paso 4 (primer outfit con ropa del clóset, sin etiqueta de ejemplo, y carrusel de temas).
+- Medianoche: [paso 4](evidence/ios-onboarding-primer-outfit-medianoche-iphone17pro.jpg) y [Hoy](evidence/ios-hoy-medianoche-iphone17pro.jpg), con el borde claro de los stickers sobre fondo oscuro.
+
+La persona reportó que en su teléfono la animación de la ropa en el clóset «no queda bien». Dos cambios, a partir de lo visto en el simulador y en los registros:
+
+1. **Perchero.** La animación recalculaba el ancho de cada prenda en JavaScript en cada cuadro. Ahora el giro y el desplazamiento son transformaciones con el driver nativo. Al hacerlo, el botón dentro de la vista animada dejó de recibir toques en iOS; se sacó a una vista aparte y volvió a responder. Comprobado con el clóset de prueba «Ejemplo» en iOS y con el clóset de ejemplo en Expo web: elegir otra prenda la gira al frente y actualiza la ficha.
+2. **Sombra de los stickers.** iOS avisaba, por cada sticker, de que no podía calcular la sombra de forma eficiente. Los stickers ahora se rasterizan en iOS. A la vista se ven igual de nítidos, con borde y sombra.
+
+La persona confirmó después que se refería al perchero. Con la animación ralentizada a 40 s en el simulador se vio la causa de que se viera mal: las prendas a cada lado de la elegida miraban hacia ella, así que al elegir otra todas las de en medio se volteaban pasando de frente y [se encimaban a medio giro](evidence/ios-perchero-medio-giro-antes-iphone17pro.jpg).
+
+3. **Un solo sentido.** Todas las prendas cuelgan giradas hacia el mismo lado. Al elegir otra giran solo la que sale y la que entra; [las de en medio se deslizan de canto](evidence/ios-perchero-medio-giro-iphone17pro.jpg). Comprobado a cámara lenta en dos momentos del recorrido; la duración volvió a 320 ms.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados.
+
+Sin verificar: cómo se ve y qué tan fluida va en el teléfono de la persona, porque un simulador no mide fluidez; el aviso de iOS sobre la sombra sigue apareciendo aunque el sticker esté rasterizado, así que tampoco sirve de confirmación. Tampoco Android, un iPhone real, la bienvenida del primer arranque, los temas Papel, Salvia, Chicle y Malva, elegir o tomar foto, Reducir movimiento, VoiceOver ni Dynamic Type.
