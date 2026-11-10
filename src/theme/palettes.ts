@@ -16,7 +16,14 @@ export interface Palette {
   floating: string;
   errorBg: string;
   swatchBorder: string;
+  /** The theme's accent as drawn on sticker paper, which stays light in every theme. */
+  stickerMark: string;
 }
+
+/** A sticker keeps its own light paper on any theme, like a real one on any surface. */
+export const STICKER_PAPER = '#FBFAF6';
+/** Ink for words written on sticker paper; fixed because the paper is. */
+export const STICKER_INK = '#242923';
 
 export const THEME_OPTIONS: {
   id: ThemeId;
@@ -48,6 +55,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#FFFFFFE6',
     errorBg: '#F4E0D7',
     swatchBorder: '#00000026',
+    stickerMark: '#95462F',
   },
   paper: {
     paper: '#FAFAFA',
@@ -65,6 +73,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#FFFFFFE6',
     errorBg: '#F7E8E4',
     swatchBorder: '#00000026',
+    stickerMark: '#373B44',
   },
   midnight: {
     paper: '#101113',
@@ -82,6 +91,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#34373EE6',
     errorBg: '#382637',
     swatchBorder: '#FFFFFF40',
+    stickerMark: '#95462F',
   },
   sage: {
     paper: '#F0F4EF',
@@ -99,6 +109,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#FAFCF9E6',
     errorBg: '#F0E2D8',
     swatchBorder: '#1C302A33',
+    stickerMark: '#315F4C',
   },
   bubblegum: {
     paper: '#FFF5F8',
@@ -116,6 +127,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#FFFFFFE6',
     errorBg: '#FCE3E3',
     swatchBorder: '#3B1A2C26',
+    stickerMark: '#B5175A',
   },
   mauve: {
     paper: '#F8F2F3',
@@ -133,6 +145,7 @@ const themes: Record<ThemeId, Palette> = {
     floating: '#FFFDFDE6',
     errorBg: '#F5E2DF',
     swatchBorder: '#2D212726',
+    stickerMark: '#86435C',
   },
 };
 

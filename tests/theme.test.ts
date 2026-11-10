@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { getTheme, THEME_OPTIONS } from '../src/theme/palettes';
+import {
+  getTheme,
+  STICKER_INK,
+  STICKER_PAPER,
+  THEME_OPTIONS,
+} from '../src/theme/palettes';
 
 function luminance(hex: string): number {
   const [r, g, b] = hex
@@ -42,3 +47,12 @@ for (const { id } of THEME_OPTIONS) {
     );
   });
 }
+
+test('what is written on sticker paper reads in every theme, since the paper never changes', () => {
+  assert.ok(contrast(STICKER_INK, STICKER_PAPER) >= 4.5, 'sticker ink');
+  for (const { id } of THEME_OPTIONS)
+    assert.ok(
+      contrast(getTheme(id).stickerMark, STICKER_PAPER) >= 4.5,
+      `${id} sticker mark`,
+    );
+});

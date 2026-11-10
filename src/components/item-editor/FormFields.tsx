@@ -1,8 +1,9 @@
 import React from 'react';
-import { Switch, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import type { Category } from '../../domain';
 import { suggestedItemName } from '../itemForm';
 import { Button, FieldLabel, useUI } from '../ui';
+import { Toggle } from '../Toggle';
 
 /** Takes the place of the save button, so the question is in view wherever the form was. */
 export function DiscardPrompt({
@@ -89,12 +90,7 @@ export function AvailabilityField({
           Desactívala si está en la lavandería.
         </Text>
       </View>
-      <Switch
-        accessibilityLabel="Disponible para usar"
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ true: palette.green }}
-      />
+      <Toggle label="Disponible para usar" value={value} onChange={onChange} />
     </View>
   );
 }
@@ -110,12 +106,7 @@ export function WearMoreField({
   return (
     <View style={[s.row, { justifyContent: 'space-between', marginTop: 16 }]}>
       <Text style={{ color: palette.ink, flex: 1 }}>Quiero usarla más</Text>
-      <Switch
-        accessibilityLabel="Quiero usarla más"
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ true: palette.green }}
-      />
+      <Toggle label="Quiero usarla más" value={value} onChange={onChange} />
     </View>
   );
 }

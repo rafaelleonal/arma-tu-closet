@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Palette } from '../../theme/ThemeProvider';
 import { useUI } from '../ui';
+import { Toggle } from '../Toggle';
 
 export const MIN_TEMPERATURE = -30;
 export const MAX_TEMPERATURE = 55;
@@ -112,12 +113,7 @@ export function ManualWeather({
       </View>
       <View style={[styles.row, styles.divided]}>
         <Text style={styles.label}>Lluvia</Text>
-        <Switch
-          accessibilityLabel="Hay lluvia"
-          value={raining}
-          onValueChange={onRaining}
-          trackColor={{ true: palette.green }}
-        />
+        <Toggle label="Hay lluvia" value={raining} onChange={onRaining} />
       </View>
     </View>
   );

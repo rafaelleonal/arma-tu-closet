@@ -476,3 +476,21 @@ Expo web a 375 × 812 en `127.0.0.1:8093`, con dos prendas del clóset de ejempl
 Simulador iPhone 17 Pro (iOS 26.5): con clima manual y sin prenda marcada, la pantalla termina en el botón principal. Se marcó «Quiero usarla más» en el Vestido blanco de ejemplo desde el formulario nuevo: [aparece la fila Otra vuelta](evidence/ios-hoy-otra-vuelta-iphone17pro.jpg) y abre Combínala; después se desmarcó y la fila desapareció. De paso quedó comprobado editar una prenda existente con el formulario de stickers y muestras.
 
 Sin verificar: el aviso de clima en Medianoche y en iOS, Elegir con IA con el servidor encendido y en iOS (necesita `EXPO_PUBLIC_AI_API_URL`), Otra vuelta con una foto propia, Papel, Salvia, Chicle y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.
+
+## 10/11/2026 — Revisión de Papel, Salvia, Chicle y Malva
+
+El rediseño de stickers se había revisado en Lino y Medianoche. En los otros cuatro temas los contrastes de texto ya estaban cubiertos por test, y los de puntos, bordes y superficies calculados dan lo mismo que en Lino (entre 1,1 y 1,4), así que la revisión fue visual. Salieron tres cosas:
+
+1. **Marca de los stickers de palabra.** El «✦» y el «✓» iban siempre en el café rojizo de Lino; en Chicle, Salvia y Papel era el único elemento de ese color en la pantalla. Ahora usan el rol `stickerMark` de cada tema. El papel y la palabra no cambian.
+2. **Fila de temas en Ajustes.** Abría siempre en Lino, de modo que con Chicle o Malva el tema en uso quedaba fuera de la vista. Ahora abre en el tema elegido.
+3. **Interruptores en web.** Apagado no se veía el riel y encendido el botón era verde azulado en cualquier tema. Los seis interruptores usan ahora un componente compartido; en el teléfono no cambia nada.
+
+No se tocó ninguna paleta. Los dibujos de las prendas siguen en su tinta verde en todos los temas, como establece [la guía](diseno-personalizacion.md#hoy-como-mesa-de-stickers).
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (103 pruebas, una nueva para lo que se escribe sobre papel de sticker) aprobados.
+
+Expo web a 375 × 812 en `127.0.0.1:8093`. Chicle: Hoy, Mi clóset, Mi estilo, Colores, Ajustes, Agregar prenda y Clima y ocasión. Papel y Salvia: Hoy y Mi estilo. Malva: Hoy y los pasos 1 y 2 de Editar preferencias. Después de los cambios: [Mi estilo en Chicle](evidence/temas-mi-estilo-chicle-web-375.jpg) con la marca en su rosa, [Ajustes en Chicle](evidence/temas-ajustes-chicle-web-375.jpg) abierto en su tema y con el interruptor corregido, el interruptor de lluvia apagado con riel visible, y Medianoche con la marca sin cambio y la fila abierta en su tema. El origen de pruebas volvió a Lino.
+
+Simulador iPhone 17 Pro (iOS 26.5): se eligió Chicle en Ajustes, se cerró y [al reabrir la fila ya estaba en Chicle](evidence/ios-ajustes-chicle-iphone17pro.jpg); después se devolvió a Lino.
+
+Sin verificar: la marca en su nuevo color en iOS (el clóset del simulador no tiene estilos elegidos), Papel, Salvia y Malva en iOS, las demás hojas en Papel, Salvia y Malva, un teléfono real, Android, VoiceOver, teclado y texto ampliado.

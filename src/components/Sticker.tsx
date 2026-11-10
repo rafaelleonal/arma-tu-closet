@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import type { WardrobeItem } from '../domain';
+import { STICKER_INK, STICKER_PAPER } from '../theme/palettes';
 import { demoPhotoFor, photoAspect } from './demoPhotos';
 import {
   illustrationFor,
@@ -29,10 +30,8 @@ const drawings: Record<IllustrationKind, ImageSourcePropType> = {
 };
 
 /** A sticker keeps its own light border on any theme, like a real one on any surface. */
-const PAPER = '#FBFAF6';
-/** Ink for words written on sticker paper; fixed because the paper is. */
-export const STICKER_INK = '#242923';
-export const STICKER_PAPER = PAPER;
+const PAPER = STICKER_PAPER;
+export { STICKER_INK, STICKER_PAPER };
 /** Below this size the border would be thinner than a pixel, so the picture goes alone. */
 const SMALL = 70;
 /** Eight copies of the picture, pushed outwards, draw the border around any cut-out. */

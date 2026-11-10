@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, Switch, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import {
   OCCASIONS,
   occasionLabels,
@@ -8,6 +8,7 @@ import {
   type StyleId,
 } from '../../domain';
 import { Chip, FieldLabel, useUI } from '../ui';
+import { Toggle } from '../Toggle';
 
 export const warmthLabels = [
   'Muy ligera',
@@ -148,11 +149,10 @@ export function DetailsSection({
             <Text style={{ color: palette.ink, flex: 1 }}>
               La uso cuando llueve
             </Text>
-            <Switch
-              accessibilityLabel="Apta para lluvia"
+            <Toggle
+              label="Apta para lluvia"
               value={rainReady}
-              onValueChange={(next) => onChange({ rainReady: next })}
-              trackColor={{ true: palette.green }}
+              onChange={(next) => onChange({ rainReady: next })}
             />
           </View>
           <FieldLabel>Estilos · opcional</FieldLabel>

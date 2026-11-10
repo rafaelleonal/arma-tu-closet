@@ -75,6 +75,7 @@ La referencia es el [onboarding de Letterly](https://x.com/bthreeagency/status/2
 ## Tradeoffs deliberados
 
 - Cuatro pasos aún cuestan atención: todo lo opcional admite continuar, y los cambios se pueden hacer después.
+- Los interruptores pasan por [Toggle.tsx](../src/components/Toggle.tsx): en web el componente estándar no dibuja el riel apagado y pone un botón verde azulado que no pertenece a ningún tema.
 - Seis temas aumentan la superficie de verificación: usar roles de color compartidos para paneles, campos, estados, iconos y texto; comprobar especialmente Medianoche. Cambiar solo el fondo dejaría una personalización incompleta.
 - La preferencia de estilo puede mejorar el orden sin generar opciones nuevas cuando el clóset es pequeño. Probar con candidatos suficientes y reconocer ese límite.
 - Preferir colores es una señal suave; evitarlos restringe. La interfaz debe explicar esa diferencia en lugar de prometer variedad ilimitada.
@@ -110,7 +111,7 @@ Con clima manual y sin prenda marcada, la pantalla termina en **Hoy me lo puse**
 | Con foto sin recortar | La foto en un marco claro cuadrado. |
 | Sin foto | El dibujo genérico sin carita, sobre su propio papel. Para lectores de pantalla sigue siendo «Ilustración genérica». |
 
-El papel del sticker es claro en todos los temas, como un sticker real sobre cualquier superficie; por eso el dibujo no se tiñe con el tema en Hoy. En iOS cada sticker se rasteriza (`shouldRasterizeIOS`): se dibuja una vez con su borde y su sombra y se reutiliza al desplazarse, porque la sombra de una vista sin fondo es costosa de calcular en cada cuadro. Los colores de la prenda siguen aparte, en la etiqueta con su nombre.
+El papel del sticker es claro en todos los temas, como un sticker real sobre cualquier superficie; por eso el dibujo no se tiñe con el tema en Hoy. Lo único del tema que se escribe sobre ese papel es la marca de un sticker de palabra («✦» o «✓»): usa el rol `stickerMark`, que en los temas claros es su acento y en Medianoche conserva el de Lino, porque un acento pensado para fondo oscuro no se lee sobre papel claro. Un test comprueba ese contraste en los seis temas. En iOS cada sticker se rasteriza (`shouldRasterizeIOS`): se dibuja una vez con su borde y su sombra y se reutiliza al desplazarse, porque la sombra de una vista sin fondo es costosa de calcular en cada cuadro. Los colores de la prenda siguen aparte, en la etiqueta con su nombre.
 
 Los motivos van en una burbuja con la voz de las prendas, como en el onboarding: «Hoy vamos en plan urbano.» en lugar de «Estilo: urbano». [reasonVoice.ts](../src/domain/reasonVoice.ts) reescribe cada motivo sin añadir afirmaciones; uno que no conoce se muestra tal cual. Se dicen hasta dos. Las advertencias no cambian de voz ni se ocultan al desactivar los motivos.
 
@@ -128,7 +129,7 @@ Debajo, **Guardados** es una fila que se desliza con cada outfit como collage pe
 
 La pantalla termina ahí: estilos, guardados y colores son lo que describe a la persona. Lo que solo cambia cómo se ve o se comporta la app va en la hoja **Ajustes** ([SettingsSheet.tsx](../src/screens/SettingsSheet.tsx)), que se abre con el botón redondo junto al título:
 
-- **Tema**: los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers.
+- **Tema**: los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers. La fila abre en el tema en uso, con un poco del anterior a la vista.
 - **Vista**, **Explicaciones** y, en el teléfono, **Vibración**.
 - **Esperar para repetir una prenda**: Nada, 3, 7 o 14 días. La etiqueta sustituye al párrafo que lo explicaba.
 - **Tus datos**: tres frases sin personaje sobre dónde se guarda todo, qué pasa al borrar la app y que solo Analizar foto envía la foto de una prenda a OpenAI. Debajo, cuántas prendas propias y usos hay, y el crédito de Open-Meteo que pide su licencia.

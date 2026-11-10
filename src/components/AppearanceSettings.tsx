@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Platform,
   Pressable,
   ScrollView,
-  Switch,
   Text,
   View,
+  type ScrollViewInstance,
 } from 'react-native';
 import type { LocalData } from '../storage/schema';
 import { getTheme, THEME_OPTIONS } from '../theme/ThemeProvider';
 import { Chip, FieldLabel, useUI } from './ui';
+import { Toggle } from './Toggle';
 import { useFeedback } from './Feedback';
 import { ThemePreview } from './ThemePreview';
 
 type Appearance = LocalData['appearance'];
+
+const CARD_WIDTH = 136;
+const CARD_GAP = 12;
+/** How much of the previous theme stays in view when the row opens on the one in use. */
+const CARD_PEEK = 44;
 
 export interface AppearanceSettingsProps {
   value: Appearance;
@@ -29,13 +35,29 @@ export function AppearanceSettings({
   bleed = 0,
 }: AppearanceSettingsProps) {
   const { s, palette } = useUI();
+  const themes = useRef<ScrollViewInstance>(null);
+  const placed = useRef(false);
   return (
     <View>
       <ScrollView
+        ref={themes}
         horizontal
+        // Opens on the theme in use, with a little of the one before it in view.
+        onLayout={() => {
+          if (placed.current) return;
+          placed.current = true;
+          const index = THEME_OPTIONS.findIndex(
+            (option) => option.id === value.themeId,
+          );
+          if (index > 0)
+            themes.current?.scrollTo({
+              x: index * (CARD_WIDTH + CARD_GAP) - CARD_PEEK,
+              animated: false,
+            });
+        }}
         showsHorizontalScrollIndicator={false}
         style={{ marginHorizontal: -bleed }}
-        contentContainerStyle={{ gap: 12, paddingHorizontal: bleed }}
+        contentContainerStyle={{ gap: CARD_GAP, paddingHorizontal: bleed }}
       >
         {THEME_OPTIONS.map((option) => (
           <ThemeCard
@@ -76,11 +98,10 @@ export function AppearanceSettings({
             Las advertencias siguen visibles.
           </Text>
         </View>
-        <Switch
-          accessibilityLabel="Mostrar explicaciones de conjuntos"
+        <Toggle
+          label="Mostrar explicaciones de conjuntos"
           value={value.showReasons}
-          onValueChange={(showReasons) => onChange({ ...value, showReasons })}
-          trackColor={{ true: palette.green }}
+          onChange={(showReasons) => onChange({ ...value, showReasons })}
         />
       </View>
       {Platform.OS !== 'web' ? (
@@ -88,13 +109,12 @@ export function AppearanceSettings({
           style={[s.row, { justifyContent: 'space-between', marginTop: 24 }]}
         >
           <Text style={{ color: palette.ink, fontSize: 13 }}>Vibración</Text>
-          <Switch
-            accessibilityLabel="Vibración"
+          <Toggle
+            label="Vibración"
             value={value.hapticsEnabled !== false}
-            onValueChange={(hapticsEnabled) =>
+            onChange={(hapticsEnabled) =>
               onChange({ ...value, hapticsEnabled })
             }
-            trackColor={{ true: palette.green }}
           />
         </View>
       ) : null}
@@ -128,7 +148,7 @@ function ThemeCard({
         onSelect();
       }}
       style={{
-        width: 136,
+        width: CARD_WIDTH,
         borderWidth: selected ? 2 : 1,
         borderColor: selected ? palette.ink : palette.line,
         backgroundColor: palette.white,

@@ -22,6 +22,7 @@ export function WordSticker({
   tilt?: number;
   small?: boolean;
 }) {
+  const { palette } = useUI();
   return (
     <View
       shouldRasterizeIOS
@@ -36,7 +37,8 @@ export function WordSticker({
         <Text
           style={[
             styles.word,
-            styles.mark,
+            // The mark carries the theme's accent; the paper and the word do not change.
+            { color: palette.stickerMark },
             small && styles.smallWord,
             small && styles.smallMark,
           ]}
@@ -136,6 +138,5 @@ const styles = StyleSheet.create({
     color: STICKER_INK,
   },
   smallWord: { fontSize: 17, letterSpacing: -0.3 },
-  mark: { color: '#95462F' },
   smallMark: { width: 16, textAlign: 'center' },
 });
