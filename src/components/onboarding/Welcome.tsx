@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MotionIn } from '../Feedback';
+import { Dots } from '../rail';
 import { Button, useUI } from '../ui';
 import { Crew } from './Crew';
 import { OnboardingLogo } from './OnboardingChrome';
@@ -13,6 +14,7 @@ export function Welcome({ onStart }: { onStart: () => void }) {
       edges={['top', 'bottom']}
       style={{ flex: 1, backgroundColor: palette.paper }}
     >
+      <Dots />
       <View
         style={{
           flex: 1,
@@ -52,7 +54,11 @@ export function Welcome({ onStart }: { onStart: () => void }) {
             </Text>
           </MotionIn>
         </View>
-        <Button label="Vamos a tu clóset" onPress={onStart} />
+        <Button
+          label="Vamos a tu clóset"
+          onPress={onStart}
+          style={{ minHeight: 56, borderRadius: 28 }}
+        />
         <Text
           style={[
             s.subtitle,

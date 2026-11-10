@@ -1,21 +1,11 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { EMPTY_STYLE_GOAL, STYLE_OPTIONS, type StyleId } from '../../domain';
 import { useFeedback } from '../Feedback';
-import { Chip, FieldLabel, useUI } from '../ui';
+import { FieldLabel, useUI } from '../ui';
+import { WordChoice, wordTilt } from '../WordSticker';
 import { Guide } from './Guide';
 import type { StepProps } from './types';
-
-const styleMarks: Record<StyleId, string> = {
-  minimal: '—',
-  classic: '◇',
-  street: '↗',
-  relaxed: '≈',
-  creative: '✱',
-  sport: '⌁',
-  girly: '♡',
-  feminine: '❀',
-};
 
 const MAX_STYLES = 3;
 
@@ -24,7 +14,7 @@ export function StyleStep({
   onChange,
   startExploring,
 }: StepProps & { startExploring: boolean }) {
-  const { s, palette } = useUI();
+  const { palette } = useUI();
   const feedback = useFeedback();
   const [notice, setNotice] = useState('');
   const selectedIds = data.profile.styleIds;
@@ -73,23 +63,27 @@ export function StyleStep({
         say={`${name ? `${name}, soy` : 'Soy'} Cami, la camisa. Cuéntame de tu ropa.`}
         title="¿Cómo te vistes casi siempre?"
       />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-        {STYLE_OPTIONS.map((option) => (
-          <StyleCard
+      <View style={styles.words}>
+        {STYLE_OPTIONS.map((option, index) => (
+          <WordChoice
             key={option.id}
-            label={option.label}
-            mark={styleMarks[option.id]}
+            word={option.label}
+            tilt={wordTilt(index)}
+            label={`Estilo ${option.label}`}
             selected={selectedIds.includes(option.id)}
             onPress={() => select(option.id)}
           />
         ))}
       </View>
       <FieldLabel>¿Y cómo te gustaría verte?</FieldLabel>
-      <View style={s.wrap}>
-        {STYLE_OPTIONS.map((option) => (
-          <Chip
+      <View style={styles.words}>
+        {STYLE_OPTIONS.map((option, index) => (
+          <WordChoice
             key={option.id}
-            label={option.label}
+            word={option.label}
+            mark="✦"
+            tilt={wordTilt(index + 1)}
+            label={`Quiero probar ${option.label}`}
             selected={goal.targetStyleIds.includes(option.id)}
             onPress={() => selectTarget(option.id)}
           />
@@ -109,71 +103,6 @@ export function StyleStep({
   );
 }
 
-function StyleCard({
-  label,
-  mark,
-  selected,
-  onPress,
-}: {
-  label: string;
-  mark: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const { palette } = useUI();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`Estilo ${label}`}
-      accessibilityState={{ selected }}
-      aria-pressed={selected}
-      onPress={onPress}
-      style={{
-        flexBasis: '30%',
-        minWidth: 120,
-        flexGrow: 1,
-        minHeight: 112,
-        padding: 18,
-        borderRadius: 16,
-        backgroundColor: selected ? palette.ink : palette.white,
-        borderWidth: 1,
-        borderColor: selected ? palette.ink : palette.line,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginBottom: 14,
-        }}
-      >
-        <Text
-          style={{
-            color: selected ? palette.onInk : palette.green,
-            fontSize: 26,
-            lineHeight: 28,
-          }}
-        >
-          {mark}
-        </Text>
-        <Text
-          style={{
-            color: selected ? palette.onInk : palette.muted,
-            fontSize: 15,
-          }}
-        >
-          {selected ? '✓' : '+'}
-        </Text>
-      </View>
-      <Text
-        style={{
-          color: selected ? palette.onInk : palette.ink,
-          fontSize: 15,
-          fontWeight: '600',
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
+const styles = StyleSheet.create({
+  words: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+});

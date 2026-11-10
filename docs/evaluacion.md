@@ -354,3 +354,23 @@ Recorrido en navegador con Expo web en `127.0.0.1:8093` a 375 × 812 con el cló
 - A 320 × 568, Combínala no desborda en horizontal; la mesa queda en su altura mínima y las acciones se alcanzan desplazando la hoja.
 
 Sin verificar: iOS y Android (teclado sobre el pie fijo, áreas seguras, deslizar con el dedo), elegir o tomar una foto, quitar fondo y analizar foto en el editor nuevo, fotos propias, un outfit con accesorio, la disposición Compacta, los temas Papel, Salvia, Chicle y Malva, VoiceOver y teclado.
+
+## 9/11/2026 — Onboarding con la base de stickers
+
+La bienvenida y los cuatro pasos siguen [la guía](diseno-personalizacion.md#bienvenida-y-cuatro-pasos): prendas que hablan como stickers con carita, burbuja compartida con Hoy, estilos como stickers de palabra y primer outfit como collage. `scripts/garment-stickers.py` genera además `assets/garments/stickers/crew/`; los nueve stickers sin carita salieron idénticos al regenerarlos. El sticker de palabra de Mi estilo se extrajo a `WordSticker.tsx`. Preguntas, opciones, textos y lo que se guarda no cambian.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (102 pruebas) aprobados. No hay pruebas nuevas: el cambio es de presentación.
+
+`npx expo export --platform all` terminó para web, iOS y Android e incluye los seis stickers nuevos en los tres. Es una exportación, no una prueba en dispositivo.
+
+Recorrido en navegador con Expo web a 375 × 812 en `localhost:8093`, un origen sin datos:
+
+- [Bienvenida](evidence/onboarding-stickers-bienvenida-web-375.jpg) y paso 1 con nombre; la burbuja responde con el nombre y la opción elegida muestra su respuesta.
+- [Paso 2](evidence/onboarding-stickers-estilos-web-375.jpg): elegir dos estilos y uno para probar; los textos del pie caben en una línea.
+- Paso 3 con el selector de colores, sin cambios.
+- [Paso 4](evidence/onboarding-stickers-primer-outfit-web-375.jpg) con el outfit de ejemplo identificado, y en [Medianoche](evidence/onboarding-stickers-primer-outfit-medianoche-web-375.jpg) tras elegir el tema ahí mismo. En Medianoche también se revisaron los pasos 1 y 2.
+- Terminar con **Ver el clóset de ejemplo**: entra a Hoy con 10 prendas de ejemplo, los estilos elegidos, Algo nuevo encendido y «Todo listo, Ale.».
+- Editar preferencias desde Mi estilo: abre en el paso 1 sin bienvenida y con **Cerrar**. Mi estilo conserva sus stickers de palabra.
+- A 320 × 568 el paso 2 no desborda en horizontal; «Lo hago después» pasa a dos líneas.
+
+Sin verificar: iOS y Android (movimiento de la bienvenida y de la burbuja, teclado en el paso 1, áreas seguras), la bienvenida en un tema distinto de Lino, **Vamos con mi ropa**, la ciudad y la ubicación del paso 1, un primer outfit con ropa propia, los temas Papel, Salvia, Chicle y Malva, Reducir movimiento, VoiceOver y teclado.

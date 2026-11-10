@@ -7,6 +7,8 @@ import { FirstOutfitPreview } from './FirstOutfitPreview';
 import { Guide } from './Guide';
 import type { OnboardingEntry, StepProps } from './types';
 
+const PILL = { minHeight: 52, borderRadius: 26 };
+
 /** Last step. Only the first run offers the example closet; it never replaces an existing one. */
 export function AppearanceStep({
   data,
@@ -37,12 +39,17 @@ export function AppearanceStep({
       <FieldLabel>Apariencia</FieldLabel>
       <AppearanceSettings
         compact
+        bleed={24}
         value={data.appearance}
         onChange={(appearance) => onChange({ appearance })}
       />
       {edit ? (
         <View style={{ marginTop: 28 }}>
-          <Button label="¡Listo!" onPress={() => onFinish('keep')} />
+          <Button
+            label="¡Listo!"
+            onPress={() => onFinish('keep')}
+            style={PILL}
+          />
         </View>
       ) : (
         <View style={{ marginTop: 32 }}>
@@ -59,12 +66,16 @@ export function AppearanceStep({
           <Text style={[s.subtitle, { fontSize: 12, marginBottom: 17 }]}>
             El ejemplo contiene prendas ficticias.
           </Text>
-          <Button label="Vamos con mi ropa" onPress={() => onFinish('own')} />
+          <Button
+            label="Vamos con mi ropa"
+            onPress={() => onFinish('own')}
+            style={PILL}
+          />
           <Button
             secondary
             label="Ver el clóset de ejemplo"
             onPress={() => onFinish('demo')}
-            style={{ marginTop: 10 }}
+            style={{ ...PILL, marginTop: 10 }}
           />
         </View>
       )}

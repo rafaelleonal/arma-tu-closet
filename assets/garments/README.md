@@ -24,6 +24,8 @@ Los prompts completos, sus referencias y los archivos de salida están en [promp
 
 `stickers/` contiene una versión de cada dibujo para la pantalla Hoy: sin carita, sobre una silueta clara (`#FBFAF6`) con borde troquelado y recortada a su contorno, a 640 px en su lado mayor. Conservan la tinta original y no se tiñen con el tema.
 
+`stickers/crew/` contiene las seis prendas que hablan en el onboarding (playera, camisa, chamarra, tenis, bufanda y vestido) con el mismo papel y borde, pero con su carita, a 420 px en su lado mayor.
+
 Se generan a partir de los nueve PNG de esta carpeta, sin tocarlos:
 
 ```bash

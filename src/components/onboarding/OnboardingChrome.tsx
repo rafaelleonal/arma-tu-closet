@@ -110,7 +110,26 @@ export function StepFooter({
         }}
       >
         {step > 0 ? (
-          <Button secondary label="Atrás" onPress={() => onGo(step - 1)} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Atrás"
+            onPress={() => onGo(step - 1)}
+            style={({ pressed }) => [
+              {
+                width: 52,
+                height: 52,
+                borderRadius: 26,
+                borderWidth: 1,
+                borderColor: palette.line,
+                backgroundColor: palette.white,
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              pressed && { opacity: 0.72 },
+            ]}
+          >
+            <Text style={{ fontSize: 20, color: palette.ink }}>←</Text>
+          </Pressable>
         ) : null}
         {step < LAST_STEP ? (
           <>
@@ -124,14 +143,25 @@ export function StepFooter({
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ fontSize: 12, color: palette.muted }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: palette.muted,
+                  textAlign: 'center',
+                }}
+              >
                 Lo hago después
               </Text>
             </Pressable>
             <Button
               label={NEXT_LABELS[step]}
               onPress={() => onGo(step + 1)}
-              style={{ flex: 1 }}
+              style={{
+                minHeight: 52,
+                minWidth: 148,
+                borderRadius: 26,
+                paddingHorizontal: 16,
+              }}
             />
           </>
         ) : null}

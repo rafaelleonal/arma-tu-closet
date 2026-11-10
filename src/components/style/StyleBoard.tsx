@@ -3,12 +3,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { STYLE_OPTIONS, type StyleId } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
 import { Dots } from '../rail';
-import { STICKER_INK, STICKER_PAPER, lifted } from '../Sticker';
 import { useUI } from '../ui';
+import { WordSticker, wordTilt } from '../WordSticker';
 
 /** Same as the horizontal padding of the screen, so the board reaches both edges. */
 const BLEED = 24;
-const TILTS = [-3, 2, -1.5];
 
 function labels(ids: readonly StyleId[]) {
   return STYLE_OPTIONS.filter((style) => ids.includes(style.id)).map(
@@ -47,21 +46,12 @@ function Row({
       <View style={styles.words}>
         {words.length ? (
           words.map((word, index) => (
-            <View
+            <WordSticker
               key={word}
-              style={[
-                lifted,
-                styles.sticker,
-                {
-                  transform: [{ rotate: `${TILTS[index % TILTS.length]}deg` }],
-                },
-              ]}
-            >
-              <Text style={styles.word}>
-                {mark ? <Text style={styles.mark}>{mark} </Text> : null}
-                {word}
-              </Text>
-            </View>
+              word={word}
+              mark={mark}
+              tilt={wordTilt(index)}
+            />
           ))
         ) : (
           <View style={styles.blank}>
@@ -133,19 +123,6 @@ const createStyles = (palette: Palette) =>
     },
     action: { fontSize: 12, fontWeight: '600', color: palette.rust },
     words: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    sticker: {
-      backgroundColor: STICKER_PAPER,
-      paddingHorizontal: 18,
-      paddingVertical: 11,
-      borderRadius: 14,
-    },
-    word: {
-      fontSize: 22,
-      fontWeight: '600',
-      letterSpacing: -0.5,
-      color: STICKER_INK,
-    },
-    mark: { color: '#95462F' },
     blank: {
       minHeight: 48,
       paddingHorizontal: 18,

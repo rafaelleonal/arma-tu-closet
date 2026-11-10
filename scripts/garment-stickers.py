@@ -1,6 +1,7 @@
 """Genera los stickers de las ilustraciones de prendas (assets/garments/stickers).
 
 Cada sticker es el dibujo sin carita sobre una silueta blanca con borde troquelado.
+En stickers/crew quedan, con su carita, las prendas que hablan en el onboarding.
 Los dibujos originales de assets/garments no se modifican.
 
 Uso:
@@ -20,7 +21,9 @@ KINDS = [
     "tee", "shirt", "sweater", "trousers", "dress",
     "sneakers", "boots", "jacket", "scarf",
 ]  # fmt: skip
+CREW = ["tee", "shirt", "jacket", "sneakers", "scarf", "dress"]
 SIZE = 640
+CREW_SIZE = 420
 BORDER = 22  # px en el original de 1254; unos 11 px en la salida
 PAPER = (251, 250, 246)
 
@@ -69,10 +72,11 @@ def face_components(alpha):
     raise SystemExit("No se encontró la carita")
 
 
-def sticker(path):
+def sticker(path, face=False):
     arr = np.array(Image.open(path).convert("RGBA"))
-    labels, face = face_components(arr[..., 3])
-    arr[ndi.binary_dilation(np.isin(labels, face), iterations=3), 3] = 0
+    if not face:
+        labels, parts = face_components(arr[..., 3])
+        arr[ndi.binary_dilation(np.isin(labels, parts), iterations=3), 3] = 0
     alpha = arr[..., 3].astype(float) / 255
     alpha[alpha < 0.08] = 0  # los originales traen ruido casi transparente
     solid = alpha > 0.2
@@ -97,6 +101,12 @@ def main():
         image.thumbnail((SIZE, SIZE), Image.LANCZOS)
         image.save(OUT / f"{kind}.png", optimize=True)
         print(kind, image.size)
+    (OUT / "crew").mkdir(exist_ok=True)
+    for kind in CREW:
+        image = sticker(SRC / f"{kind}.png", face=True)
+        image.thumbnail((CREW_SIZE, CREW_SIZE), Image.LANCZOS)
+        image.save(OUT / "crew" / f"{kind}.png", optimize=True)
+        print("crew", kind, image.size)
 
 
 if __name__ == "__main__":

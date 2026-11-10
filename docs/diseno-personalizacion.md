@@ -20,6 +20,8 @@ Un estilo es una preferencia declarada, no una propiedad descubierta en una foto
 
 El onboarding es una conversación con las prendas ilustradas: en cada paso una prenda comenta en una burbuja y debajo va la pregunta, que es el encabezado para lectores de pantalla. Las ilustraciones son decorativas y se mueven solo si Reducir movimiento está apagado.
 
+Sigue la misma base que el resto de la app. Las prendas que hablan son stickers con su carita sobre el fondo de puntos, y lo que dicen va en la misma burbuja de Hoy, con la cola hacia quien habla. En la bienvenida el fondo de puntos ocupa toda la pantalla; en cada paso es una franja de borde a borde. Los estilos se eligen como stickers de palabra: cada opción es un hueco punteado con «+» y, al elegirla, queda el sticker con «✓», o con «✦» si es un estilo que la persona quiere probar, igual que en Mi estilo. El hueco y el sticker miden lo mismo, así que elegir no mueve el resto. El primer outfit se muestra como collage de stickers sobre puntos, con sus motivos en la voz de las prendas; con el clóset de ejemplo lleva la etiqueta «Ejemplo con prendas ficticias» y omite los motivos sobre uso, porque nadie ha usado esas prendas. En el pie, la acción principal es una píldora, **Lo hago después** queda al centro y **Atrás** es un botón redondo con flecha.
+
 En el primer arranque, antes del paso 1, la bienvenida muestra las prendas saludando, el nombre de la app, una frase de qué hace, **Empezar** y que no hace falta cuenta. No se persiste: si la persona cierra la app a mitad del alta, vuelve al paso guardado sin repetirla. Editar preferencias no la muestra.
 
 | Paso | Decisión | Ayuda y resultado |
@@ -152,7 +154,7 @@ Usar títulos, acciones y ayudas breves. Se retiraron eslóganes, títulos promo
 
 Las nueve ilustraciones de prendas siguen las referencias de Café Sinónimo aportadas por el usuario: una tinta, trazo redondo e irregular, espacios transparentes y caras pequeñas. Comparten recursos entre el clóset, los conjuntos y las vistas de apariencia. La tinta adapta el dibujo al tema; las muestras de color describen la prenda. Las fotos se muestran sin tintado.
 
-En Hoy cada dibujo se muestra como sticker: la misma ilustración sin carita sobre una silueta clara con borde troquelado. La carita se queda en el onboarding, donde las prendas hablan. Los nueve stickers se generan con [garment-stickers.py](../scripts/garment-stickers.py) a partir de los originales, que no cambian.
+En Hoy cada dibujo se muestra como sticker: la misma ilustración sin carita sobre una silueta clara con borde troquelado. La carita se queda en el onboarding, donde las prendas hablan: allí las seis que aparecen son stickers con carita (`stickers/crew/`). Todos se generan con [garment-stickers.py](../scripts/garment-stickers.py) a partir de los originales, que no cambian.
 
 Los dibujos son genéricos; su selección por categoría y algunas palabras del nombre no analiza la foto ni infiere estilo. La biblioteca todavía no distingue todos los tipos de prendas. [Archivos y prompts](../assets/garments/README.md). El nombre visible «Amplia» conserva el identificador persistido `editorial` para evitar un cambio de esquema innecesario.
 

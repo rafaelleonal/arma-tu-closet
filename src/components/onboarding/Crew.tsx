@@ -3,28 +3,29 @@ import {
   Animated,
   Easing,
   Platform,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { Bubble } from '../Bubble';
 import { useFeedback } from '../Feedback';
-import { GarmentIllustration } from '../Garment';
-import { useUI } from '../ui';
+import { CrewSticker } from './CrewSticker';
 
 const CREW = [
-  { kind: 'scarf', size: 62, lift: 34 },
-  { kind: 'sneakers', size: 74, lift: -6 },
-  { kind: 'tee', size: 136, lift: 0 },
-  { kind: 'dress', size: 80, lift: 8 },
-  { kind: 'jacket', size: 66, lift: 40 },
+  { kind: 'scarf', size: 66, lift: 40, tilt: -8 },
+  { kind: 'sneakers', size: 86, lift: 4, tilt: 6 },
+  { kind: 'tee', size: 150, lift: 0, tilt: -3 },
+  { kind: 'dress', size: 88, lift: 12, tilt: 5 },
+  { kind: 'jacket', size: 78, lift: 46, tilt: -6 },
 ] as const;
-const CREW_WIDTH = CREW.reduce((sum, { size }) => sum + size, 0);
+/** They overlap a little, like stickers put down by hand. */
+const OVERLAP = 26;
+const CREW_WIDTH =
+  CREW.reduce((sum, { size }) => sum + size, 0) - OVERLAP * (CREW.length - 1);
 const CONTENT_MAX = 560;
 const GUTTERS = 48;
 
-/** Decorative welcome: the illustrated garments greet the person and bob gently. */
+/** Decorative welcome: the garments greet the person as stickers and bob gently. */
 export function Crew() {
-  const { palette } = useUI();
   const { reduceMotion } = useFeedback();
   const { width } = useWindowDimensions();
   const fit = Math.min(
@@ -52,32 +53,21 @@ export function Crew() {
   }, [reduceMotion, bob]);
   return (
     <View style={{ alignItems: 'center' }}>
-      <View
-        style={{
-          backgroundColor: palette.white,
-          borderColor: palette.line,
-          borderWidth: 1,
-          borderRadius: 16,
-          borderBottomLeftRadius: 4,
-          paddingHorizontal: 14,
-          paddingVertical: 8,
-          marginBottom: 6,
-        }}
-      >
-        <Text style={{ color: palette.ink, fontSize: 14, fontWeight: '600' }}>
-          ¡Hola! Soy Tere.
-        </Text>
+      <View style={{ marginBottom: 14 }}>
+        <Bubble>¡Hola! Soy Tere.</Bubble>
       </View>
       <View
         accessible={false}
         importantForAccessibility="no-hide-descendants"
         style={{ flexDirection: 'row', alignItems: 'center' }}
       >
-        {CREW.map(({ kind, size, lift }, index) => (
+        {CREW.map(({ kind, size, lift, tilt }, index) => (
           <Animated.View
             key={kind}
             style={{
               marginTop: lift * fit,
+              marginLeft: index ? -OVERLAP * fit : 0,
+              zIndex: kind === 'tee' ? 1 : 0,
               transform: [
                 {
                   translateY: bob.interpolate({
@@ -85,14 +75,11 @@ export function Crew() {
                     outputRange: [0, index % 2 ? 7 : -7],
                   }),
                 },
+                { rotate: `${tilt}deg` },
               ],
             }}
           >
-            <GarmentIllustration
-              kind={kind}
-              size={size * fit}
-              ink={palette.green}
-            />
+            <CrewSticker kind={kind} size={size * fit} />
           </Animated.View>
         ))}
       </View>
