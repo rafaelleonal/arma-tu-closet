@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, useWindowDimensions } from 'react-native';
-import {
-  categoryLabels,
-  type Category,
-  type Outfit,
-  type WardrobeItem,
-} from '../domain';
+import type { Category, Outfit, WardrobeItem } from '../domain';
+import { useCopy, type Copy } from '../i18n';
 import { BuilderStage, type Chosen } from './builder/BuilderStage';
 import { SlotShelf } from './builder/SlotShelf';
 import { Sheet } from './Sheet';
@@ -20,13 +16,10 @@ const REQUIRED: Record<Shape, Category[]> = {
 const OPTIONAL: Category[] = ['layer', 'accessory'];
 
 /** "Parte de abajo y calzado": the categories still missing, as one phrase. */
-function missingPhrase(categories: Category[]) {
-  const names = categories.map((category) =>
-    categoryLabels[category].toLowerCase(),
+function missingPhrase(t: Copy, categories: Category[]) {
+  return t.list(
+    categories.map((category) => t.categories[category].toLowerCase()),
   );
-  return names.length > 1
-    ? `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`
-    : names[0];
 }
 
 /** Any available garment can be chosen here: the person decides, so excluded colors still show. */
@@ -40,6 +33,7 @@ export function ManualBuilder({
   onClose: () => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const window = useWindowDimensions();
   const [shape, setShape] = useState<Shape>('separates');
   const [selected, setSelected] = useState<Partial<Record<Category, string>>>(
@@ -62,7 +56,7 @@ export function ManualBuilder({
   }
   return (
     <Sheet
-      title="Armar outfit"
+      title={t.closet.build}
       onClose={onClose}
       pinned={
         <BuilderStage
@@ -82,10 +76,10 @@ export function ManualBuilder({
             </Text>
           ) : null}
           <Button
-            label="Guardar outfit"
+            label={t.outfit.save}
             onPress={() => {
               if (missing.length) {
-                setError(`Falta elegir ${missingPhrase(missing)}.`);
+                setError(t.builder.missing(missingPhrase(t, missing)));
                 return;
               }
               onSave({
@@ -102,12 +96,12 @@ export function ManualBuilder({
     >
       <View style={[s.wrap, { marginTop: 14 }]}>
         <Chip
-          label="Arriba + abajo"
+          label={t.builder.separates}
           selected={shape === 'separates'}
           onPress={() => choose('separates')}
         />
         <Chip
-          label="Prenda completa"
+          label={t.categories['one-piece']}
           selected={shape === 'one-piece'}
           onPress={() => choose('one-piece')}
         />

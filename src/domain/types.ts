@@ -27,52 +27,6 @@ export const STYLE_IDS = [
   'feminine',
 ] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
-export const STYLE_OPTIONS: readonly {
-  id: StyleId;
-  label: string;
-  description: string;
-}[] = [
-  {
-    id: 'minimal',
-    label: 'Minimal',
-    description: 'Líneas simples y combinaciones discretas.',
-  },
-  {
-    id: 'classic',
-    label: 'Clásico',
-    description: 'Prendas de siempre y detalles sobrios.',
-  },
-  {
-    id: 'street',
-    label: 'Urbano',
-    description: 'Inspiración de calle y contrastes casuales.',
-  },
-  {
-    id: 'relaxed',
-    label: 'Relajado',
-    description: 'Comodidad y un aire despreocupado.',
-  },
-  {
-    id: 'creative',
-    label: 'Creativo',
-    description: 'Colores, mezclas y detalles con personalidad.',
-  },
-  {
-    id: 'sport',
-    label: 'Deportivo',
-    description: 'Prendas con inspiración deportiva.',
-  },
-  {
-    id: 'girly',
-    label: 'Girly',
-    description: 'Tonos suaves, moños y detalles juguetones.',
-  },
-  {
-    id: 'feminine',
-    label: 'Femenino',
-    description: 'Siluetas definidas y detalles delicados.',
-  },
-];
 
 export const COLOR_TONES = [
   'spring-light',
@@ -136,47 +90,49 @@ export interface Outfit {
   id: string;
   items: WardrobeItem[];
   score: number;
+  /**
+   * Reason and warning codes (see `reasons.ts`), worded by the interface in the active
+   * language. Outfits saved before the codes may still hold Spanish sentences.
+   */
   reasons: string[];
   warnings: string[];
 }
 
+/** A base piece the wardrobe lacks among available garments without an excluded color. */
+export type MissingPiece = 'shoes' | 'top' | 'bottom';
+
+/** Why there is no proposal. The interface turns it into a sentence. */
+export type RecommendationProblem =
+  | { kind: 'empty' }
+  | { kind: 'pinned-gone' }
+  | { kind: 'pinned-unavailable' }
+  | { kind: 'pinned-excluded' }
+  | { kind: 'pinned-missing'; missing: MissingPiece[] }
+  /** `onePieceWouldDo` is false only when shoes are what is missing. */
+  | { kind: 'missing'; missing: MissingPiece[]; onePieceWouldDo: boolean };
+
 export interface RecommendationResult {
   status: 'ready' | 'empty' | 'insufficient';
   outfits: Outfit[];
-  message: string;
+  problem?: RecommendationProblem;
 }
+
+export type SwapProblem = 'outfit-changed' | 'slot-missing' | 'no-option';
 
 export interface SwapResult {
   status: 'swapped' | 'unavailable';
   outfit: Outfit;
-  message: string;
+  problem?: SwapProblem;
 }
 
 export interface WearResult {
   status: 'recorded' | 'unavailable';
   wardrobe: WardrobeItem[];
-  message: string;
 }
 
 export type Context = RecommendationContext;
 
-export const CATEGORY_LABELS: Record<Category, string> = {
-  top: 'Parte de arriba',
-  bottom: 'Parte de abajo',
-  'one-piece': 'Prenda completa',
-  shoes: 'Calzado',
-  layer: 'Capa exterior',
-  accessory: 'Accesorio',
-};
-
-export const OCCASION_LABELS: Record<Occasion, string> = {
-  casual: 'Día a día',
-  work: 'Trabajo',
-  formal: 'Evento formal',
-  sport: 'Actividad física',
-  outing: 'Salida',
-};
-
+/** Stored color ids. They stay in Spanish for compatibility; the interface translates them. */
 export const COLOR_OPTIONS = [
   'negro',
   'blanco',
@@ -190,13 +146,5 @@ export const COLOR_OPTIONS = [
   'amarillo',
   'morado',
   'naranja',
-];
-
-export const categoryLabels = CATEGORY_LABELS;
-export const occasionLabels = OCCASION_LABELS;
-export const colorLabels: Record<string, string> = Object.fromEntries(
-  COLOR_OPTIONS.map((color) => [
-    color,
-    color === 'cafe' ? 'Café' : color.charAt(0).toUpperCase() + color.slice(1),
-  ]),
-);
+] as const;
+export type ColorId = (typeof COLOR_OPTIONS)[number];

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { OCCASIONS, occasionLabels } from '../../domain';
+import { OCCASIONS } from '../../domain';
+import { useCopy } from '../../i18n';
 import { ThemeRow } from '../AppearanceSettings';
 import { Button, Chip, FieldLabel, useUI } from '../ui';
 import { FirstOutfitPreview } from './FirstOutfitPreview';
@@ -17,26 +18,24 @@ export function AppearanceStep({
   onFinish,
 }: StepProps & { edit: boolean; onFinish: (entry: OnboardingEntry) => void }) {
   const { s, palette } = useUI();
+  const t = useCopy();
+  const copy = t.onboarding;
   return (
     <>
-      <Guide
-        kind="sneakers"
-        say="Soy Teni, los tenis. Con lo que me contaste armé esto."
-        title="Tu primer outfit"
-      />
+      <Guide kind="sneakers" say={copy.outfitSay} title={copy.outfitTitle} />
       <FirstOutfitPreview data={data} />
-      <FieldLabel>¿Para qué te vistes casi siempre?</FieldLabel>
+      <FieldLabel>{copy.occasionQuestion}</FieldLabel>
       <View style={s.wrap}>
         {OCCASIONS.map((occasion) => (
           <Chip
             key={occasion}
-            label={occasionLabels[occasion]}
+            label={t.occasions[occasion]}
             selected={data.context.occasion === occasion}
             onPress={() => onChange({ context: { ...data.context, occasion } })}
           />
         ))}
       </View>
-      <FieldLabel>Tema</FieldLabel>
+      <FieldLabel>{t.settings.theme}</FieldLabel>
       <ThemeRow
         bleed={24}
         value={data.appearance}
@@ -45,7 +44,7 @@ export function AppearanceStep({
       {edit ? (
         <View style={{ marginTop: 28 }}>
           <Button
-            label="¡Listo!"
+            label={copy.done}
             onPress={() => onFinish('keep')}
             style={PILL}
           />
@@ -60,16 +59,16 @@ export function AppearanceStep({
               marginBottom: 16,
             }}
           >
-            ¿Con qué ropa empezamos?
+            {copy.startWith}
           </Text>
           <Button
-            label="Vamos con mi ropa"
+            label={copy.ownClothes}
             onPress={() => onFinish('own')}
             style={PILL}
           />
           <Button
             secondary
-            label="Ver el clóset de ejemplo"
+            label={t.closet.showDemo}
             onPress={() => onFinish('demo')}
             style={{ ...PILL, marginTop: 10 }}
           />

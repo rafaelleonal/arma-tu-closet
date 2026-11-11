@@ -8,16 +8,18 @@ import { SaveErrorBanner } from '../components/AppChrome';
 import { AppLogo } from '../components/AppLogo';
 import { Onboarding, type OnboardingEntry } from '../components/Onboarding';
 import { Button, useUI } from '../components/ui';
+import { useCopy } from '../i18n';
 import { withDemo } from './actions';
 
 export function LoadingScreen({
   error,
   onRetry,
 }: {
-  error: string;
+  error: boolean;
   onRetry: () => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   return (
     <SafeAreaView style={[styles.loading, { backgroundColor: palette.paper }]}>
       <AppLogo />
@@ -27,9 +29,9 @@ export function LoadingScreen({
             accessibilityRole="alert"
             style={[s.subtitle, { textAlign: 'center', marginVertical: 24 }]}
           >
-            {error}
+            {t.storage.loadFailed}
           </Text>
-          <Button label="Intentar de nuevo" onPress={onRetry} />
+          <Button label={t.common.retry} onPress={onRetry} />
         </>
       ) : (
         <ActivityIndicator color={palette.green} />
@@ -53,6 +55,7 @@ export function OnboardingScreen({
   onFinish: (entry: OnboardingEntry) => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   return (
     <View style={{ flex: 1, backgroundColor: palette.paper }}>
       <SaveErrorBanner
@@ -73,12 +76,10 @@ export function OnboardingScreen({
             };
             return current.onboarded || entry !== 'demo'
               ? next
-              : withDemo(next);
+              : withDemo(next, t.demoNames);
           });
           const name = data.profile.name.trim();
-          autosave.noticeAfterSave(
-            name ? `Todo listo, ${name}.` : 'Todo listo.',
-          );
+          autosave.noticeAfterSave(t.notices.allSet(name));
           onFinish(entry);
         }}
       />

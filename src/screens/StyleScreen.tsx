@@ -13,6 +13,7 @@ import {
   type StyleGoalResult,
 } from '../components/style-goal/StyleGoalSheet';
 import { useUI } from '../components/ui';
+import { useCopy } from '../i18n';
 import { SettingsSheet } from './SettingsSheet';
 
 type Preferences = LocalData['preferences'];
@@ -31,6 +32,7 @@ export function StyleScreen({
   onNoticeAfterSave: (message: string) => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const [goalOpen, setGoalOpen] = useState(false);
   const [stylesOpen, setStylesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -47,7 +49,7 @@ export function StyleScreen({
       },
     }));
     setGoalOpen(false);
-    onNoticeAfterSave('Guardé tu objetivo.');
+    onNoticeAfterSave(t.notices.goalSaved);
   };
   const setPreferences = (fn: (current: Preferences) => Partial<Preferences>) =>
     update((current) => ({
@@ -63,7 +65,7 @@ export function StyleScreen({
       ) : null}
       <View style={[s.pageHeading, { marginBottom: 16 }]}>
         <Text accessibilityRole="header" style={s.title}>
-          Mi estilo
+          {t.style.title}
         </Text>
         <SettingsButton onPress={() => setSettingsOpen(true)} />
       </View>
@@ -83,7 +85,7 @@ export function StyleScreen({
               profile: { ...current.profile, styleIds },
             }));
             setStylesOpen(false);
-            onNoticeAfterSave('Guardé tus estilos.');
+            onNoticeAfterSave(t.notices.stylesSaved);
           }}
         />
       ) : null}
@@ -96,7 +98,7 @@ export function StyleScreen({
       ) : null}
       <SavedShelf outfits={data.savedOutfits} onOpen={onOpenOutfit} />
       <Text style={[s.sectionTitle, { marginTop: 34, marginBottom: 14 }]}>
-        Colores
+        {t.style.colors}
       </Text>
       <ColorPicker
         value={data.preferences}

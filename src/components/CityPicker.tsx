@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Linking, Pressable, Text, TextInput, View } from 'react-native';
 import type { WeatherLocation } from '../weather/types';
-import { searchLocations } from '../weather/openMeteo';
+import { searchLocations, WeatherRequestError } from '../weather/openMeteo';
 import {
   deviceLocationSupported,
   findDeviceCity,
 } from '../weather/deviceLocation';
 import { Button, useUI } from './ui';
+import { useI18n } from '../i18n';
 
 /** Location first on iOS/Android; the search by name stays available and opens after a denial or failure. */
 export function CityPicker({
@@ -20,6 +21,7 @@ export function CityPicker({
   hideSelected?: boolean;
 }) {
   const { palette, s } = useUI();
+  const { t, language } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<WeatherLocation[]>([]);
   const [searching, setSearching] = useState(false);
@@ -62,7 +64,7 @@ export function CityPicker({
     setResults([]);
     setSearched(false);
     try {
-      const result = await findDeviceCity(active.signal);
+      const result = await findDeviceCity(active.signal, language);
       if (active.signal.aborted) return;
       if (result.status === 'found') {
         choose(result.location);
@@ -71,18 +73,12 @@ export function CityPicker({
       setSearchOpen(true);
       if (result.status === 'denied') {
         setSettingsBlocked(!result.canAskAgain);
-        setError(
-          result.canAskAgain
-            ? 'Sin permiso de ubicación. Busca tu ciudad por nombre.'
-            : 'La ubicación está bloqueada para esta app. Actívala en Ajustes o busca tu ciudad.',
-        );
-      } else setError(result.message);
+        setError(result.canAskAgain ? t.city.denied : t.city.blocked);
+      } else setError(t.city.failures[result.reason]);
     } catch {
       if (!active.signal.aborted) {
         setSearchOpen(true);
-        setError(
-          'No pudimos obtener tu ubicación. Busca tu ciudad por nombre.',
-        );
+        setError(t.city.failures.position);
       }
     } finally {
       if (controller.current === active) setLocating(false);
@@ -93,7 +89,11 @@ export function CityPicker({
     setSearching(true);
     setSearched(false);
     try {
-      const places = await searchLocations(query.trim(), active.signal);
+      const places = await searchLocations(
+        query.trim(),
+        active.signal,
+        language,
+      );
       if (!active.signal.aborted) {
         setResults(places);
         setSearched(true);
@@ -101,9 +101,9 @@ export function CityPicker({
     } catch (cause) {
       if (!active.signal.aborted)
         setError(
-          cause instanceof Error
-            ? cause.message
-            : 'No pudimos buscar la ciudad.',
+          cause instanceof WeatherRequestError
+            ? t.city.failures[cause.code]
+            : t.city.searchFailed,
         );
     } finally {
       if (controller.current === active) setSearching(false);
@@ -114,7 +114,7 @@ export function CityPicker({
     <View>
       {value && !hideSelected ? (
         <Text style={[s.subtitle, { marginBottom: 12 }]}>
-          Seleccionada:{' '}
+          {t.city.selected}{' '}
           <Text style={{ color: palette.ink }}>{placeLabel(value)}</Text>
         </Text>
       ) : null}
@@ -124,10 +124,10 @@ export function CityPicker({
             secondary={!!value}
             label={
               locating
-                ? 'Buscando tu ciudad…'
+                ? t.city.locating
                 : value
-                  ? 'Actualizar con mi ubicación'
-                  : 'Usar mi ubicación'
+                  ? t.city.updateWithLocation
+                  : t.city.useLocation
             }
             disabled={locating}
             onPress={() => void locate()}
@@ -135,7 +135,7 @@ export function CityPicker({
           <Text
             style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 8 }]}
           >
-            Solo para encontrar tu ciudad. No guardamos tu ubicación exacta.
+            {t.city.locationPrivacy}
           </Text>
         </>
       ) : null}
@@ -156,11 +156,11 @@ export function CityPicker({
         <Button
           secondary
           small
-          label="Abrir Ajustes"
+          label={t.city.openSettings}
           style={{ marginTop: 8 }}
           onPress={() =>
             void Linking.openSettings().catch(() =>
-              setError('Abre Ajustes y activa Ubicación para esta app.'),
+              setError(t.city.openSettingsFailed),
             )
           }
         />
@@ -190,7 +190,7 @@ export function CityPicker({
               textDecorationLine: 'underline',
             }}
           >
-            Buscar por nombre
+            {t.city.searchByName}
           </Text>
         </Pressable>
       )}
@@ -216,11 +216,12 @@ function CitySearch({
   onChoose: (place: WeatherLocation) => void;
 }) {
   const { palette, s } = useUI();
+  const { t } = useI18n();
   return (
     <>
       <TextInput
-        accessibilityLabel="Buscar ciudad"
-        placeholder="Nombre de la ciudad"
+        accessibilityLabel={t.city.search}
+        placeholder={t.city.placeholder}
         placeholderTextColor={palette.muted}
         value={query}
         onChangeText={onQuery}
@@ -233,7 +234,7 @@ function CitySearch({
       />
       <Button
         secondary
-        label={searching ? 'Buscando…' : 'Buscar ciudad'}
+        label={searching ? t.city.searching : t.city.search}
         disabled={searching || query.trim().length < 2}
         onPress={onSearch}
         style={{ marginTop: 12 }}
@@ -249,9 +250,7 @@ function CitySearch({
         ))}
       </View>
       {searched && !results.length ? (
-        <Text style={[s.subtitle, { marginTop: 12 }]}>
-          No encontramos esa ciudad. Prueba otro nombre.
-        </Text>
+        <Text style={[s.subtitle, { marginTop: 12 }]}>{t.city.notFound}</Text>
       ) : null}
     </>
   );

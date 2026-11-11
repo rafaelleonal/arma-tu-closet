@@ -8,7 +8,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 
 ## Forma de trabajar
 
-- Comunica en español. Conserva identificadores de código en inglés y el texto visible en español.
+- Comunica en español. Conserva identificadores de código en inglés. El texto visible va en los catálogos de `src/i18n/`: `es.ts` es la fuente y `en.ts` lo repite en inglés ([ADR-012](docs/adr/0012-idiomas-con-catalogos-tipados.md)).
 - Haz cambios concretos dentro de la petición, revisa el resultado y completa las comprobaciones relevantes. No añadas backend, proveedores, telemetría o dependencias por anticipación.
 - Respeta cambios existentes y datos locales. No reinicies el clóset ni borres fotos para resolver un error de carga o de QA.
 - Usa `pnpm` y conserva `pnpm-lock.yaml`. No edites `node_modules/`, `.expo/` ni `dist/` como fuentes.
@@ -28,6 +28,7 @@ Antes de cambiar código, lee [README.md](README.md), el documento del área afe
 | `src/weather/` y `src/ai/` | Adaptadores de red y validación. La IA solo devuelve propuestas; no guarda prendas. |
 | `server/` | Clave y llamada al proveedor; límites de origen, tamaño, tiempo y uso. Solo loopback en este prototipo. |
 | `src/theme/` | Roles de color de la interfaz. No decide preferencias de vestuario. |
+| `src/i18n/` | Catálogos de texto por idioma y el idioma activo. El dominio y los adaptadores devuelven códigos; no importan esta carpeta. |
 | `assets/garments/` | Ilustraciones incluidas en la app y registro de su generación. |
 | `assets/demo/` | Fotos recortadas del clóset de ejemplo, con autor, enlace y licencia de cada una. |
 

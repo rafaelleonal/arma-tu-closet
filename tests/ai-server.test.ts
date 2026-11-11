@@ -299,8 +299,25 @@ test('multiple garments, ambiguous photos and non-garments return explicit rejec
     const result = await call(server);
     assert.equal(result.status, 422);
     assert.equal(typeof result.body.error, 'string');
+    assert.equal(result.body.reason, status);
     assert.equal(result.body.suggestion, undefined);
   }
+});
+
+test('the suggested name follows Accept-Language: English when asked, Spanish otherwise', async (t) => {
+  const languages: unknown[] = [];
+  const server = await setup(t, {
+    analyze: async (_image, _signal, language) => {
+      languages.push(language);
+      return success;
+    },
+  });
+  for (const header of ['en-US,en;q=0.9', 'es-MX', 'fr', undefined])
+    await call(
+      server,
+      header ? { headers: { 'Accept-Language': header } } : undefined,
+    );
+  assert.deepEqual(languages, ['en', 'es', 'es', 'es']);
 });
 
 test('provider errors and malformed output never leak raw errors, photos or unknown attributes', async (t) => {

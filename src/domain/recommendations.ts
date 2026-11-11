@@ -1,15 +1,15 @@
-import {
-  CATEGORY_LABELS,
-  OCCASION_LABELS,
-  STYLE_IDS,
-  STYLE_OPTIONS,
-} from './types';
+import { reasonCode, warningCode } from './reasons';
+import type { OutfitReason, OutfitWarning } from './reasons';
+import { STYLE_IDS } from './types';
 import type {
   Category,
+  MissingPiece,
   Outfit,
   OutfitSlot,
   RecommendationContext,
   RecommendationResult,
+  StyleId,
+  SwapProblem,
   SwapResult,
   WardrobeItem,
   WearResult,
@@ -57,7 +57,7 @@ function recent(item: WardrobeItem, context: RecommendationContext): boolean {
 function matchedStyles(
   item: WardrobeItem,
   context: RecommendationContext,
-): string[] {
+): StyleId[] {
   const preferred = new Set(
     (context.styleIds ?? []).filter((style) => STYLE_IDS.includes(style)),
   );
@@ -213,57 +213,60 @@ function makeOutfit(
   items: WardrobeItem[],
   context: RecommendationContext,
 ): Outfit {
-  const reasons: string[] = [];
-  const warnings: string[] = [];
+  const reasons: OutfitReason[] = [];
+  const warnings: OutfitWarning[] = [];
   const preferred = normalized(context.preferredColors);
   const matchingOccasion = items.every((item) =>
     item.occasions.includes(context.occasion),
   );
   if (matchingOccasion)
-    reasons.push(`Ocasión: ${OCCASION_LABELS[context.occasion].toLowerCase()}`);
-  else warnings.push('Hay prendas sin etiqueta para esta ocasión');
+    reasons.push({ kind: 'occasion', occasion: context.occasion });
+  else warnings.push({ kind: 'occasion-untagged' });
+  const warmth = {
+    kind: 'warmth',
+    temperatureC: temperature(context),
+  } as const;
   if (Math.abs(bodyWarmth(items) - targetWarmth(context)) <= 0.8)
-    reasons.push(`Abrigo estimado para ${temperature(context)} °C`);
-  else warnings.push(`Revisa el abrigo para ${temperature(context)} °C`);
+    reasons.push(warmth);
+  else warnings.push(warmth);
   if (
     items.some((item) =>
       item.colors.some((color) => preferred.has(normalizeColor(color))),
     )
   )
-    reasons.push('Color favorito');
+    reasons.push({ kind: 'favorite-color' });
   // First, because the card only shows the top reasons.
   if (context.explore && items.some(lightlyUsed))
-    reasons.unshift('Incluye prendas poco usadas');
+    reasons.unshift({ kind: 'lightly-used' });
   const styles = new Set(items.flatMap((item) => matchedStyles(item, context)));
-  if (styles.size) {
-    const labels = STYLE_OPTIONS.filter((style) => styles.has(style.id)).map(
-      (style) => style.label.toLowerCase(),
-    );
-    reasons.unshift(`Estilo: ${labels.join(', ')}`);
-  }
+  if (styles.size)
+    reasons.unshift({
+      kind: 'style',
+      styleIds: STYLE_IDS.filter((style) => styles.has(style)),
+    });
   if (!items.some((item) => recent(item, context))) {
     if (context.rotationDays > 0)
-      reasons.push(`Sin uso registrado en ${context.rotationDays} días`);
-  } else warnings.push('Incluye prendas usadas recientemente');
+      reasons.push({ kind: 'rotation', days: context.rotationDays });
+  } else warnings.push({ kind: 'worn-recently' });
   if (context.raining) {
     if (!items.find((item) => item.category === 'shoes')?.rainReady)
-      warnings.push('Calzado sin marcar para lluvia');
+      warnings.push({ kind: 'shoes-not-rain-ready' });
     if (!items.find((item) => item.category === 'layer')?.rainReady)
-      warnings.push('Sin capa marcada para lluvia');
+      warnings.push({ kind: 'no-rain-layer' });
     if (
       items.find((item) => item.category === 'shoes')?.rainReady &&
       items.find((item) => item.category === 'layer')?.rainReady
     )
-      reasons.push('Calzado y capa marcados para lluvia');
+      reasons.push({ kind: 'rain-ready' });
   }
   if (normalized(items.flatMap((item) => item.colors)).size === 1)
-    reasons.push('Un solo color');
+    reasons.push({ kind: 'one-color' });
   return {
     id: fingerprint(items),
     items: [...items],
     score: Math.round(scoreItems(items, context) * 10) / 10,
-    reasons,
-    warnings,
+    reasons: reasons.map(reasonCode),
+    warnings: warnings.map(warningCode),
   };
 }
 
@@ -293,11 +296,11 @@ function missingForPinned(
   bottoms: WardrobeItem[],
   onePieces: WardrobeItem[],
   shoes: WardrobeItem[],
-): string[] {
-  const missing = shoes.length ? [] : ['calzado'];
+): MissingPiece[] {
+  const missing: MissingPiece[] = shoes.length ? [] : ['shoes'];
   if (pinned.category === 'one-piece' || onePieces.length) return missing;
-  if (!tops.length) missing.push('una parte de arriba');
-  if (!bottoms.length) missing.push('una parte de abajo');
+  if (!tops.length) missing.push('top');
+  if (!bottoms.length) missing.push('bottom');
   return missing;
 }
 
@@ -311,7 +314,7 @@ export function generateRecommendations(
     return {
       status: 'empty',
       outfits: [],
-      message: 'Tu clóset está vacío. Agrega tu primera prenda.',
+      problem: { kind: 'empty' },
     };
   // Deduplicate IDs defensively after restoring local JSON or importing garments.
   const unique = [...new Map(wardrobe.map((item) => [item.id, item])).values()];
@@ -323,11 +326,13 @@ export function generateRecommendations(
     return {
       status: 'insufficient',
       outfits: [],
-      message: !pinned
-        ? 'La prenda ya no está en tu clóset.'
-        : !pinned.available
-          ? 'Marca esta prenda como disponible para combinarla.'
-          : 'Esta prenda tiene un color excluido. Puedes cambiarlo en tus preferencias.',
+      problem: {
+        kind: !pinned
+          ? 'pinned-gone'
+          : !pinned.available
+            ? 'pinned-unavailable'
+            : 'pinned-excluded',
+      },
     };
   }
   const eligible = unique.filter((item) => isItemEligible(item, context));
@@ -355,24 +360,27 @@ export function generateRecommendations(
       return {
         status: 'insufficient',
         outfits: [],
-        message: `Para combinar esta prenda, agrega ${missing.join(' y ')} o revisa la disponibilidad y los colores excluidos.`,
+        problem: { kind: 'pinned-missing', missing },
       };
   }
   if (
     !shoes.length ||
     (!onePieces.length && (!tops.length || !bottoms.length))
   ) {
-    const missing = !shoes.length
-      ? 'calzado'
-      : !tops.length && !bottoms.length
-        ? 'una parte de arriba y una de abajo, o una prenda completa'
-        : !tops.length
-          ? 'una parte de arriba o una prenda completa'
-          : 'una parte de abajo o una prenda completa';
+    const missing: MissingPiece[] = !shoes.length
+      ? ['shoes']
+      : [
+          ...(tops.length ? [] : (['top'] as const)),
+          ...(bottoms.length ? [] : (['bottom'] as const)),
+        ];
     return {
       status: 'insufficient',
       outfits: [],
-      message: `Falta ${missing} disponible que respete tus colores excluidos. Agrega prendas o revisa disponibilidad y preferencias.`,
+      problem: {
+        kind: 'missing',
+        missing,
+        onePieceWouldDo: shoes.length > 0,
+      },
     };
   }
   const bases = rankSets(
@@ -445,10 +453,6 @@ export function generateRecommendations(
   return {
     status: 'ready',
     outfits: selected.map((items) => makeOutfit(items, context)),
-    message:
-      selected.length === 1
-        ? 'Una combinación con las prendas que tienes.'
-        : `${selected.length} combinaciones con las prendas que tienes.`,
   };
 }
 
@@ -548,20 +552,15 @@ export function swapOutfitItem(
   context: RecommendationContext,
 ): SwapResult {
   const current = currentItems(outfit, wardrobe);
-  const unavailable = (message: string): SwapResult => ({
+  const unavailable = (problem: SwapProblem): SwapResult => ({
     status: 'unavailable',
     outfit,
-    message,
+    problem,
   });
   if (!current || !current.every((item) => isItemEligible(item, context)))
-    return unavailable(
-      'La combinación cambió o contiene prendas no disponibles. Genera opciones nuevas.',
-    );
+    return unavailable('outfit-changed');
   const old = current.find((item) => item.category === slot);
-  if (!old)
-    return unavailable(
-      'Esta combinación no tiene ese tipo de prenda para cambiar.',
-    );
+  if (!old) return unavailable('slot-missing');
   const candidates = wardrobe
     .filter(
       (item) =>
@@ -575,15 +574,8 @@ export function swapOutfitItem(
     )
     .filter((items) => isValidOutfit(items))
     .sort((a, b) => compareSets(a, b, context));
-  if (!candidates.length)
-    return unavailable(
-      `No hay otra opción disponible de ${CATEGORY_LABELS[slot].toLowerCase()} que respete tus preferencias.`,
-    );
-  return {
-    status: 'swapped',
-    outfit: makeOutfit(candidates[0], context),
-    message: 'Prenda cambiada con una opción de tu guardarropa.',
-  };
+  if (!candidates.length) return unavailable('no-option');
+  return { status: 'swapped', outfit: makeOutfit(candidates[0], context) };
 }
 
 /** Only current, available garments from a complete outfit may receive a wear mark. */
@@ -593,12 +585,7 @@ export function recordOutfitWorn(
   now: string,
 ): WearResult {
   if (!Number.isFinite(Date.parse(now)) || !currentItems(outfit, wardrobe))
-    return {
-      status: 'unavailable',
-      wardrobe,
-      message:
-        'No se pudo registrar: revisa la fecha y que las prendas sigan disponibles.',
-    };
+    return { status: 'unavailable', wardrobe };
   const ids = new Set(outfit.items.map((item) => item.id));
   return {
     status: 'recorded',
@@ -607,7 +594,5 @@ export function recordOutfitWorn(
         ? { ...item, lastWornAt: now, wearCount: (item.wearCount ?? 0) + 1 }
         : item,
     ),
-    message:
-      'Uso registrado. Lo tendremos en cuenta para la próxima combinación.',
   };
 }

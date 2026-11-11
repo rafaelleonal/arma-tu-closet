@@ -15,6 +15,7 @@ import { OutfitDeck } from '../components/today/OutfitDeck';
 import { WearMoreNudge } from '../components/today/WearMoreNudge';
 import { WeatherNotice, WeatherPill } from '../components/WeatherCard';
 import { Button, useUI } from '../components/ui';
+import { useI18n, type Copy } from '../i18n';
 import { withoutDemo, type OutfitActions } from './actions';
 
 interface TodayScreenProps {
@@ -32,8 +33,8 @@ interface TodayScreenProps {
 /** Height of the example-closet banner and its margin. */
 const DEMO_BANNER = 56;
 
-function todayLabel(name: string) {
-  const date = new Intl.DateTimeFormat('es-MX', {
+function todayLabel(name: string, locale: string) {
+  const date = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -46,14 +47,15 @@ function todayLabel(name: string) {
 export function TodayScreen(props: TodayScreenProps) {
   const { data, update, recs, weather, onTab, onEditContext } = props;
   const { palette, s } = useUI();
+  const { t, locale } = useI18n();
   return (
     <>
       <Text style={{ color: palette.muted, fontSize: 12 }}>
-        {todayLabel(data.profile.name)}
+        {todayLabel(data.profile.name, locale)}
       </Text>
       <View style={[s.pageHeading, { columnGap: 12, rowGap: 8 }]}>
         <Text accessibilityRole="header" style={s.title}>
-          Hoy
+          {t.today.title}
         </Text>
         <WeatherPill
           data={data}
@@ -134,12 +136,13 @@ function AiChoiceControl({
   choice: ReturnType<typeof useAiOutfitChoice>;
 }) {
   const { palette, s } = useUI();
+  const { t } = useI18n();
   const note = [s.subtitle, { fontSize: 12 }];
   const pending = choice.status === 'pending';
   if (choice.status === 'ready')
     return (
       <Text accessibilityLiveRegion="polite" style={[note, { marginTop: 12 }]}>
-        Propuesta principal elegida con IA.
+        {t.today.aiChosen}
       </Text>
     );
   return (
@@ -158,37 +161,39 @@ function AiChoiceControl({
             color: pending ? palette.muted : palette.rust,
           }}
         >
-          {pending ? 'Consultando…' : 'Elegir con IA'}
+          {pending ? t.today.aiPending : t.today.aiChoose}
         </Text>
       </Pressable>
       {choice.status === 'failed' ? (
         <Text accessibilityRole="alert" style={[note, { flex: 1 }]}>
-          No se pudo consultar la IA.
+          {t.today.aiFailed}
         </Text>
       ) : null}
     </View>
   );
 }
 
+function noOutfitsMessage(t: Copy, result: TodayScreenProps['recs']['result']) {
+  if (result.outfits.length) return t.today.noMoreIdeas;
+  return result.problem ? t.problems.recommendation(result.problem) : '';
+}
+
 function NoOutfits({ data, update, recs, onTab }: TodayScreenProps) {
   const { palette, s } = useUI();
+  const { t } = useI18n();
   return (
     <>
       <View style={[s.panel, { paddingVertical: 35 }]}>
         <Text style={{ fontSize: 28, marginBottom: 14, color: palette.ink }}>
-          Todavía no hay outfits
+          {t.today.emptyTitle}
         </Text>
-        <Text style={s.subtitle}>
-          {recs.result.outfits.length
-            ? 'Ya no tengo más ideas para hoy.'
-            : recs.result.message}
-        </Text>
+        <Text style={s.subtitle}>{noOutfitsMessage(t, recs.result)}</Text>
         <View style={[s.row, { marginTop: 22, flexWrap: 'wrap' }]}>
-          <Button label="Ir a mi clóset" onPress={() => onTab('closet')} />
+          <Button label={t.today.goToCloset} onPress={() => onTab('closet')} />
           {data.dislikedOutfitIds.length ? (
             <Button
               secondary
-              label="Ver las anteriores"
+              label={t.today.showPrevious}
               onPress={() =>
                 update((current) => ({ ...current, dislikedOutfitIds: [] }))
               }
@@ -196,7 +201,7 @@ function NoOutfits({ data, update, recs, onTab }: TodayScreenProps) {
           ) : (
             <Button
               secondary
-              label="Revisar mi estilo"
+              label={t.today.reviewStyle}
               onPress={() => onTab('style')}
             />
           )}

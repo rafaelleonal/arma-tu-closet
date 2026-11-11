@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { colorLabels, type WardrobeItem } from '../../domain';
+import type { WardrobeItem } from '../../domain';
+import { colorName, useCopy } from '../../i18n';
 import { NameTag } from '../NameTag';
 import { Dots } from '../Dots';
 import { SHEET_BLEED } from '../Sheet';
@@ -16,14 +17,13 @@ const HEIGHT = 212;
  */
 export function GarmentPreview({ draft }: { draft: WardrobeItem }) {
   const { palette } = useUI();
-  const colors = draft.colors
-    .map((color) => colorLabels[color] || color)
-    .join(', ');
+  const t = useCopy();
+  const colors = draft.colors.map((color) => colorName(t, color)).join(', ');
   return (
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`${stickerArt(draft)}${draft.name ? ` de ${draft.name}` : ''}${colors ? `. Colores: ${colors}` : ''}`}
+      accessibilityLabel={`${stickerArt(t, draft)}${draft.name ? t.art.ofName(draft.name) : ''}${colors ? t.art.colorsSuffix(colors) : ''}`}
       style={[styles.stage, { backgroundColor: palette.art }]}
     >
       <Dots />

@@ -2,6 +2,7 @@ import { recordOutfitWorn, seedWardrobe, type Outfit } from '../domain';
 import type { LocalData } from '../storage/local';
 import type { Autosave } from '../hooks/useAutosave';
 import type { UpdateData } from '../hooks/useLocalData';
+import type { Copy } from '../i18n';
 
 /** Removes the example garments and the saved outfits that use them. */
 export function withoutDemo(current: LocalData): LocalData {
@@ -14,8 +15,18 @@ export function withoutDemo(current: LocalData): LocalData {
   };
 }
 
-export function withDemo(current: LocalData): LocalData {
-  return { ...current, items: seedWardrobe.map((item) => ({ ...item })) };
+/** The example garments, named in the active language when they are added. */
+export function withDemo(
+  current: LocalData,
+  names: Record<string, string>,
+): LocalData {
+  return {
+    ...current,
+    items: seedWardrobe.map((item) => ({
+      ...item,
+      name: names[item.id] ?? item.name,
+    })),
+  };
 }
 
 function localDay(value: string) {
@@ -31,6 +42,7 @@ export function createOutfitActions(
   update: UpdateData,
   autosave: Autosave,
   closeOutfit: () => void,
+  t: Copy,
 ) {
   const isSaved = (outfit: Outfit) =>
     data.savedOutfits.some((item) => item.id === outfit.id);
@@ -45,7 +57,7 @@ export function createOutfitActions(
           : [outfit, ...current.savedOutfits],
       }));
       autosave.noticeAfterSave(
-        saved ? 'Lo quité de guardados.' : 'Outfit guardado.',
+        saved ? t.notices.unsaved : t.notices.outfitSaved,
       );
     },
     worn(outfit: Outfit) {
@@ -53,7 +65,7 @@ export function createOutfitActions(
       const wear = recordOutfitWorn(data.items, outfit, now);
       closeOutfit();
       if (wear.status !== 'recorded') {
-        autosave.setNotice(wear.message);
+        autosave.setNotice(t.notices.wearFailed);
         return;
       }
       const today = localDay(now);
@@ -62,7 +74,7 @@ export function createOutfitActions(
           (entry) => entry.id === outfit.id && localDay(entry.date) === today,
         )
       ) {
-        autosave.setNotice('Ya lo registraste hoy.');
+        autosave.setNotice(t.notices.alreadyWorn);
         return;
       }
       update((current) => ({
@@ -77,7 +89,7 @@ export function createOutfitActions(
           ...current.wearHistory,
         ].slice(0, 365),
       }));
-      autosave.noticeAfterSave('Anotado: te lo pusiste hoy.');
+      autosave.noticeAfterSave(t.notices.worn);
     },
   };
 }

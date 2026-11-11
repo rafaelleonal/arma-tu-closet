@@ -13,6 +13,7 @@ import { Chip, FieldLabel, useUI } from './ui';
 import { Toggle } from './Toggle';
 import { useFeedback } from './Feedback';
 import { ThemePreview } from './ThemePreview';
+import { useCopy } from '../i18n';
 
 type Appearance = LocalData['appearance'];
 
@@ -77,18 +78,19 @@ export function AppearanceSettings({
   bleed = 0,
 }: AppearanceSettingsProps) {
   const { s, palette } = useUI();
+  const t = useCopy();
   return (
     <View>
       <ThemeRow value={value} onChange={onChange} bleed={bleed} />
-      <FieldLabel>Vista</FieldLabel>
+      <FieldLabel>{t.appearance.layout}</FieldLabel>
       <View style={s.wrap}>
         <Chip
-          label="Amplia"
+          label={t.appearance.wide}
           selected={value.outfitLayout === 'editorial'}
           onPress={() => onChange({ ...value, outfitLayout: 'editorial' })}
         />
         <Chip
-          label="Compacta"
+          label={t.appearance.compact}
           selected={value.outfitLayout === 'compact'}
           onPress={() => onChange({ ...value, outfitLayout: 'compact' })}
         />
@@ -101,16 +103,16 @@ export function AppearanceSettings({
       >
         <View style={{ flex: 1 }}>
           <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '500' }}>
-            Explicaciones
+            {t.appearance.reasons}
           </Text>
           <Text
             style={[s.subtitle, { fontSize: 11, lineHeight: 17, marginTop: 4 }]}
           >
-            Las advertencias siguen visibles.
+            {t.appearance.warningsStay}
           </Text>
         </View>
         <Toggle
-          label="Mostrar explicaciones de conjuntos"
+          label={t.appearance.reasonsToggle}
           value={value.showReasons}
           onChange={(showReasons) => onChange({ ...value, showReasons })}
         />
@@ -119,9 +121,11 @@ export function AppearanceSettings({
         <View
           style={[s.row, { justifyContent: 'space-between', marginTop: 24 }]}
         >
-          <Text style={{ color: palette.ink, fontSize: 13 }}>Vibración</Text>
+          <Text style={{ color: palette.ink, fontSize: 13 }}>
+            {t.appearance.haptics}
+          </Text>
           <Toggle
-            label="Vibración"
+            label={t.appearance.haptics}
             value={value.hapticsEnabled !== false}
             onChange={(hapticsEnabled) =>
               onChange({ ...value, hapticsEnabled })
@@ -146,11 +150,13 @@ function ThemeCard({
   onSelect: () => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const feedback = useFeedback();
+  const name = t.themes[option.id];
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Tema ${option.name}`}
+      accessibilityLabel={t.appearance.themeLabel(name)}
       accessibilityState={{ selected }}
       aria-pressed={selected}
       onPress={() => {
@@ -188,7 +194,7 @@ function ThemeCard({
             fontWeight: '600',
           }}
         >
-          {option.name}
+          {name}
         </Text>
         <Text
           style={{

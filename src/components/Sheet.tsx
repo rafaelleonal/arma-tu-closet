@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUI } from './ui';
 import type { Palette } from '../theme/ThemeProvider';
 import { useFeedback } from './Feedback';
+import { useCopy } from '../i18n';
 
 /** Horizontal padding of a sheet, the same as a screen's, so full-width pieces bleed alike. */
 export const SHEET_BLEED = 24;
@@ -72,6 +73,7 @@ export function Sheet({
   footer?: React.ReactNode;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const { reduceMotion } = useFeedback();
   const styles = useMemo(() => createStyles(palette), [palette]);
   // Read here, outside the modal: inside it there is no provider, so a SafeAreaView reports none.
@@ -103,7 +105,7 @@ export function Sheet({
             </Text>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Cerrar"
+              accessibilityLabel={t.common.close}
               onPress={onClose}
               style={styles.close}
             >

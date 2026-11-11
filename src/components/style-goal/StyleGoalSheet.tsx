@@ -3,10 +3,10 @@ import { Text, View } from 'react-native';
 import {
   EMPTY_STYLE_GOAL,
   COLOR_TONE_INFO,
-  colorLabels,
   suggestedColors,
   type StyleGoal,
 } from '../../domain';
+import { colorName, useCopy } from '../../i18n';
 import type { LocalData } from '../../storage/local';
 import { ColorTest, ToneSwatches } from '../colorimetry/ColorTest';
 import { Sheet } from '../Sheet';
@@ -34,6 +34,8 @@ export function StyleGoalSheet({
   onSave: (result: StyleGoalResult) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
+  const copy = t.styleGoal;
   const [goal, setGoal] = useState<StyleGoal>(
     data.styleGoal ?? EMPTY_STYLE_GOAL,
   );
@@ -48,7 +50,7 @@ export function StyleGoalSheet({
   const tone = goal.colorTone && COLOR_TONE_INFO[goal.colorTone];
   if (testing)
     return (
-      <Sheet title="Colorimetría" onClose={() => setTesting(false)}>
+      <Sheet title={copy.colorTest} onClose={() => setTesting(false)}>
         <ColorTest
           onDone={(colorTone) => {
             change({ colorTone });
@@ -59,30 +61,28 @@ export function StyleGoalSheet({
       </Sheet>
     );
   return (
-    <Sheet title="Cambiar mi estilo" onClose={onClose}>
-      <FieldLabel>Me gustaría verme más…</FieldLabel>
+    <Sheet title={copy.title} onClose={onClose}>
+      <FieldLabel>{copy.wantMore}</FieldLabel>
       <StylePicker
         value={goal.targetStyleIds}
         onChange={(targetStyleIds) => change({ targetStyleIds })}
         mark="✦"
-        prefix="Quiero probar"
+        prefix={t.styleBoard.goal}
       />
-      <FieldLabel>Tu colorimetría · opcional</FieldLabel>
+      <FieldLabel>{copy.toneTitle}</FieldLabel>
       {tone ? (
         <>
           <Text style={[s.sectionTitle, { marginBottom: 12 }]}>
-            {tone.label}
+            {goal.colorTone ? t.tones[goal.colorTone].label : ''}
           </Text>
           <ToneSwatches colors={tone.palette} />
         </>
       ) : (
-        <Text style={[s.subtitle, { fontSize: 12 }]}>
-          Compara colores junto a tu cara. Tu foto no sale del teléfono.
-        </Text>
+        <Text style={[s.subtitle, { fontSize: 12 }]}>{copy.testHint}</Text>
       )}
       <Button
         secondary
-        label={tone ? 'Repetir la prueba' : 'Hacer la prueba'}
+        label={tone ? copy.repeatTest : copy.takeTest}
         style={{ marginTop: 14 }}
         onPress={() => setTesting(true)}
       />
@@ -90,22 +90,22 @@ export function StyleGoalSheet({
         <Button
           secondary
           small
-          label="Quitar resultado"
+          label={copy.removeResult}
           style={{ marginTop: 8 }}
           onPress={() => change({ colorTone: undefined })}
         />
       ) : null}
       {suggested.length ? (
         <>
-          <FieldLabel>Tus colores</FieldLabel>
+          <FieldLabel>{copy.yourColors}</FieldLabel>
           <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
-            Los que elijas se suman a tus favoritos.
+            {copy.yourColorsHint}
           </Text>
           <View style={s.wrap}>
             {suggested.map((color) => (
               <Chip
                 key={color}
-                label={colorLabels[color]}
+                label={colorName(t, color)}
                 swatch={colorHex[color]}
                 selected={colors.includes(color)}
                 onPress={() => setColors(toggled(colors, color))}
@@ -115,7 +115,7 @@ export function StyleGoalSheet({
         </>
       ) : null}
       <Button
-        label="Guardar"
+        label={t.common.save}
         style={{ marginTop: 24 }}
         onPress={() =>
           onSave({

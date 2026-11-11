@@ -10,10 +10,12 @@ export type {
   ThemeId,
   OnboardingProgress,
 } from './schema';
+export type { LanguageId, StorageErrorCode } from './schema';
 export {
   createDefaultProfile,
   createDefaultAppearance,
   createLocalData,
+  StorageError,
 } from './schema';
 const KEY = '@arma-tu-outfit/v1';
 let writes: Promise<void> = Promise.resolve();

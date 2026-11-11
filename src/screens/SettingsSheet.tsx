@@ -5,12 +5,10 @@ import type { UpdateData } from '../hooks/useLocalData';
 import { AppearanceSettings } from '../components/AppearanceSettings';
 import { Sheet, SHEET_BLEED } from '../components/Sheet';
 import { Button, Chip, FieldLabel, useUI } from '../components/ui';
+import { LanguageSetting } from '../components/LanguageSetting';
+import { useCopy } from '../i18n';
 
 const ROTATION_DAYS = [0, 3, 7, 14];
-
-function plural(count: number, one: string, many: string) {
-  return `${count} ${count === 1 ? one : many}`;
-}
 
 /** How the app looks and behaves, apart from the person's style: opened from Mi estilo. */
 export function SettingsSheet({
@@ -26,10 +24,11 @@ export function SettingsSheet({
   onClose: () => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const note = [s.subtitle, { fontSize: 12, lineHeight: 19 }];
   return (
-    <Sheet title="Ajustes" onClose={onClose}>
-      <FieldLabel>Tema</FieldLabel>
+    <Sheet title={t.settings.title} onClose={onClose}>
+      <FieldLabel>{t.settings.theme}</FieldLabel>
       <AppearanceSettings
         bleed={SHEET_BLEED}
         value={data.appearance}
@@ -37,12 +36,22 @@ export function SettingsSheet({
           update((current) => ({ ...current, appearance }))
         }
       />
-      <FieldLabel>Esperar para repetir una prenda</FieldLabel>
+      <FieldLabel>{t.settings.language}</FieldLabel>
+      <LanguageSetting
+        value={data.appearance.language}
+        onChange={(language) =>
+          update((current) => ({
+            ...current,
+            appearance: { ...current.appearance, language },
+          }))
+        }
+      />
+      <FieldLabel>{t.settings.rotation}</FieldLabel>
       <View style={s.wrap}>
         {ROTATION_DAYS.map((days) => (
           <Chip
             key={days}
-            label={days ? `${days} días` : 'Nada'}
+            label={days ? t.settings.days(days) : t.settings.noWait}
             selected={data.preferences.rotationDays === days}
             onPress={() =>
               update((current) => ({
@@ -56,7 +65,7 @@ export function SettingsSheet({
       <Button
         secondary
         small
-        label="Volver a personalizar"
+        label={t.settings.personalize}
         onPress={onPersonalize}
         style={{ marginTop: 28, alignSelf: 'flex-start' }}
       />
@@ -67,24 +76,13 @@ export function SettingsSheet({
         ]}
       >
         <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '600' }}>
-          Tus datos
+          {t.settings.dataTitle}
         </Text>
+        <Text style={note}>{t.settings.dataPrivacy}</Text>
         <Text style={note}>
-          Tu ropa y tus fotos se guardan solo en este dispositivo, sin copia en
-          la nube. Si borras la app, se pierden. Solo Analizar foto envía la
-          foto de una prenda a OpenAI.
-        </Text>
-        <Text style={note}>
-          {plural(
+          {t.settings.dataCounts(
             data.items.filter((item) => !item.isDemo).length,
-            'prenda propia',
-            'prendas propias',
-          )}{' '}
-          ·{' '}
-          {plural(
             data.wearHistory.length,
-            'uso registrado',
-            'usos registrados',
           )}
         </Text>
         {/* The weather data's license asks for credit; this is the one place that gives it. */}
@@ -93,7 +91,7 @@ export function SettingsSheet({
           onPress={() => void Linking.openURL('https://open-meteo.com/')}
           style={[note, { textDecorationLine: 'underline' }]}
         >
-          Clima automático: datos de Open-Meteo
+          {t.settings.weatherCredit}
         </Text>
       </View>
     </Sheet>

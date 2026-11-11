@@ -8,12 +8,7 @@ import {
 } from '../../domain';
 import { MotionIn, useFeedback } from '../Feedback';
 import { Button, useUI } from '../ui';
-
-const ROUND_TITLES = [
-  'Primero, la temperatura',
-  'Ahora, la intensidad',
-  'Último ajuste',
-];
+import { useCopy } from '../../i18n';
 
 function DrapePanel({
   uri,
@@ -27,11 +22,13 @@ function DrapePanel({
   onPress: () => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
+  const name = t.drapes[drape.id as keyof typeof t.drapes] ?? drape.id;
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Elegir ${side}: ${drape.label}`}
+        accessibilityLabel={t.colorTest.chooseSide(side, name)}
         onPress={onPress}
         style={{
           width: '100%',
@@ -51,7 +48,7 @@ function DrapePanel({
         />
       </Pressable>
       <Text style={{ color: palette.muted, fontSize: 12, marginTop: 8 }}>
-        {drape.label}
+        {name}
       </Text>
     </View>
   );
@@ -70,6 +67,8 @@ export function DrapeCompare({
   onBack?: () => void;
 }) {
   const { s, palette } = useUI();
+  const t = useCopy();
+  const copy = t.colorTest;
   const feedback = useFeedback();
   const vote = (value: DrapeVote) => {
     feedback.selection();
@@ -81,10 +80,10 @@ export function DrapeCompare({
     <MotionIn trigger={step.index}>
       <View style={[s.row, { justifyContent: 'space-between' }]}>
         <Text style={{ color: palette.muted, fontSize: 12 }}>
-          {ROUND_TITLES[step.round]}
+          {copy.rounds[step.round]}
         </Text>
         <Text style={{ color: palette.muted, fontSize: 12 }}>
-          {step.index + 1} de {COLOR_TEST_STEPS}
+          {t.outfit.pageCount(step.index + 1, COLOR_TEST_STEPS)}
         </Text>
       </View>
       <Text
@@ -98,28 +97,28 @@ export function DrapeCompare({
           marginTop: 10,
         }}
       >
-        ¿Con cuál se ve tu piel más uniforme?
+        {copy.question}
       </Text>
       <Text style={[s.subtitle, { fontSize: 12, marginTop: 6 }]}>
-        Fíjate en ojeras, sombras y rojeces. Toca tu favorita.
+        {copy.questionHint}
       </Text>
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
         <DrapePanel
           uri={uri}
           drape={step.pair[left]}
-          side="izquierda"
+          side={copy.left}
           onPress={() => vote(left)}
         />
         <DrapePanel
           uri={uri}
           drape={step.pair[right]}
-          side="derecha"
+          side={copy.right}
           onPress={() => vote(right)}
         />
       </View>
       <Button
         secondary
-        label="No noto diferencia"
+        label={copy.tie}
         style={{ marginTop: 14 }}
         onPress={() => vote('tie')}
       />
@@ -127,7 +126,7 @@ export function DrapeCompare({
         <Button
           secondary
           small
-          label="Atrás"
+          label={t.common.back}
           style={{ marginTop: 8 }}
           onPress={onBack}
         />

@@ -61,7 +61,11 @@ test('empty and incomplete wardrobes give actionable states and no invented garm
   assert.equal(generateRecommendations([], context()).status, 'empty');
   const incomplete = generateRecommendations([item('top', 'top')], context());
   assert.equal(incomplete.status, 'insufficient');
-  assert.match(incomplete.message, /calzado/);
+  assert.deepEqual(incomplete.problem, {
+    kind: 'missing',
+    missing: ['shoes'],
+    onePieceWouldDo: false,
+  });
   assert.deepEqual(incomplete.outfits, []);
 });
 
@@ -115,11 +119,7 @@ test('a mostly black wardrobe remains usable without requiring another color', (
   );
   assert.equal(result.status, 'ready');
   assert.equal(result.outfits.length, 1);
-  assert.ok(
-    result.outfits[0].reasons.some((reason) =>
-      reason.includes('Un solo color'),
-    ),
-  );
+  assert.ok(result.outfits[0].reasons.includes('one-color'));
 });
 
 test('one-piece is an alternate complete base and never mixed with top or bottom', () => {
@@ -154,18 +154,12 @@ test('recent wear is a flexible preference; scarcity can still repeat clothing',
   }));
   const result = generateRecommendations(repeated, context());
   assert.equal(result.status, 'ready');
-  assert.ok(
-    result.outfits[0].warnings.some((warning) =>
-      warning.includes('usadas recientemente'),
-    ),
-  );
+  assert.ok(result.outfits[0].warnings.includes('worn-recently'));
   assert.ok(
     !generateRecommendations(
       repeated,
       context({ rotationDays: 0 }),
-    ).outfits[0].warnings.some((warning) =>
-      warning.includes('usadas recientemente'),
-    ),
+    ).outfits[0].warnings.includes('worn-recently'),
   );
 });
 
@@ -174,10 +168,12 @@ test('manual cold and rain context prefers available protection but warns when m
   const sparse = generateRecommendations(minimal(), weather);
   assert.equal(sparse.status, 'ready');
   assert.ok(
-    sparse.outfits[0].warnings.some((warning) => warning.includes('abrigo')),
+    sparse.outfits[0].warnings.some((warning) => warning.startsWith('warmth:')),
   );
   assert.ok(
-    sparse.outfits[0].warnings.some((warning) => warning.includes('lluvia')),
+    sparse.outfits[0].warnings.some((warning) =>
+      ['shoes-not-rain-ready', 'no-rain-layer'].includes(warning),
+    ),
   );
   const protectedWardrobe = [
     ...minimal(),
@@ -225,11 +221,7 @@ test('occasion and preferred color affect ranking without discarding the rest', 
   assert.ok(
     result.outfits[0].items.some((garment) => garment.id === 'work-shirt'),
   );
-  assert.ok(
-    result.outfits[0].reasons.some((reason) =>
-      reason.includes('Color favorito'),
-    ),
-  );
+  assert.ok(result.outfits[0].reasons.includes('favorite-color'));
   assert.equal(result.status, 'ready');
 });
 
@@ -360,14 +352,14 @@ test('explicit known style affinity changes ranking with accurate reasons', () =
     context({ styleIds: ['minimal'] }),
   ).outfits[0];
   assert.ok(best.items.some((garment) => garment.id === 'style-top'));
-  assert.ok(best.reasons.some((reason) => reason.includes('Estilo: minimal')));
+  assert.ok(best.reasons.includes('style:minimal'));
   const noMatch = generateRecommendations(
     minimal(),
     context({ styleIds: ['minimal'] }),
   );
   assert.equal(noMatch.status, 'ready');
   assert.ok(
-    !noMatch.outfits[0].reasons.some((reason) => reason.startsWith('Estilo:')),
+    !noMatch.outfits[0].reasons.some((reason) => reason.startsWith('style:')),
   );
 });
 
@@ -514,7 +506,10 @@ test('an incompatible dress does not satisfy the missing bottom for a pinned top
     { pinnedItemId: 'top' },
   );
   assert.equal(result.status, 'insufficient');
-  assert.match(result.message, /una parte de abajo/);
+  assert.deepEqual(result.problem, {
+    kind: 'pinned-missing',
+    missing: ['bottom'],
+  });
   assert.deepEqual(result.outfits, []);
 });
 
@@ -589,7 +584,7 @@ test('explore mode moves the target style first and explains rarely worn pieces'
     context({ styleIds: ['street'], explore: true }),
   ).outfits[0];
   assert.ok(outfit.items.some((piece) => piece.id === 'top-street'));
-  assert.ok(outfit.reasons.includes('Incluye prendas poco usadas'));
+  assert.ok(outfit.reasons.includes('lightly-used'));
 });
 
 test('explore mode never brings back an excluded color or unavailable garment', () => {
@@ -680,7 +675,11 @@ test('every tone maps to wardrobe colors and suggestions respect exclusions', ()
   assert.deepEqual(suggestedColors({}, []), []);
   for (const tone of COLOR_TONES) {
     const { colors, palette } = COLOR_TONE_INFO[tone];
-    assert.ok(colors.every((color) => COLOR_OPTIONS.includes(color)));
+    assert.ok(
+      colors.every((color) =>
+        (COLOR_OPTIONS as readonly string[]).includes(color),
+      ),
+    );
     assert.ok(palette.every((hex) => /^#[0-9A-F]{6}$/.test(hex)));
     const without = suggestedColors({ colorTone: tone }, [
       colors[0].toUpperCase(),

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { COLOR_OPTIONS, colorLabels } from '../domain';
+import { COLOR_OPTIONS } from '../domain';
+import { colorName, useCopy } from '../i18n';
 import { useFeedback } from './Feedback';
 import { Segmented } from './Segmented';
 import { colorHex, useUI } from './ui';
@@ -27,6 +28,7 @@ export function ColorPicker({
   onMode: (mode: ColorMode) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   const feedback = useFeedback();
   const { preferredColors, excludedColors } = value;
   const current = mode === 'favorite' ? preferredColors : excludedColors;
@@ -43,8 +45,12 @@ export function ColorPicker({
     });
   }
   const modes = [
-    { id: 'favorite', label: 'Me gustan', count: preferredColors.length },
-    { id: 'avoid', label: 'Prefiero evitar', count: excludedColors.length },
+    {
+      id: 'favorite',
+      label: t.colorPicker.favorite,
+      count: preferredColors.length,
+    },
+    { id: 'avoid', label: t.colorPicker.avoid, count: excludedColors.length },
   ] as const;
   return (
     <>
@@ -60,8 +66,8 @@ export function ColorPicker({
       </View>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 20 }]}>
         {mode === 'favorite'
-          ? 'Los uso primero en tus outfits.'
-          : 'No te propongo prendas con estos colores.'}
+          ? t.colorPicker.favoriteHint
+          : t.colorPicker.avoidHint}
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         {COLOR_OPTIONS.map((color) => (
@@ -93,11 +99,17 @@ function ColorTile({
   onPress: () => void;
 }) {
   const { palette } = useUI();
-  const otherLabel = mode === 'favorite' ? 'evitado' : 'favorito';
+  const t = useCopy();
+  const name = colorName(t, color);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${colorLabels[color]}${selected ? ', seleccionado' : ''}${inOther ? `, actualmente ${otherLabel}` : ''}`}
+      accessibilityLabel={t.colorPicker.tileLabel(
+        name,
+        selected,
+        inOther,
+        mode,
+      )}
       accessibilityState={{ selected }}
       aria-pressed={selected}
       onPress={onPress}
@@ -136,11 +148,11 @@ function ColorTile({
         ) : null}
       </View>
       <Text style={{ color: palette.ink, fontSize: 11, marginTop: 9 }}>
-        {colorLabels[color]}
+        {name}
       </Text>
       {inOther ? (
         <Text style={{ fontSize: 8, marginTop: 3, color: palette.muted }}>
-          {mode === 'favorite' ? 'Lo evitas' : 'Te gusta'}
+          {mode === 'favorite' ? t.colorPicker.youAvoid : t.colorPicker.youLike}
         </Text>
       ) : null}
     </Pressable>

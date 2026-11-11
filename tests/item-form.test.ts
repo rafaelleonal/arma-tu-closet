@@ -7,6 +7,8 @@ import {
   suggestedItemName,
 } from '../src/components/itemForm';
 import { CATEGORIES, seedWardrobe } from '../src/domain';
+import { en } from '../src/i18n/en';
+import { es } from '../src/i18n/es';
 
 test('save rejects empty required attributes and accepts corrected values', () => {
   const item = { ...seedWardrobe[0], name: '  ', colors: [], occasions: [] };
@@ -40,13 +42,16 @@ test('discard protection catches photos and edits, while restored values are cle
 
 test('an empty name becomes a valid name only once a color is chosen', () => {
   for (const category of CATEGORIES) {
-    assert.equal(suggestedItemName(category, []), '');
-    const name = suggestedItemName(category, ['negro', 'cafe', 'azul']);
+    assert.equal(suggestedItemName(es, category, []), '');
+    const name = suggestedItemName(es, category, ['negro', 'cafe', 'azul']);
     assert.ok(
       !itemFormErrors({ name, colors: ['negro'], occasions: ['casual'] }).name,
     );
     assert.match(name, /café/);
     assert.doesNotMatch(name, /azul/);
+    // The stored ids stay in Spanish; the name follows the active language.
+    const english = suggestedItemName(en, category, ['negro', 'cafe']);
+    assert.match(english, /black and brown/);
   }
 });
 

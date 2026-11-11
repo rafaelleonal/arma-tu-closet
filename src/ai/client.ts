@@ -15,11 +15,20 @@ export class AiClientError extends Error {
       | 'response'
       | 'server',
     message: string,
+    /** Why the server could not suggest a garment, when it says so. */
+    public readonly reason?: AnalysisRejection,
   ) {
     super(message);
     this.name = 'AiClientError';
   }
 }
+
+export const ANALYSIS_REJECTIONS = [
+  'multiple_garments',
+  'unclear',
+  'not_garment',
+] as const;
+export type AnalysisRejection = (typeof ANALYSIS_REJECTIONS)[number];
 export type SupportedImageMime = 'image/jpeg' | 'image/png' | 'image/webp';
 
 /** Inspects only the local bytes; a URI or filename never determines the format. */
@@ -146,6 +155,8 @@ export function isAiAvailable(
 
 export interface AnalyzePhotoOptions {
   apiUrl: string;
+  /** Sent as Accept-Language so the suggested name comes in the app's language. */
+  language?: string;
   signal?: AbortSignal;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
@@ -162,6 +173,7 @@ async function postPhoto<T>(
   imageDataUrl: string,
   {
     apiUrl,
+    language,
     signal,
     timeoutMs = 30_000,
     fetchImpl = fetch,
@@ -201,7 +213,10 @@ async function postPhoto<T>(
     try {
       response = await fetchImpl(apiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(language ? { 'Accept-Language': language } : {}),
+        },
         body: JSON.stringify({ imageDataUrl }),
         signal: controller.signal,
       });
@@ -229,10 +244,15 @@ async function postPhoto<T>(
         typeof body.error === 'string'
           ? body.error.trim().slice(0, 240)
           : '';
+      const reason =
+        body && typeof body === 'object' && 'reason' in body
+          ? ANALYSIS_REJECTIONS.find((value) => value === body.reason)
+          : undefined;
       throw new AiClientError(
         'server',
         message ||
           'No pudimos analizar la foto. Puedes reintentar o completar la prenda manualmente.',
+        reason,
       );
     }
     try {

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Palette } from '../../theme/ThemeProvider';
 import { useUI } from '../ui';
 import { Toggle } from '../Toggle';
+import { useCopy } from '../../i18n';
 
 export const MIN_TEMPERATURE = -30;
 export const MAX_TEMPERATURE = 55;
@@ -84,20 +85,21 @@ export function ManualWeather({
 }) {
   const { palette } = useUI();
   const styles = createStyles(palette);
+  const t = useCopy();
   const degrees = Math.round(temperatureC);
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <Text style={styles.label}>Temperatura</Text>
+        <Text style={styles.label}>{t.manualWeather.temperature}</Text>
         <View style={styles.stepper}>
           <StepButton
             sign="−"
-            label="Bajar la temperatura"
+            label={t.manualWeather.lower}
             disabled={degrees <= MIN_TEMPERATURE}
             onStep={() => onTemperature(-1)}
           />
           <Text
-            accessibilityLabel={`${degrees} grados Celsius`}
+            accessibilityLabel={t.manualWeather.degrees(degrees)}
             accessibilityLiveRegion="polite"
             style={styles.value}
           >
@@ -105,15 +107,19 @@ export function ManualWeather({
           </Text>
           <StepButton
             sign="+"
-            label="Subir la temperatura"
+            label={t.manualWeather.raise}
             disabled={degrees >= MAX_TEMPERATURE}
             onStep={() => onTemperature(1)}
           />
         </View>
       </View>
       <View style={[styles.row, styles.divided]}>
-        <Text style={styles.label}>Lluvia</Text>
-        <Toggle label="Hay lluvia" value={raining} onChange={onRaining} />
+        <Text style={styles.label}>{t.manualWeather.rain}</Text>
+        <Toggle
+          label={t.manualWeather.raining}
+          value={raining}
+          onChange={onRaining}
+        />
       </View>
     </View>
   );

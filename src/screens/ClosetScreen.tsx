@@ -8,6 +8,7 @@ import { ClosetGrid } from '../components/ClosetGrid';
 import { Dots } from '../components/Dots';
 import { DrawingSticker } from '../components/Sticker';
 import { Button, useUI } from '../components/ui';
+import { useCopy } from '../i18n';
 import { withDemo, withoutDemo } from './actions';
 
 export function ClosetScreen({
@@ -26,19 +27,19 @@ export function ClosetScreen({
   onDemoReady: () => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const available = items.filter((item) => item.available).length;
   return (
     <>
       <Text style={{ color: palette.muted, fontSize: 12 }}>
-        {items.length} {items.length === 1 ? 'prenda' : 'prendas'} · {available}{' '}
-        {available === 1 ? 'disponible' : 'disponibles'}
+        {t.closet.count(items.length, available)}
       </Text>
       <View style={[s.pageHeading, { columnGap: 12, rowGap: 8 }]}>
         <Text accessibilityRole="header" style={s.title}>
-          Mi clóset
+          {t.closet.title}
         </Text>
         <Button
-          label="+ Agregar prenda"
+          label={t.closet.addShort}
           onPress={onAdd}
           small
           style={{ borderRadius: 22 }}
@@ -55,7 +56,7 @@ export function ClosetScreen({
           onDemo={() => {
             // An existing closet is never replaced by the example.
             update((current) =>
-              current.items.length ? current : withDemo(current),
+              current.items.length ? current : withDemo(current, t.demoNames),
             );
             onDemoReady();
           }}
@@ -66,7 +67,7 @@ export function ClosetScreen({
       )}
       <Button
         secondary
-        label="Armar outfit"
+        label={t.closet.build}
         onPress={onManual}
         style={{ marginTop: 24 }}
       />
@@ -82,14 +83,12 @@ function EmptyCloset({
   onAdd: () => void;
   onDemo: () => void;
 }) {
+  const t = useCopy();
   return (
     <>
       <View style={styles.board}>
         <Dots />
-        <Bubble>
-          Para un outfit necesitas una parte de arriba, una de abajo y calzado;
-          o una prenda completa y calzado.
-        </Bubble>
+        <Bubble>{t.closet.emptyHint}</Bubble>
         <View style={styles.blanks}>
           <DrawingSticker
             kind="tee"
@@ -111,10 +110,10 @@ function EmptyCloset({
           />
         </View>
       </View>
-      <Button label="Agregar prenda" onPress={onAdd} />
+      <Button label={t.closet.add} onPress={onAdd} />
       <Button
         secondary
-        label="Ver el clóset de ejemplo"
+        label={t.closet.showDemo}
         onPress={onDemo}
         style={{ marginTop: 10 }}
       />

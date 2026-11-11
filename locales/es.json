@@ -1,0 +1,11 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Arma tu outfit",
+    "NSPhotoLibraryUsageDescription": "Elige una foto para guardar tu prenda en este dispositivo.",
+    "NSCameraUsageDescription": "Toma una foto para agregar una prenda a tu clóset.",
+    "NSLocationWhenInUseUsageDescription": "Usa tu ubicación aproximada para encontrar tu ciudad y mostrar su clima."
+  },
+  "android": {
+    "app_name": "Arma tu outfit"
+  }
+}

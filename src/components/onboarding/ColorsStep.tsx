@@ -2,6 +2,7 @@ import React from 'react';
 import { ColorPicker, type ColorMode } from '../ColorPicker';
 import { Guide } from './Guide';
 import type { StepProps } from './types';
+import { useCopy } from '../../i18n';
 
 export type { ColorMode };
 
@@ -11,12 +12,13 @@ export function ColorsStep({
   mode,
   onMode,
 }: StepProps & { mode: ColorMode; onMode: (mode: ColorMode) => void }) {
+  const t = useCopy();
   return (
     <>
       <Guide
         kind="jacket"
-        say="Yo soy Chama, la chamarra. Vamos con los colores."
-        title="¿Qué colores te gustan?"
+        say={t.onboarding.colorsSay}
+        title={t.onboarding.colorsTitle}
       />
       <ColorPicker
         value={data.preferences}

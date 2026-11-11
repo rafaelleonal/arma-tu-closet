@@ -9,7 +9,8 @@ import {
   type ScrollViewInstance,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { reasonInVoice, type Outfit, type WardrobeItem } from '../../domain';
+import type { Outfit, WardrobeItem } from '../../domain';
+import { reasonText, useCopy, warningText } from '../../i18n';
 import type { Palette } from '../../theme/ThemeProvider';
 import { Bubble } from '../Bubble';
 import { useFeedback } from '../Feedback';
@@ -53,6 +54,7 @@ export function OutfitDeck(props: OutfitDeckProps) {
   const window = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scroll = useRef<ScrollViewInstance>(null);
+  const t = useCopy();
   // The pager spans the screen up to the content's maximum width; onLayout corrects the guess.
   const [width, setWidth] = useState(Math.min(window.width, MAX_CONTENT));
   const [index, setIndex] = useState(props.initialIndex ?? 0);
@@ -112,7 +114,7 @@ export function OutfitDeck(props: OutfitDeckProps) {
                 <Pressable
                   key={outfit.id}
                   accessibilityRole="button"
-                  accessibilityLabel={`Idea ${page + 1} de ${outfits.length}`}
+                  accessibilityLabel={t.outfit.page(page + 1, outfits.length)}
                   accessibilityState={{ selected: page === index }}
                   onPress={() =>
                     scroll.current?.scrollTo({
@@ -128,7 +130,7 @@ export function OutfitDeck(props: OutfitDeckProps) {
             : null}
           {outfits.length > 1 ? (
             <Text style={styles.count}>
-              {index + 1} de {outfits.length}
+              {t.outfit.pageCount(index + 1, outfits.length)}
             </Text>
           ) : null}
         </View>
@@ -154,15 +156,16 @@ function OutfitNotes({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   const reasons = showReasons ? outfit.reasons.slice(0, 2) : [];
   return (
     <View style={styles.notes}>
       {reasons.length ? (
-        <Bubble>{reasons.map(reasonInVoice).join(' ')}</Bubble>
+        <Bubble>{reasons.map((code) => reasonText(t, code)).join(' ')}</Bubble>
       ) : null}
       {outfit.warnings.map((warning) => (
         <Text key={warning} style={styles.warning}>
-          {warning}
+          {warningText(t, warning)}
         </Text>
       ))}
     </View>

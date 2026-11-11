@@ -7,6 +7,7 @@ App para elegir qué ponerse con la ropa del propio clóset. Es un proyecto indi
 ## Qué puedes hacer
 
 - Ver una bienvenida con las prendas ilustradas y responder un onboarding conversacional de cuatro pasos: qué te cuesta al vestirte, tu estilo actual y deseado, tus colores y un primer conjunto de ejemplo. Puedes continuar sin completar las preferencias opcionales.
+- Usar la app en español o en inglés: sigue el idioma del teléfono, o elige uno en **Ajustes → Idioma** ([ADR-012](docs/adr/0012-idiomas-con-catalogos-tipados.md)).
 - Activar o desactivar la vibración en móvil; las transiciones respetan Reducir movimiento.
 - Personalizar la apariencia con los temas Lino, Papel, Medianoche, Salvia, Chicle y Malva, vista Amplia o Compacta y explicaciones opcionales.
 - Agregar prendas con lo esencial (categoría y colores; foto y nombre opcionales) y ajustar en **Más detalles** ocasiones, abrigo, lluvia y estilos. Editar también la disponibilidad.
@@ -73,7 +74,7 @@ Expo Go no incluye el módulo de recorte. Para probar **Quitar fondo** se necesi
 npx expo run:ios
 ```
 
-El comando genera `ios/` (no se versiona), compila e instala la app en el simulador o teléfono. En Expo Go, web y Android el resto de la app funciona y el botón no aparece.
+El comando genera `ios/` (no se versiona), compila e instala la app en el simulador o teléfono. Una build anterior al 11/11/2026 no incluye `expo-localization` y no abre la app: recompila. Si `pod install` falla por la codificación, exporta `LANG=en_US.UTF-8`. En Expo Go, web y Android el resto de la app funciona y el botón no aparece.
 
 En el simulador el botón aparece, pero Vision no puede ejecutar el recorte y la app muestra «No pudimos quitar el fondo de esta foto.». El recorte se prueba en un iPhone con iOS 17 o posterior. Si arrancas Metro aparte (`npx expo start --dev-client`), no uses `CI=1`: desactiva la vigilancia de archivos y la app recibe código viejo.
 
@@ -103,6 +104,7 @@ src/weather/            Cliente Open-Meteo, caché y contexto derivado
 src/ai/                 Contrato y cliente de análisis de prendas
 server/                 Proxy local de IA sin persistencia de fotos
 src/theme/              Paletas y proveedor de apariencia
+src/i18n/               Textos en español e inglés y el idioma activo
 assets/garments/         Ilustraciones locales, sus stickers y prompts
 tests/                 Pruebas de dominio, esquema y contraste
 docs/                  Producto, arquitectura, decisiones y evidencia

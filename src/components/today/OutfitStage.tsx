@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { colorLabels, type Outfit, type WardrobeItem } from '../../domain';
+import type { Outfit, WardrobeItem } from '../../domain';
+import { colorName, useCopy, type Copy } from '../../i18n';
 import { NameTag } from '../NameTag';
 import { slotFor } from '../outfitLayout';
 import { Dots } from '../Dots';
@@ -11,11 +12,9 @@ import { stickerArt } from '../StickerAlbum';
 const TAG_HEIGHT = 20;
 const MAX_WIDTH = 440;
 
-function describe(item: WardrobeItem) {
-  const colors = item.colors
-    .map((color) => colorLabels[color] || color)
-    .join(', ');
-  return `${stickerArt(item)}${colors ? `. Colores: ${colors}` : ''}`;
+function describe(t: Copy, item: WardrobeItem) {
+  const colors = item.colors.map((color) => colorName(t, color)).join(', ');
+  return `${stickerArt(t, item)}${colors ? t.art.colorsSuffix(colors) : ''}`;
 }
 
 /**
@@ -35,6 +34,7 @@ export function OutfitStage({
   pinnedItemId?: string;
   onItem: (item: WardrobeItem) => void;
 }) {
+  const t = useCopy();
   const inner = Math.min(width, MAX_WIDTH);
   const offset = (width - inner) / 2;
   return (
@@ -48,7 +48,7 @@ export function OutfitStage({
           <Pressable
             key={item.id}
             accessibilityRole={pinned ? 'image' : 'button'}
-            accessibilityLabel={`${pinned ? `${item.name}, prenda elegida` : `Cambiar ${item.name}`}. ${describe(item)}`}
+            accessibilityLabel={`${pinned ? t.art.pinned(item.name) : t.art.change(item.name)}. ${describe(t, item)}`}
             disabled={pinned}
             onPress={() => onItem(item)}
             style={({ pressed }) => [

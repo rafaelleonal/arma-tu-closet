@@ -6,9 +6,11 @@ import { Dots } from '../Dots';
 import { Button, useUI } from '../ui';
 import { Crew } from './Crew';
 import { OnboardingLogo } from './OnboardingChrome';
+import { useCopy } from '../../i18n';
 
 export function Welcome({ onStart }: { onStart: () => void }) {
   const { s, palette } = useUI();
+  const t = useCopy();
   return (
     <SafeAreaView
       edges={['top', 'bottom']}
@@ -41,7 +43,7 @@ export function Welcome({ onStart }: { onStart: () => void }) {
                 marginTop: 40,
               }}
             >
-              Arma tu outfit
+              {t.common.appName}
             </Text>
             <Text
               style={[
@@ -49,13 +51,12 @@ export function Welcome({ onStart }: { onStart: () => void }) {
                 { fontSize: 16, lineHeight: 24, marginTop: 14 },
               ]}
             >
-              Tere, Cami y compañía te ayudan a elegir qué ponerte con la ropa
-              que ya tienes.
+              {t.onboarding.welcome}
             </Text>
           </MotionIn>
         </View>
         <Button
-          label="Vamos a tu clóset"
+          label={t.onboarding.welcomeStart}
           onPress={onStart}
           style={{ minHeight: 56, borderRadius: 28 }}
         />
@@ -65,7 +66,7 @@ export function Welcome({ onStart }: { onStart: () => void }) {
             { fontSize: 11, textAlign: 'center', marginTop: 14 },
           ]}
         >
-          Sin cuenta. Tus datos se quedan en tu teléfono.
+          {t.onboarding.welcomePrivacy}
         </Text>
       </View>
     </SafeAreaView>

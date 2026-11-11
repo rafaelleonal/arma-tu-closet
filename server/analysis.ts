@@ -15,10 +15,19 @@ export interface AnalysisImage {
   mediaType: 'image/jpeg' | 'image/png' | 'image/webp';
 }
 
+/** The language of the suggested name, from the request's Accept-Language. */
+export type AnalysisLanguage = 'es' | 'en';
+
 export type GarmentAnalyzer = (
   image: AnalysisImage,
   signal: AbortSignal,
+  language?: AnalysisLanguage,
 ) => Promise<unknown>;
+
+/** English only when the app asks for it first; anything else keeps Spanish. */
+export function analysisLanguage(header: string | undefined): AnalysisLanguage {
+  return /^\s*en\b/i.test(header ?? '') ? 'en' : 'es';
+}
 
 /** Validate again at the HTTP boundary, even with an injected provider. */
 export function parseAnalysisResult(value: unknown): AnalysisResult {

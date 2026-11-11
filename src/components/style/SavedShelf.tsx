@@ -4,6 +4,7 @@ import type { Outfit } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
 import { OutfitCollage } from '../OutfitCollage';
 import { useUI } from '../ui';
+import { useCopy } from '../../i18n';
 
 /** Same as the horizontal padding of the screen, so the shelf scrolls from edge to edge. */
 const BLEED = 24;
@@ -19,10 +20,13 @@ export function SavedShelf({
 }) {
   const { palette, s } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <>
       <View style={styles.heading}>
-        <Text style={[s.sectionTitle, { marginBottom: 0 }]}>Guardados</Text>
+        <Text style={[s.sectionTitle, { marginBottom: 0 }]}>
+          {t.saved.title}
+        </Text>
         <Text style={s.subtitle}>{outfits.length}</Text>
       </View>
       {outfits.length ? (
@@ -36,7 +40,9 @@ export function SavedShelf({
             <Pressable
               key={outfit.id}
               accessibilityRole="button"
-              accessibilityLabel={`Ver outfit guardado: ${outfit.items.map((item) => item.name).join(', ')}`}
+              accessibilityLabel={t.saved.open(
+                outfit.items.map((item) => item.name).join(', '),
+              )}
               onPress={() => onOpen(outfit)}
               style={({ pressed }) => [pressed && { opacity: 0.72 }]}
             >
@@ -48,18 +54,18 @@ export function SavedShelf({
                 />
               </View>
               <Text style={styles.caption}>
-                {outfit.id.startsWith('manual-') ? 'Creado por ti' : 'Guardado'}
+                {outfit.id.startsWith('manual-')
+                  ? t.saved.byYou
+                  : t.saved.saved}
               </Text>
               <Text style={[s.subtitle, { fontSize: 11, lineHeight: 16 }]}>
-                {outfit.items.length} prendas
+                {t.saved.items(outfit.items.length)}
               </Text>
             </Pressable>
           ))}
         </ScrollView>
       ) : (
-        <Text style={s.subtitle}>
-          Todavía no guardas ningún outfit. Toca ♡ en Hoy para guardar uno.
-        </Text>
+        <Text style={s.subtitle}>{t.saved.empty}</Text>
       )}
     </>
   );

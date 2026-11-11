@@ -64,6 +64,9 @@ La referencia es el [onboarding de Letterly](https://x.com/bthreeagency/status/2
 5. **La confianza se dice con la misma voz, sin rodeos.** «Sin cuenta. Tus datos se quedan en tu teléfono.»
 6. **Cierre con nombre.** «Todo listo, Alex.»
 7. **Español natural y neutro.** Cálido y de tú, sin modismos fuertes ni chistes forzados. Se dice «outfit» en lugar de «conjunto».
+8. **El inglés no es una traducción literal.** Las mismas reglas con frases propias del inglés: contracciones (*I’m*, *We’re*), «outfit» e «item» en lugar de «garment». Las prendas conservan sus nombres (Tere, Cami, Chama, Teni, Bufi) y dicen qué son en inglés: «I’m Tere, your tee.» Los tonos de la colorimetría usan los nombres habituales en inglés (*Light Spring*, *Deep Winter*).
+
+Todo texto visible vive en los catálogos de [src/i18n](../src/i18n/): `es.ts` es la fuente y `en.ts` repite su forma. Un texto nuevo se escribe en los dos ([ADR-012](adr/0012-idiomas-con-catalogos-tipados.md)). El nombre de la app, «Arma tu outfit», no se traduce.
 
 **Límites**
 
@@ -115,7 +118,7 @@ Al aparecer, cada sticker «se pega»: llega un poco más grande y girado, y se 
 
 El papel del sticker es claro en todos los temas, como un sticker real sobre cualquier superficie; por eso el dibujo no se tiñe con el tema en Hoy. Lo único del tema que se escribe sobre ese papel es la marca de un sticker de palabra («✦» o «✓»): usa el rol `stickerMark`, que en los temas claros es su acento y en Medianoche conserva el de Lino, porque un acento pensado para fondo oscuro no se lee sobre papel claro. Un test comprueba ese contraste en los seis temas. En iOS cada sticker se rasteriza (`shouldRasterizeIOS`): se dibuja una vez con su borde y su sombra y se reutiliza al desplazarse, porque la sombra de una vista sin fondo es costosa de calcular en cada cuadro. Los colores de la prenda siguen aparte, en la etiqueta con su nombre.
 
-Los motivos van en una burbuja con la voz de las prendas, como en el onboarding: «Hoy vamos en plan urbano.» en lugar de «Estilo: urbano». [reasonVoice.ts](../src/domain/reasonVoice.ts) reescribe cada motivo sin añadir afirmaciones; uno que no conoce se muestra tal cual. Se dicen hasta dos. Las advertencias no cambian de voz ni se ocultan al desactivar los motivos.
+Los motivos van en una burbuja con la voz de las prendas, como en el onboarding: «Hoy vamos en plan urbano.» en lugar de «Estilo: urbano». El dominio devuelve cada motivo como código ([reasons.ts](../src/domain/reasons.ts)) y [describe.ts](../src/i18n/describe.ts) lo dice en el idioma activo sin añadir afirmaciones; un texto que no reconoce se muestra tal cual. Se dicen hasta dos. Las advertencias no cambian de voz ni se ocultan al desactivar los motivos.
 
 **Algo nuevo** aparece junto al indicador de páginas cuando hay un objetivo de estilo; para lectores de pantalla se llama «Hoy me animo a algo nuevo». El aviso de categorías faltantes solo se muestra con ese modo encendido.
 

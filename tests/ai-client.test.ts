@@ -128,6 +128,24 @@ test('server and network errors are actionable without a fabricated result', asy
     }),
     errorCode('server'),
   );
+  // A rejection the server explains keeps its code, so the app can word it.
+  await assert.rejects(
+    analyzeGarmentPhoto(imageDataUrl, {
+      apiUrl,
+      fetchImpl: jsonFetch(
+        { error: 'Varias prendas.', reason: 'unclear' },
+        422,
+      ),
+    }),
+    (error) => error instanceof AiClientError && error.reason === 'unclear',
+  );
+  await assert.rejects(
+    analyzeGarmentPhoto(imageDataUrl, {
+      apiUrl,
+      fetchImpl: jsonFetch({ error: 'x', reason: 'made-up' }, 422),
+    }),
+    (error) => error instanceof AiClientError && error.reason === undefined,
+  );
   await assert.rejects(
     analyzeGarmentPhoto(imageDataUrl, {
       apiUrl,

@@ -545,3 +545,15 @@ Expo web a 375 × 812 en `localhost:8093`: [hoja Así me visto](evidence/asi-me-
 Simulador iPhone 17 Pro (iOS 26.5): [la hoja Así me visto](evidence/ios-asi-me-visto-iphone17pro.jpg) abre desde el tablero; se cerró sin guardar.
 
 Sin verificar: guardar estilos y Volver a personalizar en iOS, Cambiar mi estilo en iOS, un objetivo previo con más de tres estilos, un teléfono real, Android y VoiceOver.
+
+## 11/11/2026 — Español e inglés
+
+La app habla español e inglés según [ADR-012](adr/0012-idiomas-con-catalogos-tipados.md). Todo texto visible pasó a `src/i18n/es.ts` y `src/i18n/en.ts`. El dominio devuelve motivos, advertencias y problemas como códigos, y los adaptadores de clima, almacenamiento y análisis devuelven códigos de error. El documento sigue en versión 3: `appearance.language` es opcional y los motivos se siguen guardando como texto. Se añadió `expo-localization` ~58.0.5 con `npx expo install`.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (107 pruebas) aprobados. Las pruebas nuevas comprueban que cada motivo y advertencia del recomendador se dice en ambos idiomas, que los motivos guardados antes en español se siguen leyendo, que el catálogo inglés tiene la misma forma que el español, que el idioma elegido se guarda y uno desconocido es un error recuperable, la ciudad en el idioma pedido, `Accept-Language` en el servidor y el motivo del rechazo en el cliente. `npx expo export --platform all` generó los bundles web, iOS y Android.
+
+Expo web en `localhost:8093`, con un origen sin datos y el navegador en `es-419`: la bienvenida, los cuatro pasos y Hoy con el clóset de ejemplo salen igual que antes en español, incluidos los motivos. En [Ajustes → Idioma](evidence/idioma-ajustes-ingles-web-375.jpg), English cambia toda la app al momento. En inglés a 375 × 812 se recorrieron Mi estilo, Ajustes, Hoy con y sin prendas, Mi clóset vacío, Agregar prenda (error de color, nombre sugerido, Más detalles y descartar) y los cuatro pasos de Volver a personalizar, con el ejemplo del primer outfit nombrado en inglés. Automático regresó a español y quitó el campo del documento.
+
+Simulador iPhone 17 Pro (iOS 26.5, idiomas `es-419` y `en-MX`): se recompiló la build de desarrollo con `npx expo prebuild --platform ios` y `npx expo run:ios --no-bundler`; CocoaPods necesitó `LANG=en_US.UTF-8`. El proyecto generado incluye `es.lproj` y `en.lproj`. La app abre contra Metro en 8093 con el clóset guardado intacto y en español. Elegir English en [Ajustes](evidence/ios-idioma-ajustes-ingles-iphone17pro.jpg) cambia la app; [Hoy](evidence/ios-hoy-ingles-iphone17pro.jpg) muestra los motivos en inglés y la fecha con la región `en-MX` («Wednesday, 11 November»). Los nombres del clóset de ejemplo siguen en español porque se guardaron así. Automático regresó a español.
+
+Sin verificar: Android, los permisos nativos en inglés, el idioma del sistema en un teléfono, el análisis de foto con el servidor y el backend aparte, la colorimetría y Combínala en inglés, la bienvenida en inglés, Medianoche en inglés y VoiceOver con un texto en otro idioma.

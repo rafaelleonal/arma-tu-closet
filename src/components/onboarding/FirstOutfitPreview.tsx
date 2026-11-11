@@ -2,10 +2,11 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {
   generateRecommendations,
-  reasonInVoice,
+  parseReason,
   seedWardrobe,
   styleContext,
 } from '../../domain';
+import { reasonText, useCopy } from '../../i18n';
 import type { LocalData } from '../../storage/schema';
 import { OutfitCollage } from '../OutfitCollage';
 import { Dots } from '../Dots';
@@ -13,17 +14,23 @@ import { useUI } from '../ui';
 
 /** Same as the horizontal padding of the step, so the table reaches both edges. */
 const BLEED = 24;
-const USE_REASON = /poco usadas|Sin uso registrado/;
 const COLLAGE = { width: 280, height: 250 };
 
 /** Read-only: example garments shown here are never written to the closet. */
 export function FirstOutfitPreview({ data }: { data: LocalData }) {
   const { s, palette } = useUI();
+  const t = useCopy();
+  const copy = t.onboarding;
   const example = !data.items.length;
   const outfit = useMemo(
     () =>
       generateRecommendations(
-        example ? seedWardrobe : data.items,
+        example
+          ? seedWardrobe.map((item) => ({
+              ...item,
+              name: t.demoNames[item.id] ?? item.name,
+            }))
+          : data.items,
         {
           ...data.context,
           ...data.preferences,
@@ -39,27 +46,29 @@ export function FirstOutfitPreview({ data }: { data: LocalData }) {
       data.preferences,
       data.profile.styleIds,
       data.styleGoal,
+      t,
     ],
   );
   if (!outfit)
     return (
-      <Text style={[s.subtitle, { marginBottom: 12 }]}>
-        Con esos gustos no me salió nada. Ajústalos cuando quieras.
-      </Text>
+      <Text style={[s.subtitle, { marginBottom: 12 }]}>{copy.noPreview}</Text>
     );
   const names = outfit.items.map((item) => item.name).join(', ');
   // Nobody has worn the example garments, so a reason about their use would not be true here.
   const reasons = outfit.reasons
-    .filter((reason) => !example || !USE_REASON.test(reason))
+    .filter((code) => {
+      const kind = parseReason(code)?.kind;
+      return !example || (kind !== 'lightly-used' && kind !== 'rotation');
+    })
     .slice(0, 2)
-    .map(reasonInVoice)
+    .map((code) => reasonText(t, code))
     .join(' ');
   return (
     <View>
       <View
         accessible
         accessibilityRole="image"
-        accessibilityLabel={`${example ? 'Outfit de ejemplo con prendas ficticias' : 'Tu outfit'}: ${names}`}
+        accessibilityLabel={`${example ? copy.exampleOutfit : t.outfit.title}: ${names}`}
         style={styles.table}
       >
         <Dots />
@@ -75,7 +84,7 @@ export function FirstOutfitPreview({ data }: { data: LocalData }) {
               { color: palette.ink, backgroundColor: palette.floating },
             ]}
           >
-            Ejemplo con prendas ficticias
+            {copy.exampleTag}
           </Text>
         ) : null}
       </View>

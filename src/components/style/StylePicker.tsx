@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { STYLE_OPTIONS, type StyleId } from '../../domain';
+import { STYLE_IDS, type StyleId } from '../../domain';
+import { useCopy } from '../../i18n';
 import { useFeedback } from '../Feedback';
 import { Sheet } from '../Sheet';
 import { Button, useUI } from '../ui';
@@ -23,20 +24,22 @@ export function StylePicker({
   prefix: string;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const feedback = useFeedback();
   const [full, setFull] = useState(false);
   return (
     <>
       <View style={styles.words}>
-        {STYLE_OPTIONS.map((option, index) => {
-          const selected = value.includes(option.id);
+        {STYLE_IDS.map((id, index) => {
+          const selected = value.includes(id);
+          const word = t.styles[id].label;
           return (
             <WordChoice
-              key={option.id}
-              word={option.label}
+              key={id}
+              word={word}
               mark={mark}
               tilt={wordTilt(index)}
-              label={`${prefix} ${option.label}`}
+              label={`${prefix} ${word}`}
               selected={selected}
               onPress={() => {
                 if (!selected && value.length >= MAX_STYLES) {
@@ -47,8 +50,8 @@ export function StylePicker({
                 setFull(false);
                 onChange(
                   selected
-                    ? value.filter((id) => id !== option.id)
-                    : [...value, option.id],
+                    ? value.filter((style) => style !== id)
+                    : [...value, id],
                 );
               }}
             />
@@ -63,7 +66,7 @@ export function StylePicker({
           marginTop: 14,
         }}
       >
-        {full ? 'Máximo 3. Quita uno para elegir otro.' : 'Hasta 3.'}
+        {full ? t.styleBoard.full : t.itemEditor.upToThree}
       </Text>
     </>
   );
@@ -80,14 +83,19 @@ export function StylesSheet({
   onSave: (styleIds: StyleId[]) => void;
 }) {
   const [draft, setDraft] = useState(styleIds);
+  const t = useCopy();
   return (
     <Sheet
-      title="Así me visto"
+      title={t.styleBoard.current}
       onClose={onClose}
-      footer={<Button label="Guardar" onPress={() => onSave(draft)} />}
+      footer={<Button label={t.common.save} onPress={() => onSave(draft)} />}
     >
       <View style={{ marginTop: 14 }}>
-        <StylePicker value={draft} onChange={setDraft} prefix="Estilo" />
+        <StylePicker
+          value={draft}
+          onChange={setDraft}
+          prefix={t.styleBoard.stylePrefix}
+        />
       </View>
     </Sheet>
   );

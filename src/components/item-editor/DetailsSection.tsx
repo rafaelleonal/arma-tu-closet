@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import {
   OCCASIONS,
-  occasionLabels,
-  STYLE_OPTIONS,
+  STYLE_IDS,
   type Occasion,
   type StyleId,
 } from '../../domain';
 import { Chip, FieldLabel, useUI } from '../ui';
 import { Toggle } from '../Toggle';
+import { useCopy } from '../../i18n';
 
-export const warmthLabels = [
-  'Muy ligera',
-  'Ligera',
-  'Abrigadora',
-  'Muy abrigadora',
-] as const;
 export type Warmth = 0 | 1 | 2 | 3;
 
 export interface Details {
@@ -51,15 +45,15 @@ export function DetailsSection({
   name: React.ReactNode;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
+  const copy = t.itemEditor;
   const [styleNotice, setStyleNotice] = useState('');
   const { occasions, warmth, rainReady, styleIds } = value;
   const summary = [
-    occasions.map((item) => occasionLabels[item]).join(', ') || 'Sin ocasión',
-    warmthLabels[warmth],
-    rainReady ? 'Para lluvia' : '',
-    styleIds.length
-      ? `${styleIds.length} ${styleIds.length === 1 ? 'estilo' : 'estilos'}`
-      : '',
+    occasions.map((item) => t.occasions[item]).join(', ') || copy.noOccasion,
+    copy.warmth[warmth],
+    rainReady ? copy.forRain : '',
+    styleIds.length ? copy.styleCount(styleIds.length) : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -78,7 +72,7 @@ export function DetailsSection({
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         aria-expanded={open}
-        accessibilityLabel={`Más detalles: ${summary}`}
+        accessibilityLabel={`${copy.moreDetails}: ${summary}`}
         onPress={onToggle}
         style={{
           minHeight: 64,
@@ -90,7 +84,7 @@ export function DetailsSection({
       >
         <View style={{ flex: 1 }}>
           <Text style={{ color: palette.ink, fontSize: 15, fontWeight: '600' }}>
-            Más detalles
+            {copy.moreDetails}
           </Text>
           <Text
             numberOfLines={2}
@@ -114,21 +108,21 @@ export function DetailsSection({
       {open ? (
         <>
           {name}
-          <FieldLabel>¿Para qué la usas?</FieldLabel>
+          <FieldLabel>{copy.usedFor}</FieldLabel>
           <View style={s.wrap}>
             {OCCASIONS.map((item) => (
               <Chip
                 key={item}
-                label={occasionLabels[item]}
+                label={t.occasions[item]}
                 selected={occasions.includes(item)}
                 onPress={() => onChange({ occasions: toggle(occasions, item) })}
               />
             ))}
           </View>
           {errorText(occasionError)}
-          <FieldLabel>Qué tanto abriga</FieldLabel>
+          <FieldLabel>{copy.warmthTitle}</FieldLabel>
           <View style={s.wrap}>
-            {warmthLabels.map((label, index) => (
+            {copy.warmth.map((label, index) => (
               <Chip
                 key={label}
                 label={label}
@@ -143,34 +137,30 @@ export function DetailsSection({
           <View
             style={[s.row, { justifyContent: 'space-between', marginTop: 22 }]}
           >
-            <Text style={{ color: palette.ink, flex: 1 }}>
-              La uso cuando llueve
-            </Text>
+            <Text style={{ color: palette.ink, flex: 1 }}>{copy.rainUse}</Text>
             <Toggle
-              label="Apta para lluvia"
+              label={copy.rainReady}
               value={rainReady}
               onChange={(next) => onChange({ rainReady: next })}
             />
           </View>
-          <FieldLabel>Estilos · opcional</FieldLabel>
+          <FieldLabel>{copy.stylesTitle}</FieldLabel>
           <Text style={[s.subtitle, { fontSize: 11, marginBottom: 12 }]}>
-            Hasta 3.
+            {copy.upToThree}
           </Text>
           <View style={s.wrap}>
-            {STYLE_OPTIONS.map((option) => (
+            {STYLE_IDS.map((id) => (
               <Chip
-                key={option.id}
-                label={option.label}
-                selected={styleIds.includes(option.id)}
+                key={id}
+                label={t.styles[id].label}
+                selected={styleIds.includes(id)}
                 onPress={() => {
-                  if (!styleIds.includes(option.id) && styleIds.length >= 3) {
-                    setStyleNotice(
-                      'Elige hasta tres estilos. Quita uno para probar otro.',
-                    );
+                  if (!styleIds.includes(id) && styleIds.length >= 3) {
+                    setStyleNotice(copy.tooManyStyles);
                     return;
                   }
                   setStyleNotice('');
-                  onChange({ styleIds: toggle(styleIds, option.id) });
+                  onChange({ styleIds: toggle(styleIds, id) });
                 }}
               />
             ))}

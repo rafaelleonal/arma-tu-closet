@@ -2,10 +2,10 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { AppLogo } from '../AppLogo';
 import { Button, useUI } from '../ui';
+import { useCopy } from '../../i18n';
 
-export const STEP_NAMES = ['Hola', 'Tu estilo', 'Colores', 'Tu conjunto'];
-export const LAST_STEP = STEP_NAMES.length - 1;
-const NEXT_LABELS = ['Seguimos', 'Ahora los colores', 'Ver mi outfit'];
+const STEPS = 4;
+export const LAST_STEP = STEPS - 1;
 
 export function OnboardingLogo() {
   return <AppLogo />;
@@ -20,7 +20,8 @@ export function StepHeader({
   onClose?: () => void;
 }) {
   const { palette } = useUI();
-  const total = STEP_NAMES.length;
+  const t = useCopy();
+  const total = STEPS;
   return (
     <View
       style={{
@@ -42,12 +43,12 @@ export function StepHeader({
         <OnboardingLogo />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
           <Text style={{ color: palette.muted, fontSize: 11 }}>
-            {step + 1} de {total}
+            {t.outfit.pageCount(step + 1, total)}
           </Text>
           {onClose ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Cerrar personalización"
+              accessibilityLabel={t.onboarding.closeLabel}
               onPress={onClose}
               style={{
                 minHeight: 44,
@@ -55,18 +56,20 @@ export function StepHeader({
                 paddingHorizontal: 4,
               }}
             >
-              <Text style={{ color: palette.ink, fontSize: 12 }}>Cerrar</Text>
+              <Text style={{ color: palette.ink, fontSize: 12 }}>
+                {t.common.close}
+              </Text>
             </Pressable>
           ) : null}
         </View>
       </View>
       <View
-        accessibilityLabel={`Paso ${step + 1} de ${total}`}
+        accessibilityLabel={t.onboarding.stepLabel(step + 1, total)}
         style={{ flexDirection: 'row', gap: 6, marginTop: 17 }}
       >
-        {STEP_NAMES.map((label, index) => (
+        {Array.from({ length: STEPS }, (_, index) => index).map((index) => (
           <View
-            key={label}
+            key={index}
             style={{
               flex: 1,
               height: 3,
@@ -89,6 +92,7 @@ export function StepFooter({
   onGo: (step: number) => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   return (
     <View
       style={{
@@ -112,7 +116,7 @@ export function StepFooter({
         {step > 0 ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Atrás"
+            accessibilityLabel={t.common.back}
             onPress={() => onGo(step - 1)}
             style={({ pressed }) => [
               {
@@ -150,11 +154,11 @@ export function StepFooter({
                   textAlign: 'center',
                 }}
               >
-                Lo hago después
+                {t.onboarding.later}
               </Text>
             </Pressable>
             <Button
-              label={NEXT_LABELS[step]}
+              label={t.onboarding.next[step]}
               onPress={() => onGo(step + 1)}
               style={{
                 minHeight: 52,

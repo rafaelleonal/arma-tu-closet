@@ -1,8 +1,9 @@
 import { normalizeColor } from './recommendations';
 import type { ColorTone, StyleGoal } from './types';
 
+/** `id` names the swatch for the interface, which words it. */
 export interface Drape {
-  label: string;
+  id: string;
   hex: string;
 }
 export interface DrapePair {
@@ -12,8 +13,6 @@ export interface DrapePair {
 export type DrapeVote = 'a' | 'b' | 'tie';
 
 export interface ColorToneInfo {
-  label: string;
-  description: string;
   /** Drawn in the result. Finer than the wardrobe's 12 color names. */
   palette: string[];
   /** The same family expressed with the wardrobe's color names. */
@@ -23,73 +22,57 @@ export interface ColorToneInfo {
 /** Styling convention from personal color analysis, not a measurement of the person. */
 export const COLOR_TONE_INFO: Record<ColorTone, ColorToneInfo> = {
   'spring-light': {
-    label: 'Primavera clara',
-    description: 'Colores cálidos, luminosos y suaves.',
     palette: ['#FBD3B6', '#FFE89A', '#CFE8A0', '#9ED9CC', '#F7A58A', '#FFF4E0'],
     colors: ['beige', 'rosa', 'amarillo', 'verde', 'blanco'],
   },
   'spring-bright': {
-    label: 'Primavera brillante',
-    description: 'Colores cálidos, vivos y alegres.',
     palette: ['#FF6B35', '#FFC400', '#4CC22E', '#00B5A5', '#F2385A', '#2F7DE1'],
     colors: ['naranja', 'amarillo', 'verde', 'rojo', 'azul'],
   },
   'summer-light': {
-    label: 'Verano claro',
-    description: 'Colores fríos, claros y delicados.',
     palette: ['#D8CDEB', '#BFD6EA', '#F2C9D6', '#BDE0DC', '#E9E9F2', '#A9B8DA'],
     colors: ['rosa', 'azul', 'morado', 'gris', 'blanco'],
   },
   'summer-mute': {
-    label: 'Verano suave',
-    description: 'Colores fríos, grisáceos y serenos.',
     palette: ['#8E7E9E', '#6E8799', '#B08896', '#7F9C96', '#A7A9B4', '#5F6F8C'],
     colors: ['gris', 'azul', 'rosa', 'morado', 'beige'],
   },
   'autumn-mute': {
-    label: 'Otoño suave',
-    description: 'Colores cálidos, terrosos y apagados.',
     palette: ['#C8A98A', '#A7A76F', '#C98C7A', '#8C8455', '#D9BE8F', '#7F6A55'],
     colors: ['beige', 'cafe', 'verde', 'naranja', 'amarillo'],
   },
   'autumn-deep': {
-    label: 'Otoño profundo',
-    description: 'Colores cálidos, intensos y oscuros.',
     palette: ['#5E3A1E', '#3D4A1F', '#7A1F1A', '#B5651D', '#1E5A5E', '#8A6A1F'],
     colors: ['cafe', 'verde', 'rojo', 'naranja', 'beige'],
   },
   'winter-bright': {
-    label: 'Invierno brillante',
-    description: 'Colores fríos, puros y de alto contraste.',
     palette: ['#F01478', '#0A58FF', '#00B08A', '#7A1FE0', '#111317', '#FFFFFF'],
     colors: ['negro', 'blanco', 'rojo', 'azul', 'rosa'],
   },
   'winter-deep': {
-    label: 'Invierno profundo',
-    description: 'Colores fríos, oscuros y elegantes.',
     palette: ['#6A0F3C', '#0B1F5C', '#053D3A', '#3E1A6E', '#111317', '#5B6270'],
     colors: ['negro', 'azul', 'morado', 'rojo', 'gris'],
   },
 };
 
-const drape = (label: string, hex: string): Drape => ({ label, hex });
+const drape = (id: string, hex: string): Drape => ({ id, hex });
 const pair = (a: Drape, b: Drape): DrapePair => ({ a, b });
 
 /** In every pair of this round, `a` is warm and `b` is cool. */
 const TEMPERATURE = [
-  pair(drape('Coral', '#F2785C'), drape('Fucsia', '#D63C8A')),
-  pair(drape('Dorado', '#C9A24B'), drape('Plateado', '#AEB4BC')),
-  pair(drape('Oliva', '#6F7A35'), drape('Azul verdoso', '#1F7F73')),
+  pair(drape('coral', '#F2785C'), drape('fuchsia', '#D63C8A')),
+  pair(drape('gold', '#C9A24B'), drape('silver', '#AEB4BC')),
+  pair(drape('olive', '#6F7A35'), drape('teal', '#1F7F73')),
 ];
 const SPRING_OR_AUTUMN = [
-  pair(drape('Durazno', '#F7A58A'), drape('Terracota', '#A8502F')),
-  pair(drape('Verde manzana', '#9CCB4E'), drape('Musgo', '#56602A')),
-  pair(drape('Turquesa', '#2FB6A8'), drape('Petróleo', '#1E5A5E')),
+  pair(drape('peach', '#F7A58A'), drape('terracotta', '#A8502F')),
+  pair(drape('apple-green', '#9CCB4E'), drape('moss', '#56602A')),
+  pair(drape('turquoise', '#2FB6A8'), drape('petrol', '#1E5A5E')),
 ];
 const SUMMER_OR_WINTER = [
-  pair(drape('Lavanda', '#B9A6D6'), drape('Violeta', '#5B1E9C')),
-  pair(drape('Rosa empolvado', '#D9A0B4'), drape('Magenta', '#C00E6E')),
-  pair(drape('Azul grisáceo', '#8FAFCB'), drape('Azul rey', '#1238A8')),
+  pair(drape('lavender', '#B9A6D6'), drape('violet', '#5B1E9C')),
+  pair(drape('dusty-pink', '#D9A0B4'), drape('magenta', '#C00E6E')),
+  pair(drape('gray-blue', '#8FAFCB'), drape('royal-blue', '#1238A8')),
 ];
 
 const SUBTYPES: Record<
@@ -100,36 +83,36 @@ const SUBTYPES: Record<
     a: 'spring-light',
     b: 'spring-bright',
     pairs: [
-      pair(drape('Melocotón', '#FBD3B6'), drape('Naranja vivo', '#FF6B35')),
-      pair(drape('Verde tierno', '#CFE8A0'), drape('Verde vivo', '#4CC22E')),
-      pair(drape('Vainilla', '#FFE89A'), drape('Amarillo vivo', '#FFC400')),
+      pair(drape('apricot', '#FBD3B6'), drape('bright-orange', '#FF6B35')),
+      pair(drape('soft-green', '#CFE8A0'), drape('bright-green', '#4CC22E')),
+      pair(drape('vanilla', '#FFE89A'), drape('bright-yellow', '#FFC400')),
     ],
   },
   summer: {
     a: 'summer-light',
     b: 'summer-mute',
     pairs: [
-      pair(drape('Lila claro', '#D8CDEB'), drape('Malva gris', '#8E7E9E')),
-      pair(drape('Azul pálido', '#BFD6EA'), drape('Azul humo', '#6E8799')),
-      pair(drape('Rosa pálido', '#F2C9D6'), drape('Rosa viejo', '#B08896')),
+      pair(drape('light-lilac', '#D8CDEB'), drape('gray-mauve', '#8E7E9E')),
+      pair(drape('pale-blue', '#BFD6EA'), drape('smoke-blue', '#6E8799')),
+      pair(drape('pale-pink', '#F2C9D6'), drape('old-rose', '#B08896')),
     ],
   },
   autumn: {
     a: 'autumn-mute',
     b: 'autumn-deep',
     pairs: [
-      pair(drape('Camel', '#C8A98A'), drape('Chocolate', '#5E3A1E')),
-      pair(drape('Salvia', '#A7A76F'), drape('Verde bosque', '#3D4A1F')),
-      pair(drape('Teja suave', '#C98C7A'), drape('Vino tostado', '#7A1F1A')),
+      pair(drape('camel', '#C8A98A'), drape('chocolate', '#5E3A1E')),
+      pair(drape('sage', '#A7A76F'), drape('forest-green', '#3D4A1F')),
+      pair(drape('soft-tile', '#C98C7A'), drape('burnt-wine', '#7A1F1A')),
     ],
   },
   winter: {
     a: 'winter-bright',
     b: 'winter-deep',
     pairs: [
-      pair(drape('Fucsia vivo', '#F01478'), drape('Vino frío', '#6A0F3C')),
-      pair(drape('Azul eléctrico', '#0A58FF'), drape('Marino', '#0B1F5C')),
-      pair(drape('Esmeralda', '#00B08A'), drape('Pino', '#053D3A')),
+      pair(drape('bright-fuchsia', '#F01478'), drape('cool-wine', '#6A0F3C')),
+      pair(drape('electric-blue', '#0A58FF'), drape('navy', '#0B1F5C')),
+      pair(drape('emerald', '#00B08A'), drape('pine', '#053D3A')),
     ],
   },
 };

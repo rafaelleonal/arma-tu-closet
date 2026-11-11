@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { categoryLabels, type Category, type WardrobeItem } from '../../domain';
+import type { Category, WardrobeItem } from '../../domain';
+import { useCopy } from '../../i18n';
 import { SHEET_BLEED } from '../Sheet';
 import { StickerTile, tiltFor } from '../StickerAlbum';
 import { FieldLabel, useUI } from '../ui';
@@ -22,11 +23,12 @@ export function SlotShelf({
   onToggle: (item: WardrobeItem) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   return (
     <View>
       <FieldLabel>
-        {categoryLabels[category]}
-        {optional ? ' · opcional' : ''}
+        {t.categories[category]}
+        {optional ? ` · ${t.common.optional}` : ''}
       </FieldLabel>
       {items.length ? (
         <ScrollView
@@ -48,9 +50,7 @@ export function SlotShelf({
           ))}
         </ScrollView>
       ) : (
-        <Text style={s.subtitle}>
-          Aún no hay prendas disponibles en esta categoría.
-        </Text>
+        <Text style={s.subtitle}>{t.builder.noneAvailable}</Text>
       )}
     </View>
   );

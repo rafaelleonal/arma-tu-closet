@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import {
-  CATEGORIES,
-  categoryLabels,
-  type Category,
-  type WardrobeItem,
-} from '../domain';
+import { CATEGORIES, type Category, type WardrobeItem } from '../domain';
+import { useCopy } from '../i18n';
 import { StickerAlbum } from './StickerAlbum';
 import { Chip, useUI } from './ui';
 
@@ -21,6 +17,7 @@ export function ClosetGrid({
   onEdit: (item: WardrobeItem) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   const [category, setCategory] = useState<Category | 'all'>('all');
   const present = CATEGORIES.filter((value) =>
     items.some((item) => item.category === value),
@@ -37,14 +34,14 @@ export function ClosetGrid({
         contentContainerStyle={styles.filterRow}
       >
         <Chip
-          label={`Todo · ${items.length}`}
+          label={`${t.closet.all} · ${items.length}`}
           selected={category === 'all'}
           onPress={() => setCategory('all')}
         />
         {present.map((value) => (
           <Chip
             key={value}
-            label={`${categoryLabels[value]} · ${items.filter((item) => item.category === value).length}`}
+            label={`${t.categories[value]} · ${items.filter((item) => item.category === value).length}`}
             selected={category === value}
             onPress={() => setCategory(value)}
           />
@@ -52,11 +49,11 @@ export function ClosetGrid({
       </ScrollView>
       <StickerAlbum
         items={visible}
-        labelFor={(item) => `Editar ${item.name}`}
+        labelFor={(item) => t.closet.edit(item.name)}
         onPress={onEdit}
       />
       {!visible.length ? (
-        <Text style={s.subtitle}>No tienes prendas en esta categoría.</Text>
+        <Text style={s.subtitle}>{t.closet.emptyCategory}</Text>
       ) : null}
     </View>
   );

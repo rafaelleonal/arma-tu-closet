@@ -4,13 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Palette } from '../theme/ThemeProvider';
 import { useFeedback } from './Feedback';
 import { Button, useUI } from './ui';
+import { useCopy } from '../i18n';
 
 export type Tab = 'today' | 'closet' | 'style';
 
 const TABS = [
-  { id: 'today', icon: '☼', label: 'Hoy' },
-  { id: 'closet', icon: '▥', label: 'Mi clóset' },
-  { id: 'style', icon: '◌', label: 'Mi estilo' },
+  { id: 'today', icon: '☼' },
+  { id: 'closet', icon: '▥' },
+  { id: 'style', icon: '◌' },
 ] as const;
 
 export function TabBar({
@@ -23,6 +24,12 @@ export function TabBar({
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
   const feedback = useFeedback();
+  const t = useCopy();
+  const labels: Record<Tab, string> = {
+    today: t.today.title,
+    closet: t.closet.title,
+    style: t.style.title,
+  };
   return (
     <SafeAreaView edges={['bottom']} style={styles.tabBar}>
       <View style={styles.tabInner}>
@@ -56,7 +63,7 @@ export function TabBar({
                   fontWeight: selected ? '700' : '400',
                 }}
               >
-                {value.label}
+                {labels[value.id]}
               </Text>
               {selected ? <View style={styles.tabDot} /> : null}
             </Pressable>
@@ -77,6 +84,7 @@ export function SaveErrorBanner({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   if (!message) return null;
   return (
     <View style={styles.error}>
@@ -86,7 +94,7 @@ export function SaveErrorBanner({
       >
         {message}
       </Text>
-      <Button secondary small label="Reintentar" onPress={onRetry} />
+      <Button secondary small label={t.common.retryShort} onPress={onRetry} />
     </View>
   );
 }
@@ -101,12 +109,13 @@ export function FloatingNotice({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   if (!message) return null;
   return (
     <Pressable
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
-      accessibilityHint="Toca para cerrar"
+      accessibilityHint={t.common.tapToClose}
       onPress={onClose}
       style={styles.notice}
     >
@@ -120,12 +129,13 @@ export function FloatingNotice({
 export function DemoBanner({ onStart }: { onStart: () => void }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <View style={styles.demo}>
       <Text
         style={{ color: palette.green, flex: 1, fontSize: 11, lineHeight: 17 }}
       >
-        CLÓSET DE EJEMPLO
+        {t.demo.banner}
       </Text>
       <Pressable
         accessibilityRole="button"
@@ -133,7 +143,7 @@ export function DemoBanner({ onStart }: { onStart: () => void }) {
         style={{ padding: 10 }}
       >
         <Text style={{ fontSize: 11, color: palette.rust, fontWeight: '600' }}>
-          Usar mi ropa
+          {t.demo.useMine}
         </Text>
       </Pressable>
     </View>

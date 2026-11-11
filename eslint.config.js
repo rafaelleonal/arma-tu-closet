@@ -20,13 +20,27 @@ const boundaries = [
       '**/weather/**',
       '**/ai/**',
       '**/theme/**',
+      '**/i18n/**',
       ...UI,
     ],
   },
   {
     files: ['src/storage/**', 'src/weather/**', 'src/ai/**', 'server/**'],
-    message: 'Los adaptadores no dependen de la interfaz.',
-    patterns: ['**/theme/**', ...UI],
+    message:
+      'Los adaptadores no dependen de la interfaz: devuelven códigos y la interfaz los traduce.',
+    patterns: ['**/theme/**', '**/i18n/**', ...UI],
+  },
+  {
+    files: ['src/i18n/**'],
+    message:
+      'Los catálogos solo traducen: leen tipos del dominio, sin interfaz ni almacenamiento.',
+    patterns: [
+      '**/storage/**',
+      '**/weather/**',
+      '**/ai/**',
+      '**/theme/**',
+      ...UI,
+    ],
   },
   {
     files: ['src/theme/**'],

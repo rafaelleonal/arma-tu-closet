@@ -28,6 +28,7 @@ import {
 } from '../components/OutfitSheets';
 import { QaClosetToggle, useQaCloset } from '../components/QaClosetToggle';
 import { useUI } from '../components/ui';
+import { useCopy } from '../i18n';
 import { createOutfitActions } from './actions';
 import { ClosetSheets } from './ClosetSheets';
 import { ClosetScreen } from './ClosetScreen';
@@ -49,6 +50,7 @@ export interface HomeShellProps {
 export function HomeShell(props: HomeShellProps) {
   const { data, update, autosave, weather, recs, tab, onTab } = props;
   const { palette } = useUI();
+  const t = useCopy();
   const contentScroll = useRef<ScrollViewInstance>(null);
   useEffect(() => {
     contentScroll.current?.scrollTo({ y: 0, animated: false });
@@ -60,10 +62,16 @@ export function HomeShell(props: HomeShellProps) {
   const [combineItemId, setCombineItemId] = useState<string | null>(null);
   const [swap, setSwap] = useState<SwapTarget | null>(null);
   const qa = useQaCloset();
-  const actions = createOutfitActions(data, update, autosave, () => {
-    setSelectedOutfit(null);
-    setCombineItemId(null);
-  });
+  const actions = createOutfitActions(
+    data,
+    update,
+    autosave,
+    () => {
+      setSelectedOutfit(null);
+      setCombineItemId(null);
+    },
+    t,
+  );
   return (
     <SafeAreaView
       style={[styles.root, { backgroundColor: palette.paper }]}
@@ -102,9 +110,7 @@ export function HomeShell(props: HomeShellProps) {
                 onEdit={qa.items ? () => {} : setEditor}
                 onManual={() => setManualOpen(true)}
                 onDemoReady={() =>
-                  autosave.noticeAfterSave(
-                    'Listo, este es el clóset de ejemplo.',
-                  )
+                  autosave.noticeAfterSave(t.notices.demoReady)
                 }
               />
             ) : null}
@@ -184,7 +190,7 @@ export function HomeShell(props: HomeShellProps) {
             }));
             setManualOpen(false);
             onTab('style');
-            autosave.noticeAfterSave('Outfit guardado.');
+            autosave.noticeAfterSave(t.notices.outfitSaved);
           }}
         />
       ) : null}
@@ -210,7 +216,11 @@ export function HomeShell(props: HomeShellProps) {
           context={recs.context}
           onClose={() => setSwap(null)}
           onResult={(change) => {
-            autosave.setNotice(change.message);
+            autosave.setNotice(
+              change.status === 'swapped'
+                ? t.notices.swapped
+                : t.problems.swap(change.problem, swap.category),
+            );
             if (change.status === 'swapped') {
               setSwap(null);
               setSelectedOutfit(change.outfit);

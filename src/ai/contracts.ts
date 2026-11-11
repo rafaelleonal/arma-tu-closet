@@ -27,7 +27,9 @@ export function parseGarmentSuggestion(value: unknown): GarmentSuggestion {
     !candidate.colors.length ||
     candidate.colors.length > COLOR_OPTIONS.length ||
     candidate.colors.some(
-      (color) => typeof color !== 'string' || !COLOR_OPTIONS.includes(color),
+      (color) =>
+        typeof color !== 'string' ||
+        !(COLOR_OPTIONS as readonly string[]).includes(color),
     ) ||
     new Set(candidate.colors).size !== candidate.colors.length
   ) {

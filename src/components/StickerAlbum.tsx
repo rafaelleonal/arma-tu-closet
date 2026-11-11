@@ -8,6 +8,7 @@ import { Dots } from './Dots';
 import { Sticker } from './Sticker';
 import { StickerIn } from './StickerIn';
 import { useUI } from './ui';
+import { useCopy, type Copy } from '../i18n';
 
 const GAP = 12;
 /** Same as the horizontal padding of a screen or sheet, so the album reaches both edges. */
@@ -22,8 +23,9 @@ export function tiltFor(index: number) {
 }
 
 /** What a sticker shows, for assistive technology: a photo, an example photo or a drawing. */
-export function stickerArt(item: WardrobeItem) {
+export function stickerArt(t: Copy, item: WardrobeItem) {
   return garmentArtLabel(
+    t,
     Boolean(item.cutoutUri || item.photoUri),
     Boolean(demoPhotoFor(item)),
   );
@@ -88,6 +90,7 @@ export function StickerTile({
 }) {
   const { palette } = useUI();
   const tile = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   const sticker = (
     <Sticker
       item={item}
@@ -99,7 +102,7 @@ export function StickerTile({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${label}${item.available ? '' : ', en lavandería'}. ${stickerArt(item)}`}
+      accessibilityLabel={`${label}${item.available ? '' : t.art.inLaundrySuffix}. ${stickerArt(t, item)}`}
       accessibilityState={selected === undefined ? undefined : { selected }}
       aria-pressed={selected}
       onPress={onPress}
@@ -113,7 +116,9 @@ export function StickerTile({
             <StickerIn order={order}>{sticker}</StickerIn>
           )}
         </View>
-        {!item.available ? <Text style={tile.laundry}>Lavandería</Text> : null}
+        {!item.available ? (
+          <Text style={tile.laundry}>{t.art.laundry}</Text>
+        ) : null}
         {selected ? (
           <View style={tile.check}>
             <Text style={tile.checkMark}>✓</Text>

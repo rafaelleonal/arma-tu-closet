@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import type { LocalData } from '../storage/schema';
-import { fetchWeather } from './openMeteo';
+import {
+  fetchWeather,
+  WeatherRequestError,
+  type WeatherRequestErrorCode,
+} from './openMeteo';
 import { getEffectiveWeatherContext, shouldRefreshWeather } from './helpers';
 
 export function useWeather(
@@ -16,7 +20,8 @@ export function useWeather(
   const request = useRef<AbortController | null>(null);
   const lastAttempt = useRef(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  /** A code: the interface says it in the active language. */
+  const [error, setError] = useState<WeatherRequestErrorCode | ''>('');
   const [now, setNow] = useState(() => new Date().toISOString());
 
   const refresh = useCallback(
@@ -60,9 +65,7 @@ export function useWeather(
       } catch (cause) {
         if (!controller.signal.aborted)
           setError(
-            cause instanceof Error
-              ? cause.message
-              : 'No pudimos actualizar el clima.',
+            cause instanceof WeatherRequestError ? cause.code : 'network',
           );
       } finally {
         if (request.current === controller) {

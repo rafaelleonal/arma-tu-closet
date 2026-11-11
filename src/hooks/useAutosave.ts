@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { writeLocalData, type LocalData } from '../storage/local';
+import { StorageError, writeLocalData, type LocalData } from '../storage/local';
 import { useFeedback } from '../components/Feedback';
+import { useCopy } from '../i18n';
 import type { SetLocalData } from './useLocalData';
 
 export type Autosave = ReturnType<typeof useAutosave>;
@@ -15,6 +16,7 @@ export function useAutosave(
   setData: SetLocalData,
 ) {
   const { success } = useFeedback();
+  const t = useCopy();
   const [saveError, setSaveError] = useState('');
   const [notice, setNotice] = useState('');
   const noticeOnSave = useRef('');
@@ -36,12 +38,12 @@ export function useAutosave(
       .catch((error: unknown) => {
         if (revision === writeRevision.current)
           setSaveError(
-            error instanceof Error
-              ? `${error.message} Los últimos cambios siguen en esta pantalla. Reintenta antes de cerrarla.`
-              : 'No se guardaron los últimos cambios. Revisa el espacio disponible y vuelve a intentar. Mantén esta pantalla abierta.',
+            error instanceof StorageError
+              ? t.storage.saveFailedBecause(t.storage.errors[error.code])
+              : t.storage.saveFailed,
           );
       });
-  }, [data, hydrated, success]);
+  }, [data, hydrated, success, t]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(''), 6500);

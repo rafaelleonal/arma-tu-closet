@@ -13,6 +13,7 @@ import {
   isLocalData,
   parseLocalData,
   serializeLocalData,
+  StorageError,
   type LocalData,
   type LegacyLocalData,
   type LegacyLocalDataV2,
@@ -440,6 +441,24 @@ test('v3 without haptics stays readable and an explicit opt-out survives a round
   assert.throws(
     () => parseLocalData(JSON.stringify(malformed)),
     /no es compatible/,
+  );
+});
+
+test('a chosen language round trips in v3; without one the device decides', () => {
+  const data = fixture();
+  assert.equal(
+    parseLocalData(JSON.stringify(data)).appearance.language,
+    undefined,
+  );
+  data.appearance.language = 'en';
+  assert.deepEqual(parseLocalData(serializeLocalData(data)), data);
+  const unknown = {
+    ...data,
+    appearance: { ...data.appearance, language: 'fr' },
+  };
+  assert.throws(
+    () => parseLocalData(JSON.stringify(unknown)),
+    (error) => error instanceof StorageError && error.code === 'incompatible',
   );
 });
 

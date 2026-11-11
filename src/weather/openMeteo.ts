@@ -12,6 +12,7 @@ import {
 export const WEATHER_REQUEST_TIMEOUT_MS = 10_000;
 export type WeatherRequestErrorCode =
   'network' | 'http' | 'invalid' | 'timeout' | 'aborted';
+/** The message is for logs and tests; the interface words the code in its own language. */
 export class WeatherRequestError extends Error {
   constructor(
     public readonly code: WeatherRequestErrorCode,
@@ -166,9 +167,11 @@ export function createOpenMeteoClient(
   const timeoutMs = options.timeoutMs ?? WEATHER_REQUEST_TIMEOUT_MS;
   const now = options.now ?? (() => new Date());
   return {
+    /** `language` names the places (ISO 639-1); the stored city keeps the name it was chosen with. */
     async searchLocations(
       query: string,
       signal?: AbortSignal,
+      language = 'es',
     ): Promise<WeatherLocation[]> {
       if (signal?.aborted)
         throw new WeatherRequestError('aborted', 'Consulta cancelada.');
@@ -179,7 +182,7 @@ export function createOpenMeteoClient(
           'invalid',
           'Escribe una ciudad de hasta 120 caracteres.',
         );
-      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=8&language=es&format=json`;
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=8&language=${/^[a-z]{2}$/.test(language) ? language : 'es'}&format=json`;
       const raw = await requestJson(url, fetcher, timeoutMs, signal);
       if (
         !isRecord(raw) ||

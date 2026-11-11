@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { EMPTY_STYLE_GOAL, STYLE_OPTIONS, type StyleId } from '../../domain';
+import { EMPTY_STYLE_GOAL, STYLE_IDS, type StyleId } from '../../domain';
+import { useCopy } from '../../i18n';
 import { useFeedback } from '../Feedback';
 import { FieldLabel, useUI } from '../ui';
 import { WordChoice, wordTilt } from '../WordSticker';
@@ -15,6 +16,8 @@ export function StyleStep({
   startExploring,
 }: StepProps & { startExploring: boolean }) {
   const { palette } = useUI();
+  const t = useCopy();
+  const copy = t.onboarding;
   const feedback = useFeedback();
   const [notice, setNotice] = useState('');
   const selectedIds = data.profile.styleIds;
@@ -22,7 +25,7 @@ export function StyleStep({
   const name = data.profile.name.trim();
   function select(id: StyleId) {
     if (!selectedIds.includes(id) && selectedIds.length >= MAX_STYLES) {
-      setNotice('Máximo 3. Quita uno para elegir otro.');
+      setNotice(t.styleBoard.full);
       return;
     }
     feedback.selection();
@@ -39,7 +42,7 @@ export function StyleStep({
   function selectTarget(id: StyleId) {
     const chosen = goal.targetStyleIds.includes(id);
     if (!chosen && goal.targetStyleIds.length >= MAX_STYLES) {
-      setNotice('Máximo 3. Quita uno para elegir otro.');
+      setNotice(t.styleBoard.full);
       return;
     }
     feedback.selection();
@@ -58,34 +61,30 @@ export function StyleStep({
   }
   return (
     <>
-      <Guide
-        kind="shirt"
-        say={`${name ? `${name}, soy` : 'Soy'} Cami, la camisa. Cuéntame de tu ropa.`}
-        title="¿Cómo te vistes casi siempre?"
-      />
+      <Guide kind="shirt" say={copy.styleSay(name)} title={copy.styleTitle} />
       <View style={styles.words}>
-        {STYLE_OPTIONS.map((option, index) => (
+        {STYLE_IDS.map((id, index) => (
           <WordChoice
-            key={option.id}
-            word={option.label}
+            key={id}
+            word={t.styles[id].label}
             tilt={wordTilt(index)}
-            label={`Estilo ${option.label}`}
-            selected={selectedIds.includes(option.id)}
-            onPress={() => select(option.id)}
+            label={`${t.styleBoard.stylePrefix} ${t.styles[id].label}`}
+            selected={selectedIds.includes(id)}
+            onPress={() => select(id)}
           />
         ))}
       </View>
-      <FieldLabel>¿Y cómo te gustaría verte?</FieldLabel>
+      <FieldLabel>{copy.goalQuestion}</FieldLabel>
       <View style={styles.words}>
-        {STYLE_OPTIONS.map((option, index) => (
+        {STYLE_IDS.map((id, index) => (
           <WordChoice
-            key={option.id}
-            word={option.label}
+            key={id}
+            word={t.styles[id].label}
             mark="✦"
             tilt={wordTilt(index + 1)}
-            label={`Quiero probar ${option.label}`}
-            selected={goal.targetStyleIds.includes(option.id)}
-            onPress={() => selectTarget(option.id)}
+            label={`${t.styleBoard.goal} ${t.styles[id].label}`}
+            selected={goal.targetStyleIds.includes(id)}
+            onPress={() => selectTarget(id)}
           />
         ))}
       </View>
@@ -97,7 +96,7 @@ export function StyleStep({
           fontSize: 11,
         }}
       >
-        {notice || 'Hasta 3 en cada grupo · Opcional'}
+        {notice || copy.styleHint}
       </Text>
     </>
   );

@@ -18,7 +18,7 @@ Describe el problema, el comportamiento esperado y cómo comprobarlo. Mantén ca
 
 TypeScript usa modo estricto. Conserva funciones de dominio independientes de React y los efectos de almacenamiento en su módulo. Reutiliza las paletas y controles existentes. Extrae componentes cuando reduzcan complejidad real; no añadas una capa solo por anticipar necesidades futuras.
 
-Para textos y diseño, usa español concreto e inclusivo, sin inferir género ni hacer promesas sobre IA. Añade instrucciones donde eviten errores y elimina las que solo repitan un encabezado. Un tema cambia la interfaz; no altera el vestuario. Mantén fotos originales separadas de las ilustraciones.
+Para textos y diseño, usa español concreto e inclusivo, sin inferir género ni hacer promesas sobre IA. Cada texto visible va en `src/i18n/es.ts` y su versión en `src/i18n/en.ts`; para revisar el inglés, elige English en Ajustes → Idioma. Añade instrucciones donde eviten errores y elimina las que solo repitan un encabezado. Un tema cambia la interfaz; no altera el vestuario. Mantén fotos originales separadas de las ilustraciones.
 
 ## Validación proporcional al cambio
 

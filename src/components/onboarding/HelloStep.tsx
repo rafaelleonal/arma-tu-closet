@@ -4,30 +4,10 @@ import { CityPicker } from '../CityPicker';
 import { Chip, FieldLabel, useUI } from '../ui';
 import { Guide } from './Guide';
 import type { StepProps } from './types';
+import { useCopy } from '../../i18n';
 
-export const STRUGGLES = [
-  {
-    id: 'decide',
-    label: 'Me tardo mucho en decidir',
-    reply: 'De eso me encargo: cada día te propongo hasta tres outfits.',
-  },
-  {
-    id: 'colors',
-    label: 'Me cuesta combinar colores',
-    reply: 'En un momento me dices cuáles te gustan y cuáles evitar.',
-  },
-  {
-    id: 'weather',
-    label: 'Nunca le atino al clima',
-    reply: 'Dime tu ciudad y ajusto el abrigo al clima de hoy.',
-  },
-  {
-    id: 'style',
-    label: 'Quiero cambiar de estilo',
-    reply: 'Cuéntame cómo quieres verte y armamos hacia allá.',
-  },
-] as const;
-export type Struggle = (typeof STRUGGLES)[number]['id'];
+export const STRUGGLES = ['decide', 'colors', 'weather', 'style'] as const;
+export type Struggle = (typeof STRUGGLES)[number];
 
 /** The answer is not stored: it only decides what this run shows and turns on. */
 export function HelloStep({
@@ -40,23 +20,17 @@ export function HelloStep({
   onStruggle: (value: Struggle) => void;
 }) {
   const { s, palette } = useUI();
-  const reply = STRUGGLES.find((option) => option.id === struggle)?.reply;
+  const t = useCopy();
+  const copy = t.onboarding;
+  const reply = struggle ? copy.struggles[struggle].reply : undefined;
   const name = data.profile.name.trim();
   const automatic = data.weather.mode === 'automatic';
   return (
     <>
-      <Guide
-        kind="tee"
-        say={
-          name
-            ? `Mucho gusto, ${name}. Soy Tere.`
-            : '¡Hola! Soy Tere, tu playera.'
-        }
-        title="¿Cómo te llamas?"
-      />
+      <Guide kind="tee" say={copy.helloSay(name)} title={copy.nameTitle} />
       <TextInput
-        accessibilityLabel="Tu nombre, opcional"
-        placeholder="Tu nombre · opcional"
+        accessibilityLabel={copy.nameLabel}
+        placeholder={copy.namePlaceholder}
         placeholderTextColor={palette.muted}
         value={data.profile.name}
         onChangeText={(name) =>
@@ -66,14 +40,14 @@ export function HelloStep({
         autoComplete="given-name"
         style={s.input}
       />
-      <FieldLabel>¿Qué se te complica al vestirte?</FieldLabel>
+      <FieldLabel>{copy.struggleQuestion}</FieldLabel>
       <View style={s.wrap}>
-        {STRUGGLES.map((option) => (
+        {STRUGGLES.map((id) => (
           <Chip
-            key={option.id}
-            label={option.label}
-            selected={struggle === option.id}
-            onPress={() => onStruggle(option.id)}
+            key={id}
+            label={copy.struggles[id].label}
+            selected={struggle === id}
+            onPress={() => onStruggle(id)}
           />
         ))}
       </View>
@@ -87,7 +61,7 @@ export function HelloStep({
       ) : null}
       {struggle === 'weather' || automatic ? (
         <>
-          <FieldLabel>Tu ciudad · opcional</FieldLabel>
+          <FieldLabel>{copy.cityTitle}</FieldLabel>
           <CityPicker
             value={automatic ? data.weather.location : undefined}
             onSelect={(place) =>

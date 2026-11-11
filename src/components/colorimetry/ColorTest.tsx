@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import {
+  COLOR_TEST_STEPS,
   COLOR_TONE_INFO,
   colorTestResult,
   colorTestStep,
@@ -11,12 +12,7 @@ import { Guide } from '../onboarding/Guide';
 import { Button, useUI } from '../ui';
 import { DrapeCompare } from './DrapeCompare';
 import { useSelfie } from './useSelfie';
-
-const TIPS = [
-  'Luz natural, de frente a una ventana.',
-  'Sin filtros y con poco maquillaje.',
-  'Acércate: que tu cara llene la foto, con el cabello hacia atrás.',
-];
+import { useCopy } from '../../i18n';
 
 export function ToneSwatches({ colors }: { colors: string[] }) {
   const { palette } = useUI();
@@ -47,34 +43,32 @@ function Intro({
   onPick: (camera: boolean) => void;
 }) {
   const { s, palette } = useUI();
+  const t = useCopy();
+  const copy = t.colorTest;
   return (
     <>
-      <Guide
-        kind="scarf"
-        say="Soy Bufi, la bufanda. Comparemos colores junto a tu cara."
-        title="Tu colorimetría"
-      />
+      <Guide kind="scarf" say={copy.introSay} title={copy.introTitle} />
       <Text style={[s.subtitle, { fontSize: 14 }]}>
-        Son 9 comparaciones rápidas.
+        {copy.steps(COLOR_TEST_STEPS)}
       </Text>
       <View style={[s.panel, { marginTop: 16 }]}>
-        {TIPS.map((tip) => (
+        {copy.tips.map((tip) => (
           <Text key={tip} style={[s.subtitle, { fontSize: 13, marginTop: 4 }]}>
             · {tip}
           </Text>
         ))}
       </View>
       <Text style={[s.subtitle, { fontSize: 12, marginTop: 14 }]}>
-        Tu foto no sale del teléfono y no se guarda.
+        {copy.privacy}
       </Text>
       <Button
-        label="Tomar selfie"
+        label={copy.takeSelfie}
         style={{ marginTop: 16 }}
         onPress={() => onPick(true)}
       />
       <Button
         secondary
-        label="Elegir una foto"
+        label={copy.choosePhoto}
         style={{ marginTop: 8 }}
         onPress={() => onPick(false)}
       />
@@ -102,34 +96,32 @@ function Result({
   onRepeat: () => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
+  const copy = t.colorTest;
   const info = COLOR_TONE_INFO[tone];
   return (
     <>
-      <Guide
-        kind="scarf"
-        say="Según lo que elegiste, eres…"
-        title={info.label}
-      />
+      <Guide kind="scarf" say={copy.resultSay} title={t.tones[tone].label} />
       <Text style={[s.subtitle, { fontSize: 14, marginBottom: 16 }]}>
-        {info.description}
+        {t.tones[tone].description}
       </Text>
       <ToneSwatches colors={info.palette} />
       {confident ? null : (
         <Text style={[s.subtitle, { fontSize: 12, marginTop: 14 }]}>
-          Salió muy parejo. Si puedes, repítela con mejor luz.
+          {copy.lowConfidence}
         </Text>
       )}
       <Text style={[s.subtitle, { fontSize: 12, marginTop: 14 }]}>
-        Es una simulación: depende de la luz, la foto y tu pantalla.
+        {copy.simulation}
       </Text>
       <Button
-        label="Usar mis colores"
+        label={copy.useColors}
         style={{ marginTop: 18 }}
         onPress={onUse}
       />
       <Button
         secondary
-        label="Repetir la prueba"
+        label={t.styleGoal.repeatTest}
         style={{ marginTop: 8 }}
         onPress={onRepeat}
       />

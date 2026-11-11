@@ -25,17 +25,14 @@ export const STICKER_PAPER = '#FBFAF6';
 /** Ink for words written on sticker paper; fixed because the paper is. */
 export const STICKER_INK = '#242923';
 
-export const THEME_OPTIONS: {
-  id: ThemeId;
-  name: string;
-  description: string;
-}[] = [
-  { id: 'linen', name: 'Lino', description: 'Cálido y natural' },
-  { id: 'paper', name: 'Papel', description: 'Claro y esencial' },
-  { id: 'midnight', name: 'Medianoche', description: 'Oscuro y sereno' },
-  { id: 'sage', name: 'Salvia', description: 'Un poco de calma' },
-  { id: 'bubblegum', name: 'Chicle', description: 'Rosa y juguetón' },
-  { id: 'mauve', name: 'Malva', description: 'Rosa empolvado y sobrio' },
+/** In the order Ajustes shows them; the interface names each one. */
+export const THEME_OPTIONS: { id: ThemeId }[] = [
+  { id: 'linen' },
+  { id: 'paper' },
+  { id: 'midnight' },
+  { id: 'sage' },
+  { id: 'bubblegum' },
+  { id: 'mauve' },
 ];
 
 const themes: Record<ThemeId, Palette> = {

@@ -8,6 +8,7 @@ import { useRecommendations } from './src/hooks/useRecommendations';
 import { HomeShell } from './src/screens/HomeShell';
 import { LoadingScreen, OnboardingScreen } from './src/screens/StartScreens';
 import { ThemeProvider } from './src/theme/ThemeProvider';
+import { I18nProvider } from './src/i18n';
 import { useWeather } from './src/weather/useWeather';
 
 export default function App() {
@@ -15,11 +16,13 @@ export default function App() {
   const { data } = local;
   return (
     <SafeAreaProvider>
-      <ThemeProvider themeId={data?.appearance.themeId ?? 'linen'}>
-        <FeedbackProvider enabled={data?.appearance.hapticsEnabled !== false}>
-          <Main local={local} />
-        </FeedbackProvider>
-      </ThemeProvider>
+      <I18nProvider language={data?.appearance.language}>
+        <ThemeProvider themeId={data?.appearance.themeId ?? 'linen'}>
+          <FeedbackProvider enabled={data?.appearance.hapticsEnabled !== false}>
+            <Main local={local} />
+          </FeedbackProvider>
+        </ThemeProvider>
+      </I18nProvider>
     </SafeAreaProvider>
   );
 }

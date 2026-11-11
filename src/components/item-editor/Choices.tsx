@@ -1,12 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  CATEGORIES,
-  categoryLabels,
-  COLOR_OPTIONS,
-  colorLabels,
-  type Category,
-} from '../../domain';
+import { CATEGORIES, COLOR_OPTIONS, type Category } from '../../domain';
+import { useCopy } from '../../i18n';
 import type { Palette } from '../../theme/ThemeProvider';
 import { DARK_SWATCHES } from '../ColorPicker';
 import type { IllustrationKind } from '../Garment';
@@ -33,9 +28,10 @@ export function CategoryChoices({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <>
-      <FieldLabel>¿Qué es?</FieldLabel>
+      <FieldLabel>{t.itemEditor.whatIsIt}</FieldLabel>
       <View accessibilityRole="radiogroup" style={styles.grid}>
         {CATEGORIES.map((category) => {
           const selected = category === value;
@@ -43,7 +39,7 @@ export function CategoryChoices({
             <Pressable
               key={category}
               accessibilityRole="radio"
-              accessibilityLabel={categoryLabels[category]}
+              accessibilityLabel={t.categories[category]}
               accessibilityState={{ checked: selected }}
               aria-checked={selected}
               onPress={() => onChange(category)}
@@ -71,7 +67,7 @@ export function CategoryChoices({
                 numberOfLines={2}
                 style={[styles.kindLabel, selected && { fontWeight: '700' }]}
               >
-                {categoryLabels[category]}
+                {t.categories[category]}
               </Text>
             </Pressable>
           );
@@ -93,9 +89,10 @@ export function ColorChoices({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <>
-      <FieldLabel>¿De qué color?</FieldLabel>
+      <FieldLabel>{t.itemEditor.whichColor}</FieldLabel>
       <View style={styles.grid}>
         {COLOR_OPTIONS.map((color) => {
           const selected = value.includes(color);
@@ -103,7 +100,7 @@ export function ColorChoices({
             <Pressable
               key={color}
               accessibilityRole="checkbox"
-              accessibilityLabel={colorLabels[color]}
+              accessibilityLabel={t.colors[color]}
               accessibilityState={{ checked: selected }}
               aria-checked={selected}
               onPress={() =>
@@ -142,7 +139,7 @@ export function ColorChoices({
                 numberOfLines={1}
                 style={[styles.colorLabel, selected && { fontWeight: '700' }]}
               >
-                {colorLabels[color]}
+                {t.colors[color]}
               </Text>
             </Pressable>
           );

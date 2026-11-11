@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { useCopy } from '../i18n';
 import type { Palette } from '../theme/ThemeProvider';
 import { DrawingSticker } from './Sticker';
 
@@ -13,6 +14,7 @@ export function ThemePreview({
   compact: boolean;
   showReasons: boolean;
 }) {
+  const t = useCopy();
   const size = compact ? 26 : 34;
   return (
     <View
@@ -34,7 +36,7 @@ export function ThemePreview({
         }}
       >
         <Text style={{ color: preview.ink, fontSize: 12, fontWeight: '600' }}>
-          Hoy
+          {t.today.title}
         </Text>
         <View
           style={{
@@ -110,7 +112,7 @@ export function ThemePreview({
         <Text
           style={{ textAlign: 'center', color: preview.onInk, fontSize: 8 }}
         >
-          Hoy me lo puse
+          {t.outfit.wore}
         </Text>
       </View>
     </View>

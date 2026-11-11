@@ -4,6 +4,7 @@ import type { WardrobeItem } from '../../domain';
 import type { Palette } from '../../theme/ThemeProvider';
 import { Sticker } from '../Sticker';
 import { useUI } from '../ui';
+import { useCopy } from '../../i18n';
 
 const THUMB = 46;
 
@@ -17,10 +18,11 @@ export function WearMoreNudge({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Otra vuelta: ver ideas con ${item.name}`}
+      accessibilityLabel={t.wearMore.label(item.name)}
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.72 }]}
     >
@@ -28,7 +30,7 @@ export function WearMoreNudge({
         <Sticker item={item} maxWidth={THUMB} maxHeight={THUMB} rotate={-6} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={styles.eyebrow}>Otra vuelta</Text>
+        <Text style={styles.eyebrow}>{t.wearMore.eyebrow}</Text>
         <Text numberOfLines={1} style={styles.name}>
           {item.name}
         </Text>

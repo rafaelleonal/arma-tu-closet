@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { categoryLabels, type Category, type WardrobeItem } from '../../domain';
+import type { Category, WardrobeItem } from '../../domain';
+import { useCopy } from '../../i18n';
 import type { Palette } from '../../theme/ThemeProvider';
 import { slotForCategory } from '../outfitLayout';
 import { Dots } from '../Dots';
@@ -27,6 +28,7 @@ export function BuilderStage({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   const [width, setWidth] = useState(0);
   const optional = (Object.keys(chosen) as Category[]).filter(
     (category) => chosen[category] && !required.includes(category),
@@ -38,14 +40,14 @@ export function BuilderStage({
   const names = categories.flatMap((category) => chosen[category]?.name ?? []);
   const missing = required
     .filter((category) => !chosen[category])
-    .map((category) => categoryLabels[category]);
+    .map((category) => t.categories[category]);
   return (
     <View
       accessible
       accessibilityRole="image"
       accessibilityLabel={[
-        names.length ? `Tu outfit: ${names.join(', ')}.` : 'Tu outfit, vacío.',
-        missing.length ? `Falta: ${missing.join(', ')}.` : '',
+        names.length ? t.builder.stage(names.join(', ')) : t.builder.empty,
+        missing.length ? t.builder.stageMissing(missing.join(', ')) : '',
       ]
         .join(' ')
         .trim()}
@@ -88,9 +90,7 @@ export function BuilderStage({
                       { transform: [{ rotate: `${slot.rotate}deg` }] },
                     ]}
                   >
-                    <Text style={styles.gapText}>
-                      {categoryLabels[category]}
-                    </Text>
+                    <Text style={styles.gapText}>{t.categories[category]}</Text>
                   </View>
                 )}
               </View>

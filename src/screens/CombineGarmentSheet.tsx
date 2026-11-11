@@ -11,6 +11,7 @@ import { SwapSheet, type SwapTarget } from '../components/OutfitSheets';
 import { Sheet, useSheetStageHeight } from '../components/Sheet';
 import { OutfitDeck } from '../components/today/OutfitDeck';
 import { Button, useUI } from '../components/ui';
+import { useCopy } from '../i18n';
 import type { OutfitActions } from './actions';
 
 /** Header, the line about the chosen garment, a bubble, the page dots, the actions and padding. */
@@ -36,6 +37,7 @@ export function CombineGarmentSheet({
   onNotice: (message: string) => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const [swap, setSwap] = useState<
     (SwapTarget & { proposalId: string }) | null
   >(null);
@@ -77,7 +79,7 @@ export function CombineGarmentSheet({
             }));
             setSwap(null);
           } else {
-            onNotice(change.message);
+            onNotice(t.problems.swap(change.problem, swap.category));
           }
         }}
       />
@@ -85,7 +87,7 @@ export function CombineGarmentSheet({
   }
 
   return (
-    <Sheet title="Combínala" onClose={onClose}>
+    <Sheet title={t.combine.title} onClose={onClose}>
       {saveError ? (
         <Text
           accessibilityRole="alert"
@@ -98,7 +100,7 @@ export function CombineGarmentSheet({
         <>
           {item ? (
             <Text style={[s.subtitle, { marginBottom: 14 }]}>
-              {item.name} se queda.
+              {t.combine.stays(item.name)}
             </Text>
           ) : null}
           <OutfitDeck
@@ -126,10 +128,12 @@ export function CombineGarmentSheet({
         </>
       ) : (
         <>
-          <Text style={s.subtitle}>{result.message}</Text>
+          <Text style={s.subtitle}>
+            {result.problem ? t.problems.recommendation(result.problem) : ''}
+          </Text>
           {item && isItemEligible(item, context) ? (
             <Button
-              label="Agregar prenda"
+              label={t.closet.add}
               onPress={onAdd}
               style={{ marginTop: 16 }}
             />

@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
-import {
-  CATEGORIES,
-  COLOR_OPTIONS,
-  categoryLabels,
-  colorLabels,
-} from '../domain';
+import { CATEGORIES, COLOR_OPTIONS } from '../domain';
+import { useCopy } from '../i18n';
 import {
   parseGarmentSuggestion,
   type GarmentSuggestion,
@@ -22,6 +18,8 @@ export function GarmentSuggestionReview({
   onDismiss: () => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
+  const copy = t.suggestionReview;
   const [draft, setDraft] = useState(suggestion);
   const [error, setError] = useState('');
   return (
@@ -30,37 +28,35 @@ export function GarmentSuggestionReview({
         accessibilityRole="header"
         style={{ fontSize: 18, color: palette.ink, marginBottom: 8 }}
       >
-        Revisar análisis
+        {copy.title}
       </Text>
-      <Text style={[s.subtitle, { fontSize: 12 }]}>
-        Corrige lo que haga falta antes de aplicarlo.
-      </Text>
-      <FieldLabel>Nombre propuesto</FieldLabel>
+      <Text style={[s.subtitle, { fontSize: 12 }]}>{copy.hint}</Text>
+      <FieldLabel>{copy.name}</FieldLabel>
       <TextInput
-        accessibilityLabel="Nombre propuesto por el análisis"
+        accessibilityLabel={copy.nameLabel}
         value={draft.name}
         maxLength={60}
         onChangeText={(name) => setDraft((current) => ({ ...current, name }))}
         placeholderTextColor={palette.muted}
         style={s.input}
       />
-      <FieldLabel>Categoría propuesta</FieldLabel>
+      <FieldLabel>{copy.category}</FieldLabel>
       <View style={s.wrap}>
         {CATEGORIES.map((category) => (
           <Chip
             key={category}
-            label={categoryLabels[category]}
+            label={t.categories[category]}
             selected={draft.category === category}
             onPress={() => setDraft((current) => ({ ...current, category }))}
           />
         ))}
       </View>
-      <FieldLabel>Colores propuestos</FieldLabel>
+      <FieldLabel>{copy.colors}</FieldLabel>
       <View style={s.wrap}>
         {COLOR_OPTIONS.map((color) => (
           <Chip
             key={color}
-            label={colorLabels[color]}
+            label={t.colors[color]}
             swatch={colorHex[color]}
             selected={draft.colors.includes(color)}
             onPress={() =>
@@ -83,27 +79,27 @@ export function GarmentSuggestionReview({
         </Text>
       ) : null}
       <Button
-        label="Aplicar estos datos"
+        label={copy.apply}
         style={{ marginTop: 20 }}
         onPress={() => {
           if (!draft.name.trim()) {
-            setError('Escribe un nombre.');
+            setError(copy.nameRequired);
             return;
           }
           if (!draft.colors.length) {
-            setError('Elige al menos un color.');
+            setError(t.itemForm.colorsRequired);
             return;
           }
           try {
             onApply(parseGarmentSuggestion(draft));
           } catch {
-            setError('Revisa el nombre, la categoría y los colores.');
+            setError(copy.invalid);
           }
         }}
       />
       <Button
         secondary
-        label="Descartar análisis"
+        label={copy.dismiss}
         style={{ marginTop: 8 }}
         onPress={onDismiss}
       />

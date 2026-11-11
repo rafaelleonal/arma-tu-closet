@@ -9,6 +9,7 @@ import {
 import { Bubble } from '../Bubble';
 import { useFeedback } from '../Feedback';
 import { CrewSticker } from './CrewSticker';
+import { useCopy } from '../../i18n';
 
 const CREW = [
   { kind: 'scarf', size: 66, lift: 40, tilt: -8 },
@@ -27,6 +28,7 @@ const GUTTERS = 48;
 /** Decorative welcome: the garments greet the person as stickers and bob gently. */
 export function Crew() {
   const { reduceMotion } = useFeedback();
+  const t = useCopy();
   const { width } = useWindowDimensions();
   const fit = Math.min(
     1,
@@ -54,7 +56,7 @@ export function Crew() {
   return (
     <View style={{ alignItems: 'center' }}>
       <View style={{ marginBottom: 14 }}>
-        <Bubble>¡Hola! Soy Tere.</Bubble>
+        <Bubble>{t.onboarding.crewHello}</Bubble>
       </View>
       <View
         accessible={false}

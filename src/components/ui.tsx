@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { MotionPressable } from './Feedback';
+import { useCopy } from '../i18n';
 import { useTheme, type Palette } from '../theme/ThemeProvider';
 
 export function useUI() {
@@ -80,10 +81,13 @@ const SHOW_COMING_SOON =
 /** Not a control: names a feature that needs a backend this build does not have. */
 export function ComingSoon({ label }: { label: string }) {
   const { s } = useUI();
+  const t = useCopy();
   if (!SHOW_COMING_SOON) return null;
   return (
     <View style={[s.panel, { paddingVertical: 14 }]}>
-      <Text style={[s.subtitle, { fontSize: 13 }]}>{label} · Ya casi…</Text>
+      <Text style={[s.subtitle, { fontSize: 13 }]}>
+        {label} · {t.common.comingSoon}
+      </Text>
     </View>
   );
 }

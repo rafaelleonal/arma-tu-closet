@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { WardrobeItem } from '../domain';
+import type { Copy } from '../i18n';
 
 /** The kinds of generic drawing; each has a sticker in assets/garments/stickers. */
 export type IllustrationKind =
@@ -20,8 +21,12 @@ export function illustrationFor(item: WardrobeItem): IllustrationKind {
     .toLowerCase();
   switch (item.category) {
     case 'top':
-      if (/sueter|sweater|sudadera|jersey/.test(name)) return 'sweater';
-      if (/camisa|blusa|shirt/.test(name) && !/camiseta|t-shirt/.test(name))
+      if (/sueter|sweater|sudadera|jersey|hoodie|jumper|cardigan/.test(name))
+        return 'sweater';
+      if (
+        /camisa|blusa|shirt|blouse/.test(name) &&
+        !/camiseta|t-shirt/.test(name)
+      )
         return 'shirt';
       return 'tee';
     case 'bottom':
@@ -56,7 +61,11 @@ export function useGarmentImages(item: WardrobeItem) {
 }
 
 /** Says what the picture is, so a generic drawing is never read out as the garment's photo. */
-export function garmentArtLabel(hasOwnPhoto: boolean, hasDemoPhoto: boolean) {
-  if (hasOwnPhoto) return 'Foto';
-  return hasDemoPhoto ? 'Foto de ejemplo' : 'Ilustración genérica';
+export function garmentArtLabel(
+  t: Copy,
+  hasOwnPhoto: boolean,
+  hasDemoPhoto: boolean,
+) {
+  if (hasOwnPhoto) return t.art.photo;
+  return hasDemoPhoto ? t.art.demoPhoto : t.art.drawing;
 }

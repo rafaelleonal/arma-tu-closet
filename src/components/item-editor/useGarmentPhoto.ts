@@ -17,6 +17,17 @@ import {
   launchPicker,
   localPhotoDataUrl,
 } from './localPhoto';
+import { useI18n, type Copy, type Language } from '../../i18n';
+
+/**
+ * A rejection the server explains with a code is worded here. Other server and native messages
+ * are written in Spanish, so another language gets the general one for its code.
+ */
+function analysisErrorText(t: Copy, language: Language, failure: unknown) {
+  if (!(failure instanceof AiClientError)) return t.photo.analysisFailed;
+  if (failure.reason) return t.photo.rejections[failure.reason];
+  return language === 'es' ? failure.message : t.photo.aiErrors[failure.code];
+}
 
 export type GarmentPhoto = ReturnType<typeof useGarmentPhoto>;
 
@@ -25,6 +36,7 @@ export type GarmentPhoto = ReturnType<typeof useGarmentPhoto>;
  * a result is ignored once a newer job started or the editor closed.
  */
 export function useGarmentPhoto(item?: WardrobeItem) {
+  const { t, language } = useI18n();
   const [photoUri, setPhotoUri] = useState(item?.photoUri);
   const [cutoutUri, setCutoutUri] = useState(item?.cutoutUri);
   const [cutoutSupported] = useState(isSubjectCutoutAvailable);
@@ -81,8 +93,8 @@ export function useGarmentPhoto(item?: WardrobeItem) {
           setPermissionBlocked(!permission.canAskAgain);
           setError(
             permission.canAskAgain
-              ? 'Permite la cámara para tomar una foto.'
-              : 'La cámara está bloqueada. Actívala en Ajustes o elige una foto.',
+              ? t.photo.cameraDenied
+              : t.photo.cameraBlocked,
           );
           return;
         }
@@ -100,10 +112,7 @@ export function useGarmentPhoto(item?: WardrobeItem) {
         setCutoutUri(undefined);
       }
     } catch {
-      if (isPhotoJob(job))
-        setError(
-          'No pudimos guardar la foto. Revisa el permiso o usa una imagen más pequeña; también puedes continuar sin foto.',
-        );
+      if (isPhotoJob(job)) setError(t.photo.saveFailed);
     } finally {
       if (isPhotoJob(job)) setBusy(false);
     }
@@ -125,9 +134,9 @@ export function useGarmentPhoto(item?: WardrobeItem) {
     } catch (failure) {
       if (isPhotoJob(job))
         setError(
-          failure instanceof Error
+          failure instanceof Error && language === 'es'
             ? failure.message
-            : 'No pudimos quitar el fondo. Puedes usar la foto original.',
+            : t.photo.cutoutFailed,
         );
     } finally {
       if (active.current) setCutting(false);
@@ -151,6 +160,7 @@ export function useGarmentPhoto(item?: WardrobeItem) {
       if (!isAnalysisJob(job)) return;
       const result = await analyzeGarmentPhoto(imageDataUrl, {
         apiUrl,
+        language,
         signal: abort.signal,
       });
       if (isAnalysisJob(job)) setSuggestion(result);
@@ -158,11 +168,7 @@ export function useGarmentPhoto(item?: WardrobeItem) {
       const aborted =
         failure instanceof AiClientError && failure.code === 'aborted';
       if (isAnalysisJob(job) && !aborted)
-        setAnalysisError(
-          failure instanceof Error
-            ? failure.message
-            : 'No pudimos analizar la foto. Puedes completar los datos manualmente.',
-        );
+        setAnalysisError(analysisErrorText(t, language, failure));
     } finally {
       if (isAnalysisJob(job)) {
         setAnalyzing(false);
@@ -192,9 +198,7 @@ export function useGarmentPhoto(item?: WardrobeItem) {
     cancelAll,
     suggestionApplied() {
       setSuggestion(null);
-      setAnalysisNotice(
-        'Datos aplicados. Revisa los demás campos y guarda la prenda.',
-      );
+      setAnalysisNotice(t.photo.applied);
     },
   };
 }

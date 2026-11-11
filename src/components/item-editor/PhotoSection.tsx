@@ -5,6 +5,7 @@ import { GarmentSuggestionReview } from '../GarmentSuggestionReview';
 import { Button, ComingSoon, useUI } from '../ui';
 import { photoAnalysisAvailable } from './localPhoto';
 import type { GarmentPhoto } from './useGarmentPhoto';
+import { useCopy, type Copy } from '../../i18n';
 
 /** Photo picker, background removal and the optional analysis. The preview sits above it. */
 export function PhotoSection({
@@ -15,13 +16,14 @@ export function PhotoSection({
   onApply: (suggestion: GarmentSuggestion) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   return (
     <>
       <View style={[s.row, { marginTop: 16 }]}>
         <Button
           secondary
           small
-          label={photo.busy ? 'Guardando foto…' : 'Elegir foto'}
+          label={photo.busy ? t.photo.saving : t.photo.choose}
           disabled={photo.busy}
           onPress={() => void photo.pick(false)}
           style={{ flex: 1 }}
@@ -29,7 +31,7 @@ export function PhotoSection({
         <Button
           secondary
           small
-          label="Tomar foto"
+          label={t.photo.take}
           disabled={photo.busy}
           onPress={() => void photo.pick(true)}
           style={{ flex: 1 }}
@@ -40,11 +42,11 @@ export function PhotoSection({
         <Button
           secondary
           small
-          label="Abrir Ajustes"
+          label={t.city.openSettings}
           style={{ marginTop: 8 }}
           onPress={() =>
             void Linking.openSettings().catch(() =>
-              photo.setError('Abre Ajustes y activa Cámara para esta app.'),
+              photo.setError(t.photo.openSettingsFailed),
             )
           }
         />
@@ -54,7 +56,7 @@ export function PhotoSection({
           <Button
             secondary
             small
-            label="Quitar foto"
+            label={t.photo.remove}
             onPress={photo.remove}
             style={{ marginTop: 8 }}
           />
@@ -96,13 +98,14 @@ function ErrorText({ message }: { message: string }) {
 
 function CutoutControls({ photo }: { photo: GarmentPhoto }) {
   const { s } = useUI();
+  const t = useCopy();
   return (
     <View style={{ marginTop: 14 }}>
       {photo.cutoutUri ? (
         <Button
           secondary
           small
-          label="Usar la foto con fondo"
+          label={t.photo.keepBackground}
           onPress={photo.keepOriginal}
         />
       ) : (
@@ -110,12 +113,12 @@ function CutoutControls({ photo }: { photo: GarmentPhoto }) {
           <Button
             secondary
             small
-            label={photo.cutting ? 'Quitando fondo…' : 'Quitar fondo'}
+            label={photo.cutting ? t.photo.cutting : t.photo.cut}
             disabled={photo.cutting || photo.busy}
             onPress={() => void photo.cutBackground()}
           />
           <Text style={[s.subtitle, { fontSize: 11, marginTop: 6 }]}>
-            Se hace en este teléfono; la foto no se envía.
+            {t.photo.cutLocal}
           </Text>
         </>
       )}
@@ -123,28 +126,29 @@ function CutoutControls({ photo }: { photo: GarmentPhoto }) {
   );
 }
 
-function analysisLabel(photo: GarmentPhoto) {
-  if (photo.analyzing) return 'Analizando…';
-  if (photo.analysisError) return 'Reintentar análisis';
-  return photo.suggestion ? 'Analizar de nuevo' : 'Analizar foto';
+function analysisLabel(t: Copy, photo: GarmentPhoto) {
+  if (photo.analyzing) return t.photo.analyzing;
+  if (photo.analysisError) return t.photo.retryAnalysis;
+  return photo.suggestion ? t.photo.analyzeAgain : t.photo.analyze;
 }
 
 function AnalysisControls({ photo }: { photo: GarmentPhoto }) {
   const { s } = useUI();
+  const t = useCopy();
   if (!photoAnalysisAvailable())
     return (
       <View style={{ marginTop: 18 }}>
-        <ComingSoon label="Analizar foto con IA" />
+        <ComingSoon label={t.photo.analyzeWithAi} />
       </View>
     );
   return (
     <View style={{ marginTop: 18 }}>
       <Text style={[s.subtitle, { fontSize: 12, marginBottom: 12 }]}>
-        Se enviará esta foto a OpenAI para proponer nombre, categoría y colores.
+        {t.photo.analysisPrivacy}
       </Text>
       <Button
         secondary
-        label={analysisLabel(photo)}
+        label={analysisLabel(t, photo)}
         disabled={photo.busy || photo.analyzing}
         onPress={() => void photo.analyze()}
       />
@@ -152,7 +156,7 @@ function AnalysisControls({ photo }: { photo: GarmentPhoto }) {
         <Button
           secondary
           small
-          label="Cancelar análisis"
+          label={t.photo.cancelAnalysis}
           onPress={photo.cancelAnalysis}
           style={{ marginTop: 8 }}
         />

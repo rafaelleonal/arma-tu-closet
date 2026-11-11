@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
 import {
-  categoryLabels,
   swapOutfitItem,
   type Category,
   type Context,
@@ -13,6 +12,7 @@ import { Sheet, useSheetStageHeight } from './Sheet';
 import { StickerAlbum } from './StickerAlbum';
 import { OutfitDeck } from './today/OutfitDeck';
 import { useUI } from './ui';
+import { useCopy } from '../i18n';
 
 export interface SwapTarget {
   outfit: Outfit;
@@ -44,16 +44,17 @@ export function OutfitSheet({
   onItem: (item: WardrobeItem) => void;
 }) {
   const { palette, s } = useUI();
+  const t = useCopy();
   const compact = data.appearance.outfitLayout === 'compact';
   const stageHeight = useSheetStageHeight(
     AROUND_STAGE + (saved ? SAVED_NOTE : 0),
     compact,
   );
   return (
-    <Sheet title="Tu outfit" onClose={onClose}>
+    <Sheet title={t.outfit.title} onClose={onClose}>
       {saved ? (
         <Text style={[s.subtitle, { fontSize: 12, marginBottom: 14 }]}>
-          Guardado tal como estaba; no considera el clima de hoy.
+          {t.outfit.savedNote}
         </Text>
       ) : null}
       {saveError ? (
@@ -93,6 +94,7 @@ export function SwapSheet({
   onResult: (change: ReturnType<typeof swapOutfitItem>) => void;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   const current = swap.outfit.items.find(
     (item) => item.category === swap.category,
   );
@@ -106,17 +108,14 @@ export function SwapSheet({
       ),
   );
   return (
-    <Sheet
-      title={`Cambiar · ${categoryLabels[swap.category]}`}
-      onClose={onClose}
-    >
+    <Sheet title={t.swap.title(t.categories[swap.category])} onClose={onClose}>
       {current && options.length ? (
-        <Text style={s.subtitle}>En lugar de {current.name}.</Text>
+        <Text style={s.subtitle}>{t.swap.insteadOf(current.name)}</Text>
       ) : null}
       {options.length ? (
         <StickerAlbum
           items={options}
-          labelFor={(item) => `Cambiar por ${item.name}`}
+          labelFor={(item) => t.swap.swapFor(item.name)}
           onPress={(item) =>
             onResult(
               swapOutfitItem(
@@ -132,11 +131,7 @@ export function SwapSheet({
       ) : (
         // The rule about colors is said only when it may be why nothing is left to choose.
         <Text style={s.subtitle}>
-          No hay otra disponible
-          {data.preferences.excludedColors.length
-            ? ' sin los colores que evitas'
-            : ''}
-          . Agrega una en Mi clóset.
+          {t.swap.none(data.preferences.excludedColors.length > 0)}
         </Text>
       )}
     </Sheet>

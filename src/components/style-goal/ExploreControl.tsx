@@ -1,10 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import {
-  CATEGORY_LABELS,
-  styleGaps,
-  type RecommendationContext,
-} from '../../domain';
+import { styleGaps, type RecommendationContext } from '../../domain';
+import { useCopy } from '../../i18n';
 import type { UpdateData } from '../../hooks/useLocalData';
 import type { LocalData } from '../../storage/local';
 import { useUI } from '../ui';
@@ -18,13 +15,14 @@ export function ExploreToggle({
   update: UpdateData;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const goal = data.styleGoal;
   if (!goal?.targetStyleIds.length) return null;
   const on = goal.exploring;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Hoy me animo a algo nuevo"
+      accessibilityLabel={t.explore.label}
       accessibilityState={{ selected: on }}
       aria-pressed={on}
       onPress={() =>
@@ -53,7 +51,7 @@ export function ExploreToggle({
           color: on ? palette.onInk : palette.rust,
         }}
       >
-        ✦ Algo nuevo
+        ✦ {t.explore.toggle}
       </Text>
     </Pressable>
   );
@@ -68,15 +66,16 @@ export function ExploreGaps({
   context: RecommendationContext;
 }) {
   const { s } = useUI();
+  const t = useCopy();
   const goal = data.styleGoal;
   if (!goal?.targetStyleIds.length || !goal.exploring) return null;
   const gaps = styleGaps(data.items, context);
   if (!gaps.length) return null;
   return (
     <Text style={[s.subtitle, { fontSize: 12, marginTop: 12 }]}>
-      Para ese look te falta:{' '}
-      {gaps.map((gap) => CATEGORY_LABELS[gap].toLowerCase()).join(', ')}.
-      Etiqueta tus prendas o agrega alguna.
+      {t.explore.gaps(
+        gaps.map((gap) => t.categories[gap].toLowerCase()).join(', '),
+      )}
     </Text>
   );
 }

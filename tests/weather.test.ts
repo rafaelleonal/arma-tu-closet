@@ -88,6 +88,10 @@ test('city search uses the fixed geocoding host, encoded query, Spanish labels a
   assert.equal(results.length, 2);
   assert.deepEqual(results[0], location);
   assert.equal(results[1].country, 'Guatemala');
+  await client.searchLocations('London', undefined, 'en');
+  assert.equal(new URL(requested).searchParams.get('language'), 'en');
+  await client.searchLocations('London', undefined, 'en&count=99');
+  assert.equal(new URL(requested).searchParams.get('language'), 'es');
 });
 
 test('search handles no matches and short queries without making a request', async () => {

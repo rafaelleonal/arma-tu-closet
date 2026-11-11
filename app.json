@@ -21,7 +21,12 @@
       "name": "Arma tu outfit",
       "bundler": "metro"
     },
+    "locales": {
+      "es": "./locales/es.json",
+      "en": "./locales/en.json"
+    },
     "plugins": [
+      "expo-localization",
       [
         "expo-image-picker",
         {

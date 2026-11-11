@@ -1,30 +1,33 @@
-import {
-  categoryLabels,
-  colorLabels,
-  type Category,
-  type WardrobeItem,
-} from '../domain';
+import type { Category, WardrobeItem } from '../domain';
+import { colorName } from '../i18n/describe';
+import type { Copy } from '../i18n/es';
 
+/** True for each field that still needs a value; the form words it. */
 export function itemFormErrors(
   item: Pick<WardrobeItem, 'name' | 'colors' | 'occasions'>,
 ) {
   return {
-    name: item.name.trim() ? '' : 'Escribe un nombre.',
-    colors: item.colors.length ? '' : 'Elige al menos un color.',
-    occasions: item.occasions.length ? '' : 'Elige al menos una ocasión.',
+    name: !item.name.trim(),
+    colors: !item.colors.length,
+    occasions: !item.occasions.length,
   };
 }
 
 /** Name used when the person leaves it empty; neutral wording avoids gender agreement with the category. */
 export function suggestedItemName(
+  t: Copy,
   category: Category,
   colors: string[],
 ): string {
   if (!colors.length) return '';
   const names = colors
     .slice(0, 2)
-    .map((color) => (colorLabels[color] ?? color).toLowerCase());
-  return `${categoryLabels[category]} · ${names.join(' y ')}${colors.length > 2 ? ' y más' : ''}`;
+    .map((color) => colorName(t, color).toLowerCase());
+  return t.itemForm.suggestedName(
+    t.categories[category],
+    names,
+    colors.length > 2,
+  );
 }
 
 /** Starting warmth for a new item until the person chooses one; layers usually add more than a base piece. */

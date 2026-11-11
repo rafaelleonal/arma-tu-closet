@@ -5,7 +5,9 @@ import {
 } from 'node:http';
 import {
   parseAnalysisResult,
+  analysisLanguage,
   rejectionMessages,
+  type AnalysisLanguage,
   type GarmentAnalyzer,
 } from './analysis';
 import { MAX_BODY_BYTES, parseImageRequest, RequestError } from './image';
@@ -105,7 +107,10 @@ export function createGarmentServer({
         if (!origin)
           throw new RequestError(403, 'Este origen no está permitido.');
         response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        response.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, Accept-Language',
+        );
         return send(response, 204);
       }
       if (request.method !== 'POST') {
@@ -143,7 +148,11 @@ export function createGarmentServer({
       }
       const run: (signal: AbortSignal) => Promise<unknown> = choosing
         ? prepareOutfitChoice(input, chooseOutfit!)
-        : prepareAnalysis(input, analyze!);
+        : prepareAnalysis(
+            input,
+            analyze!,
+            analysisLanguage(request.headers['accept-language']),
+          );
       if (now() - windowStart >= 60_000) {
         windowStart = now();
         minuteRequests = 0;
@@ -216,7 +225,10 @@ export function createGarmentServer({
     } catch (error) {
       if (response.destroyed || response.writableEnded) return;
       if (error instanceof RequestError)
-        send(response, error.status, { error: error.message });
+        send(response, error.status, {
+          error: error.message,
+          ...(error.reason ? { reason: error.reason } : {}),
+        });
       else
         send(response, 502, {
           error: choosing
@@ -309,12 +321,20 @@ function readBody(
   });
 }
 
-function prepareAnalysis(input: unknown, analyze: GarmentAnalyzer) {
+function prepareAnalysis(
+  input: unknown,
+  analyze: GarmentAnalyzer,
+  language: AnalysisLanguage,
+) {
   const image = parseImageRequest(input);
   return async (signal: AbortSignal) => {
-    const result = parseAnalysisResult(await analyze(image, signal));
+    const result = parseAnalysisResult(await analyze(image, signal, language));
     if (result.status !== 'ok')
-      throw new RequestError(422, rejectionMessages[result.status]);
+      throw new RequestError(
+        422,
+        rejectionMessages[result.status],
+        result.status,
+      );
     return { suggestion: result.suggestion };
   };
 }

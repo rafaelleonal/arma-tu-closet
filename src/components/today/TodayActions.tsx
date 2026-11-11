@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Palette } from '../../theme/ThemeProvider';
 import { Button, useUI } from '../ui';
+import { useCopy } from '../../i18n';
 
 function IconButton({
   icon,
@@ -49,17 +50,18 @@ export function TodayActions({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
   return (
     <View style={styles.row}>
       <IconButton
         icon={saved ? '♥' : '♡'}
-        label={saved ? 'Quitar outfit de guardados' : 'Guardar outfit'}
+        label={saved ? t.outfit.unsave : t.outfit.save}
         selected={saved}
         onPress={onFavorite}
       />
-      <Button label="Hoy me lo puse" onPress={onWorn} style={styles.main} />
+      <Button label={t.outfit.wore} onPress={onWorn} style={styles.main} />
       {onDismiss ? (
-        <IconButton icon="↻" label="Prefiero otro" onPress={onDismiss} />
+        <IconButton icon="↻" label={t.outfit.another} onPress={onDismiss} />
       ) : null}
     </View>
   );

@@ -2,12 +2,14 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { useUI } from '../ui';
+import { useCopy } from '../../i18n';
 
 const SIZE = 44;
 
 /** Round button with two sliders: opens the settings that are not about the person's style. */
 export function SettingsButton({ onPress }: { onPress: () => void }) {
   const { palette } = useUI();
+  const t = useCopy();
   const stroke = {
     stroke: palette.ink,
     strokeWidth: 1.6,
@@ -16,7 +18,7 @@ export function SettingsButton({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Ajustes"
+      accessibilityLabel={t.settings.title}
       onPress={onPress}
       style={({ pressed }) => ({
         width: SIZE,

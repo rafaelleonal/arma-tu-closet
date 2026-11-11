@@ -5,6 +5,7 @@ import type { Autosave } from '../hooks/useAutosave';
 import type { UpdateData } from '../hooks/useLocalData';
 import { ItemEditor } from '../components/ItemEditor';
 import { CombineGarmentSheet } from './CombineGarmentSheet';
+import { useCopy } from '../i18n';
 import type { OutfitActions } from './actions';
 
 type Editor = WardrobeItem | 'new' | null;
@@ -30,6 +31,7 @@ export function ClosetSheets({
   combineItemId: string | null;
   setCombineItemId: (id: string | null) => void;
 }) {
+  const t = useCopy();
   if (editor) {
     return (
       <ItemEditor
@@ -46,7 +48,7 @@ export function ClosetSheets({
               : [item, ...current.items],
           }));
           setEditor(null);
-          autosave.noticeAfterSave('Listo, quedó guardada.');
+          autosave.noticeAfterSave(t.notices.itemSaved);
         }}
       />
     );

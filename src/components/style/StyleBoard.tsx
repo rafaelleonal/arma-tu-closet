@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { STYLE_OPTIONS, type StyleId } from '../../domain';
+import { STYLE_IDS, type StyleId } from '../../domain';
+import { useCopy, type Copy } from '../../i18n';
 import type { Palette } from '../../theme/ThemeProvider';
 import { Dots } from '../Dots';
 import { useUI } from '../ui';
@@ -9,9 +10,9 @@ import { WordSticker, wordTilt } from '../WordSticker';
 /** Same as the horizontal padding of the screen, so the board reaches both edges. */
 const BLEED = 24;
 
-function labels(ids: readonly StyleId[]) {
-  return STYLE_OPTIONS.filter((style) => ids.includes(style.id)).map(
-    (style) => style.label,
+function labels(t: Copy, ids: readonly StyleId[]) {
+  return STYLE_IDS.filter((id) => ids.includes(id)).map(
+    (id) => t.styles[id].label,
   );
 }
 
@@ -77,21 +78,23 @@ export function StyleBoard({
 }) {
   const { palette } = useUI();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const t = useCopy();
+  const copy = t.styleBoard;
   return (
     <View style={styles.board}>
       <Dots />
       <Row
-        title="Así me visto"
-        words={labels(styleIds)}
-        empty="Elige tus estilos"
-        action={styleIds.length ? 'Editar' : 'Elegir'}
+        title={copy.current}
+        words={labels(t, styleIds)}
+        empty={copy.currentEmpty}
+        action={styleIds.length ? copy.edit : copy.choose}
         onPress={onEditStyles}
       />
       <Row
-        title="Quiero probar"
-        words={labels(targetStyleIds)}
-        empty="Elige cómo quieres verte"
-        action={targetStyleIds.length ? 'Editar' : 'Elegir'}
+        title={copy.goal}
+        words={labels(t, targetStyleIds)}
+        empty={copy.goalEmpty}
+        action={targetStyleIds.length ? copy.edit : copy.choose}
         mark="✦"
         onPress={onEditGoal}
       />

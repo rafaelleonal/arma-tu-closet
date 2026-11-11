@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { OCCASIONS, occasionLabels } from '../domain';
+import { OCCASIONS } from '../domain';
 import type { LocalData } from '../storage/schema';
 import type { Palette } from '../theme/ThemeProvider';
 import type { WeatherSettings } from '../weather/types';
@@ -13,6 +13,7 @@ import {
 import { Segmented } from './Segmented';
 import { Sheet } from './Sheet';
 import { Button, Chip, FieldLabel, useUI } from './ui';
+import { useCopy } from '../i18n';
 
 interface Props {
   value: LocalData['context'];
@@ -21,11 +22,6 @@ interface Props {
   onClose: () => void;
 }
 
-const MODES = [
-  { id: 'automatic', label: 'Automático' },
-  { id: 'manual', label: 'Manual' },
-] as const;
-
 /**
  * The occasion and the weather, in the order they change most. The manual city and the season
  * are no longer asked: no suggestion uses them, and their saved values are left as they are.
@@ -33,6 +29,11 @@ const MODES = [
 export function ContextEditor({ value, weather, onSave, onClose }: Props) {
   const { palette } = useUI();
   const styles = createStyles(palette);
+  const t = useCopy();
+  const modes = [
+    { id: 'automatic', label: t.weather.automatic },
+    { id: 'manual', label: t.weather.manual },
+  ] as const;
   const [draft, setDraft] = useState(value);
   const [settings, setSettings] = useState(weather);
   const [cityOpen, setCityOpen] = useState(!weather.location);
@@ -57,7 +58,7 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
   );
   return (
     <Sheet
-      title="Clima y ocasión"
+      title={t.context.title}
       onClose={onClose}
       footer={
         <>
@@ -67,11 +68,11 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
             </Text>
           ) : null}
           <Button
-            label="Aplicar"
+            label={t.context.apply}
             onPress={() => {
               if (automatic && !settings.location) {
                 setCityOpen(true);
-                setError('Elige una ciudad para el clima automático.');
+                setError(t.context.chooseCity);
                 return;
               }
               onSave(draft, settings);
@@ -80,20 +81,20 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
         </>
       }
     >
-      <FieldLabel>Ocasión</FieldLabel>
+      <FieldLabel>{t.context.occasion}</FieldLabel>
       <View style={styles.wrap}>
         {OCCASIONS.map((occasion) => (
           <Chip
             key={occasion}
-            label={occasionLabels[occasion]}
+            label={t.occasions[occasion]}
             selected={draft.occasion === occasion}
             onPress={() => setDraft((current) => ({ ...current, occasion }))}
           />
         ))}
       </View>
-      <FieldLabel>Clima</FieldLabel>
+      <FieldLabel>{t.context.weather}</FieldLabel>
       <Segmented
-        options={MODES}
+        options={modes}
         value={settings.mode}
         onChange={(mode) => {
           setSettings((current) => ({ ...current, mode }));
@@ -109,11 +110,11 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
             </Text>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Cambiar de ciudad"
+              accessibilityLabel={t.context.changeCity}
               onPress={() => setCityOpen(true)}
               style={styles.link}
             >
-              <Text style={styles.linkText}>Cambiar</Text>
+              <Text style={styles.linkText}>{t.context.change}</Text>
             </Pressable>
           </View>
         ) : null}
@@ -139,24 +140,22 @@ export function ContextEditor({ value, weather, onSave, onClose }: Props) {
         {automatic && !backupOpen ? (
           <View style={styles.backup}>
             <Text style={styles.backupText}>
-              Sin dato reciente se usa el clima manual:{' '}
-              {Math.round(draft.temperatureC)}°,{' '}
-              {draft.raining ? 'con lluvia' : 'sin lluvia'}.
+              {t.context.backup(Math.round(draft.temperatureC), draft.raining)}
             </Text>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Cambiar el clima manual de respaldo"
+              accessibilityLabel={t.context.changeBackup}
               onPress={() => setBackupOpen(true)}
               style={styles.link}
             >
-              <Text style={styles.linkText}>Cambiar</Text>
+              <Text style={styles.linkText}>{t.context.change}</Text>
             </Pressable>
           </View>
         ) : null}
         {automatic && backupOpen ? (
           <View style={{ marginTop: 18 }}>
             <Text style={[styles.backupText, { marginBottom: 10 }]}>
-              Clima manual, para cuando no hay dato reciente
+              {t.context.backupTitle}
             </Text>
             {manual}
           </View>

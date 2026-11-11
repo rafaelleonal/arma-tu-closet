@@ -1,9 +1,10 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { occasionLabels, type Context } from '../domain';
+import type { Context } from '../domain';
 import type { LocalData } from '../storage/local';
 import type { useWeather } from '../weather/useWeather';
 import { useUI } from './ui';
+import { useCopy } from '../i18n';
 
 type Weather = ReturnType<typeof useWeather>;
 
@@ -20,14 +21,16 @@ export function WeatherPill({
   onEdit: () => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const automatic = weather.effective?.source === 'automatic';
+  const occasion = t.occasions[data.context.occasion];
   const degrees = Math.round(
     automatic ? data.weather.snapshot!.temperatureC : context.temperatureC,
   );
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Editar clima y ocasión. ${degrees} grados${automatic ? '' : ', clima manual'}, ${occasionLabels[data.context.occasion]}`}
+      accessibilityLabel={t.weather.pillLabel(degrees, automatic, occasion)}
       onPress={onEdit}
       style={({ pressed }) => [
         styles.pill,
@@ -39,8 +42,7 @@ export function WeatherPill({
         {context.raining ? '☂' : '☼'}
       </Text>
       <Text style={{ fontSize: 13, color: palette.ink }}>
-        {degrees}°{automatic ? '' : ' manual'} ·{' '}
-        {occasionLabels[data.context.occasion]}
+        {degrees}°{automatic ? '' : ` ${t.weather.manualShort}`} · {occasion}
       </Text>
       <Text style={{ fontSize: 11, color: palette.muted }}>▾</Text>
     </Pressable>
@@ -53,6 +55,7 @@ export function WeatherPill({
  */
 export function WeatherNotice({ weather }: { weather: Weather }) {
   const { palette } = useUI();
+  const t = useCopy();
   if (weather.effective?.source === 'automatic') return null;
   const failed = !weather.loading && !!weather.error;
   return (
@@ -67,20 +70,22 @@ export function WeatherNotice({ weather }: { weather: Weather }) {
         }}
       >
         {weather.loading
-          ? 'Consultando el clima. Mientras, se usa el manual.'
-          : `${weather.error || 'Sin clima reciente.'} Se usa el clima manual.`}
+          ? t.weather.loading
+          : t.weather.usingManual(
+              weather.error ? t.weather.errors[weather.error] : '',
+            )}
       </Text>
       {weather.loading ? null : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Actualizar clima"
+          accessibilityLabel={t.weather.refreshLabel}
           onPress={weather.refresh}
           style={styles.link}
         >
           <Text
             style={{ fontSize: 13, fontWeight: '600', color: palette.rust }}
           >
-            Actualizar
+            {t.weather.refresh}
           </Text>
         </Pressable>
       )}

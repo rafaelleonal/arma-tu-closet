@@ -5,6 +5,8 @@ export class RequestError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** A code the app can word in its own language, sent next to the Spanish message. */
+    readonly reason?: string,
   ) {
     super(message);
   }

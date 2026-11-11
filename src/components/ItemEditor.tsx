@@ -21,6 +21,20 @@ import {
 import { GarmentPreview } from './item-editor/GarmentPreview';
 import { PhotoSection } from './item-editor/PhotoSection';
 import { useGarmentPhoto } from './item-editor/useGarmentPhoto';
+import { useCopy, type Copy } from '../i18n';
+
+/** Required fields say what they need only after a save was attempted. */
+function shownErrors(
+  t: Copy,
+  errors: ReturnType<typeof itemFormErrors>,
+  submitted: boolean,
+) {
+  return {
+    colors: submitted && errors.colors ? t.itemForm.colorsRequired : undefined,
+    occasions:
+      submitted && errors.occasions ? t.itemForm.occasionsRequired : undefined,
+  };
+}
 
 /** A new item starts without a color so a default is never saved by accident. */
 function initialForm(item?: WardrobeItem) {
@@ -63,6 +77,7 @@ export function ItemEditor({
   onCombine?: (item: WardrobeItem) => void;
 }) {
   const { palette } = useUI();
+  const t = useCopy();
   const { reduceMotion } = useFeedback();
   const scroll = useRef<ScrollViewInstance>(null);
   const fieldY = useRef({ colors: 0, details: 0 });
@@ -82,7 +97,7 @@ export function ItemEditor({
     ...item,
     ...details,
     id: initial.id,
-    name: name.trim() || suggestedItemName(category, colors),
+    name: name.trim() || suggestedItemName(t, category, colors),
     category,
     colors,
     available,
@@ -125,7 +140,7 @@ export function ItemEditor({
   }
   return (
     <Sheet
-      title={item ? 'Editar prenda' : 'Agregar prenda'}
+      title={item ? t.itemEditor.editTitle : t.closet.add}
       onClose={closeEditor}
       scrollRef={scroll}
       footer={
@@ -136,7 +151,7 @@ export function ItemEditor({
           />
         ) : (
           <Button
-            label={item ? 'Guardar cambios' : 'Agregar prenda'}
+            label={item ? t.itemEditor.saveChanges : t.closet.add}
             disabled={photo.busy}
             onPress={save}
           />
@@ -147,7 +162,7 @@ export function ItemEditor({
       {item && onCombine && !hasChanges ? (
         <Button
           secondary
-          label="Combínala"
+          label={t.combine.title}
           onPress={() => {
             discardAndClose();
             onCombine(item);
@@ -172,7 +187,7 @@ export function ItemEditor({
         <ColorChoices
           value={colors}
           onChange={setColors}
-          error={submitted ? errors.colors : undefined}
+          error={shownErrors(t, errors, submitted).colors}
         />
       </View>
       {item ? (
@@ -197,7 +212,7 @@ export function ItemEditor({
           }}
           open={detailsOpen}
           onToggle={() => setDetailsOpen((open) => !open)}
-          occasionError={submitted ? errors.occasions : undefined}
+          occasionError={shownErrors(t, errors, submitted).occasions}
           name={
             <NameField
               value={name}

@@ -14,24 +14,21 @@ export type UpdateData = (fn: (current: LocalData) => LocalData) => void;
 export function useLocalData() {
   const [data, setData] = useState<LocalData | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [loadError, setLoadError] = useState('');
+  /** The interface words it: the language may come from the document that failed to load. */
+  const [loadError, setLoadError] = useState(false);
   function load() {
     return readLocalData()
       .then((stored) => {
         setData(stored || createLocalData());
         setHydrated(true);
       })
-      .catch(() =>
-        setLoadError(
-          'No pudimos abrir tus datos locales. No los reemplazamos. Intenta de nuevo; si persiste, conserva los datos del navegador o la app para poder recuperarlos.',
-        ),
-      );
+      .catch(() => setLoadError(true));
   }
   useEffect(() => {
     void load();
   }, []);
   function retry() {
-    setLoadError('');
+    setLoadError(false);
     void load();
   }
   return { data, setData, hydrated, loadError, retry };

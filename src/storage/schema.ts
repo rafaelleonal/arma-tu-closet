@@ -33,12 +33,28 @@ export interface Profile {
   name: string;
   styleIds: StyleId[];
 }
+export const LANGUAGE_IDS = ['es', 'en'] as const;
+export type LanguageId = (typeof LANGUAGE_IDS)[number];
 export interface Appearance {
   themeId: ThemeId;
   outfitLayout: 'editorial' | 'compact';
   showReasons: boolean;
   /** Optional in v3: older documents retain the default enabled behavior. */
   hapticsEnabled?: boolean;
+  /** Optional in v3: absent follows the device's language. */
+  language?: LanguageId;
+}
+
+export type StorageErrorCode = 'incompatible' | 'incomplete' | 'web-limit';
+/** The message is for logs and tests; the interface words the code in its own language. */
+export class StorageError extends Error {
+  constructor(
+    readonly code: StorageErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'StorageError';
+  }
 }
 export interface OnboardingProgress {
   step: 0 | 1 | 2 | 3;
@@ -222,6 +238,8 @@ function personalizedLocalData(
     typeof appearance.showReasons === 'boolean' &&
     (appearance.hapticsEnabled === undefined ||
       typeof appearance.hapticsEnabled === 'boolean') &&
+    (appearance.language === undefined ||
+      known(appearance.language, LANGUAGE_IDS)) &&
     (onboarding === undefined ||
       (record(onboarding) &&
         finite(onboarding.step) &&
@@ -270,7 +288,8 @@ export function parseLocalData(raw: string): LocalData {
   if (personalizedLocalData(value) && value.version === 2)
     return { ...value, version: 3, weather: createDefaultWeather() };
   if (!isLocalData(value))
-    throw new Error(
+    throw new StorageError(
+      'incompatible',
       'El formato guardado no es compatible. Tus datos no se reemplazaron.',
     );
   return value;
@@ -281,12 +300,14 @@ export function parseLocalData(raw: string): LocalData {
 export const MAX_WEB_PAYLOAD_CHARS = 2_000_000;
 export function serializeLocalData(data: LocalData, web = false): string {
   if (!isLocalData(data))
-    throw new Error(
+    throw new StorageError(
+      'incomplete',
       'No se guardó el cambio porque contiene datos incompletos.',
     );
   const payload = JSON.stringify(data);
   if (web && payload.length > MAX_WEB_PAYLOAD_CHARS) {
-    throw new Error(
+    throw new StorageError(
+      'web-limit',
       'Se alcanzó el límite de fotos de la vista web. Reduce o quita una foto y vuelve a guardar. Los datos guardados anteriormente se conservan.',
     );
   }

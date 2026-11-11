@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { imageMimeTypeFromBase64 } from '../../ai/client';
 import { cameraPermission, launchPicker } from '../item-editor/localPhoto';
+import { useCopy } from '../../i18n';
 
 /** The photo lives only in this hook's state: never stored, never sent anywhere. */
 export function useSelfie() {
+  const t = useCopy();
   const [uri, setUri] = useState<string>();
   const [error, setError] = useState('');
   const active = useRef(true);
@@ -23,8 +25,8 @@ export function useSelfie() {
         if (!permission.granted) {
           setError(
             permission.canAskAgain
-              ? 'Permite la cámara para tomar tu selfie.'
-              : 'La cámara está bloqueada. Actívala en Ajustes o elige una foto.',
+              ? t.colorTest.cameraDenied
+              : t.photo.cameraBlocked,
           );
           return;
         }
@@ -38,8 +40,7 @@ export function useSelfie() {
           : assetUri,
       );
     } catch {
-      if (active.current)
-        setError('No pudimos abrir esa foto. Prueba con otra.');
+      if (active.current) setError(t.colorTest.photoFailed);
     }
   }
   return { uri, error, pick };
