@@ -2,7 +2,7 @@
 
 9/11/2026 · Plan, sin despliegue ni servicios contratados. Hoy el proxy solo escucha en loopback y la build de tienda no tiene URL de análisis.
 
-**Actualización del 11/11/2026:** las fases 1 a 3 están implementadas del lado del servidor en el repositorio `arma-tu-outfit-api` y probadas en local ([ADR-011](adr/0011-backend-publico-con-cuentas-opcionales.md)). La fase 3 usa un proveedor simulado y los adaptadores de OpenAI y Anthropic de la fase 4 están escritos y probados sin red: no hubo ninguna llamada real. Faltan staging, las claves, el proyecto de Supabase, la revocación de Apple y los cambios en la app. La fase 0 sigue pendiente.
+**Actualización del 11/11/2026:** las fases 1 a 3 están implementadas del lado del servidor en el repositorio `arma-tu-outfit-api` y probadas en local ([ADR-011](adr/0011-backend-publico-con-cuentas-opcionales.md)). La fase 3 usa un proveedor simulado y el adaptador de OpenRouter de la fase 4 está escrito y probado sin red: no hubo ninguna llamada real. Faltan staging, las claves, el proyecto de Supabase, la revocación de Apple y los cambios en la app. La fase 0 sigue pendiente.
 
 Sustituye la versión anterior de este documento, que proponía identidad anónima, Firestore y un servidor mínimo, porque el objetivo pasó a incluir un posible marketplace. Las decisiones están registradas en [la sección 10](#10-decisiones).
 
@@ -195,7 +195,7 @@ Las respuestas 429 llevan `Retry-After` y un mensaje que remite al alta manual. 
 ### Tres topes de gasto
 
 1. **En la aplicación:** reserva en `ai_spend` antes de llamar. Es el único que actúa antes de gastar y el freno real ante cuentas creadas en masa.
-2. **En el proveedor:** [límite estricto por proyecto de OpenAI](https://developers.openai.com/api/docs/guides/spend-limits) y el límite de gasto equivalente en la cuenta de Anthropic, por configurar en la fase 4.
+2. **En el proveedor:** límite de gasto en la cuenta de OpenRouter, por configurar en la fase 4. (Hasta el 11/11/2026 este punto preveía límites en las cuentas de OpenAI y Anthropic; ver la decisión 6.)
 3. **En la nube:** `max-instances` y [presupuesto con tope](https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps). Un presupuesto normal [solo avisa](https://docs.cloud.google.com/billing/docs/how-to/budgets).
 
 Si el abuso supera estos topes, se exige correo verificado o se añade [`@expo/app-integrity`](https://docs.expo.dev/versions/latest/sdk/app-integrity/).
@@ -232,6 +232,8 @@ Estimado, **sin ninguna llamada real**. **Fuente:** [GPT-6 Luna](https://develop
 
 Con 100 personas, Sonnet cabe en el tope de 20 USD y Opus no. Elegir entre 2 y 5 outfits ya válidos es una tarea acotada, así que Opus solo se justifica si la fase 0 muestra una mejora clara. El modelo se cambia por configuración, sin tocar código.
 
+**11/11/2026:** el titular eligió Opus 5.5 como predeterminado de ambas funciones (decisión 6). Las fotos con Opus cuestan bastante más que con Luna: unos 3 000 tokens de entrada por foto reducida a 4 USD por millón son cerca de 0.012 USD antes de la salida, frente a 0.00032 con Luna (**Supuesto** hasta la fase 0). Con el tope de 20 USD al mes, las funciones se pausan solas al agotarlo y la app conserva el alta manual.
+
 ### Escalabilidad
 
 - El servidor no guarda estado, así que crece añadiendo instancias. **Fuente:** el [máximo por defecto es de 100 por proyecto y región](https://docs.cloud.google.com/run/quotas).
@@ -253,6 +255,7 @@ Ninguna foto de una persona llega al backend ni a un proveedor. La [política de
 | Prenda, etapa D | Subida directa con URL firmada, y a OpenAI con una URL firmada de 5 minutos. **Tabe:** su regla general. |
 | OpenAI, por defecto | `store: false`, pero los [registros de abuso se conservan hasta 30 días](https://developers.openai.com/api/docs/guides/your-data). Hay que decírselo a la persona. |
 | OpenAI con ZDR | Sujeto a aprobación. Nunca prometer «retención cero» absoluta. |
+| Por OpenRouter (11/11/2026) | La foto pasa por OpenRouter y luego por el proveedor que sirve el modelo. Se pide `data_collection: "deny"`, que excluye a quien guarda o entrena con los datos. La retención propia de OpenRouter no está documentada en lo consultado; revisarla antes de la fase 5 y declarar a ambos. |
 
 ### Registros
 
@@ -344,7 +347,7 @@ Aceptadas por el titular el 9/11/2026, salvo la 8.
 | 3 | **Repositorio.** | Aparte, como `tabe-api`, con el contrato publicado por OpenAPI. |
 | 4 | **Alojamiento.** | Cloud Run. |
 | 5 | **Tope de gasto de IA en la beta.** | 20 USD al mes y 2 USD al día. |
-| 6 | **Modelo para elegir outfit.** | Claude Sonnet 5.5 como predeterminado y Opus 5.5 como alternativa si la fase 0 muestra una mejora clara. Se propone la API directa de Anthropic, para no declarar a OpenRouter como intermediario. El proxy local sigue usando OpenRouter en desarrollo. |
+| 6 | **Modelo para elegir outfit.** | Claude Sonnet 5.5 como predeterminado y Opus 5.5 como alternativa si la fase 0 muestra una mejora clara. **Cambiada el 11/11/2026:** ambas funciones usan OpenRouter en lugar de las API directas, para no depender de un proveedor y elegir el modelo por configuración, y Claude Opus 5.5 es el predeterminado de las dos, también para analizar fotos. Obliga a declarar a OpenRouter como intermediario y, con el tope de la decisión 5, alcanza para menos personas (sección 6). |
 | 7 | **Android.** | Después de validar iOS. |
 | 8 | **Titular, países y contacto de privacidad.** | **Pendiente.** Con UE o Reino Unido, revisión legal antes de la fase 5. |
 | 9 | **Primer marketplace, cuando llegue.** | Reventa entre personas, por encajar mejor con la idea del producto. |

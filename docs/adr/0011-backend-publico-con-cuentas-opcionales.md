@@ -36,7 +36,7 @@ Hay un segundo repositorio que mantener y dos proveedores que operar. La app pas
 
 El costo fijo estimado es de unos 25 USD al mes en producción, más la IA por uso. Al ir todo en Docker, cambiar de alojamiento solo cambia el destino del despliegue.
 
-Implementado el 11/11/2026 en `arma-tu-outfit-api`: base del servicio, sesiones, tabla `users`, eliminación de cuenta, `/api/status`, CI y Docker; y los dos endpoints de IA con permiso explícito, cuotas por persona, tope de gasto e idempotencia, sobre un proveedor simulado; y los adaptadores de OpenAI (Responses API) y Anthropic (Messages API), con sus SDK oficiales, probados con un transporte simulado. Verificado con pruebas unitarias, contra Postgres real —incluidas las de concurrencia— y e2e, en local. **Sin verificar:** un token real de Supabase, cualquier llamada a OpenAI o Anthropic, el despliegue, el flujo nativo de Apple y Google, y la revocación de Sign in with Apple. La app aún no tiene acceso ni llama a esta API.
+Implementado el 11/11/2026 en `arma-tu-outfit-api`: base del servicio, sesiones, tabla `users`, eliminación de cuenta, `/api/status`, CI y Docker; y los dos endpoints de IA con permiso explícito, cuotas por persona, tope de gasto e idempotencia, sobre un proveedor simulado; y un adaptador de OpenRouter para ambas funciones, probado con un transporte simulado. (El primer commit usaba adaptadores directos de OpenAI y Anthropic; el titular eligió OpenRouter el 11/11/2026 para escoger modelos por configuración.) Verificado con pruebas unitarias, contra Postgres real —incluidas las de concurrencia— y e2e, en local. **Sin verificar:** un token real de Supabase, cualquier llamada a OpenRouter, el despliegue, el flujo nativo de Apple y Google, y la revocación de Sign in with Apple. La app aún no tiene acceso ni llama a esta API.
 
 Diferencias con el plan:
 
@@ -45,6 +45,6 @@ Diferencias con el plan:
 - La reserva de una llamada ocurre en una transacción de varias sentencias, cada una atómica sobre su contador, en lugar de una sola sentencia para todos.
 - El resultado de analizar una foto no se guarda ni para responder un reintento: la misma clave devuelve un conflicto y no vuelve a cobrar. La elección de outfit sí devuelve el índice anterior.
 - Una llamada que el proveedor no llegó a responder por tiempo agotado se contabiliza al costo estimado, por si fue facturada.
-- La elección de outfit pide respaldo del servidor ante rechazos (`fallbacks: "default"`). Si responde un modelo sustituto, se cobra el estimado.
+- La IA pasa por OpenRouter y no por las API directas de OpenAI y Anthropic (decisión 6 del plan, cambiada). El permiso nombra a OpenRouter y al autor del modelo, y el gasto real es el que OpenRouter informa en cada respuesta.
 
 Revisar si App Review no acepta pedir cuenta solo para funciones de nube, si el titular o los países cambian las obligaciones de privacidad ([decisión 8](../backend-publico.md#10-decisiones), pendiente), o antes de empezar el marketplace.
