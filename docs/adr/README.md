@@ -1,6 +1,6 @@
 # Decisiones de arquitectura
 
-Estos ADRs documentan las decisiones estructurales ya implementadas en el prototipo. Se registraron el 23/10/2026 a partir del código y del objetivo del proyecto. Las alternativas describen el razonamiento de esta revisión; no implican que se hayan construido o medido prototipos de cada una.
+Estos ADRs documentan las decisiones estructurales ya implementadas en el prototipo. Los primeros se registraron el 23/10/2026 a partir del código y del objetivo del proyecto. Las alternativas describen el razonamiento de esta revisión; no implican que se hayan construido o medido prototipos de cada una.
 
 | ADR | Decisión | Estado |
 |---|---|---|
@@ -14,6 +14,7 @@ Estos ADRs documentan las decisiones estructurales ya implementadas en el protot
 | [008](0008-eleccion-opcional-con-ia.md) | Elección opcional entre conjuntos locales válidos | Aceptada para evaluación en desarrollo |
 | [009](0009-foto-de-persona-y-objetivo-de-estilo.md) | Foto de la persona con permiso explícito y objetivo de estilo | Foto sustituida por ADR-010; objetivo de estilo vigente |
 | [010](0010-colorimetria-en-el-dispositivo.md) | Prueba de colorimetría con la selfie solo en el dispositivo | Aceptada para el prototipo local |
+| [011](0011-backend-publico-con-cuentas-opcionales.md) | Backend público en NestJS con cuentas opcionales, en un repositorio aparte | Aceptada; fases 1 a 3 del servidor en local, sin desplegar |
 
 ## Cuándo crear un ADR
 

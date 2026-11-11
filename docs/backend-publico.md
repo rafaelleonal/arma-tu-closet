@@ -1,6 +1,10 @@
 # Plan del backend público
 
-9/11/2026 · Plan, sin implementación, despliegue ni servicios contratados. Hoy el proxy solo escucha en loopback y la build de tienda no tiene URL de análisis. Sustituye la versión anterior de este documento, que proponía identidad anónima, Firestore y un servidor mínimo, porque el objetivo pasó a incluir un posible marketplace. Las decisiones están registradas en [la sección 10](#10-decisiones).
+9/11/2026 · Plan, sin despliegue ni servicios contratados. Hoy el proxy solo escucha en loopback y la build de tienda no tiene URL de análisis.
+
+**Actualización del 11/11/2026:** las fases 1 a 3 están implementadas del lado del servidor en el repositorio `arma-tu-outfit-api` y probadas en local ([ADR-011](adr/0011-backend-publico-con-cuentas-opcionales.md)). La fase 3 usa un proveedor simulado y los adaptadores de OpenAI y Anthropic de la fase 4 están escritos y probados sin red: no hubo ninguna llamada real. Faltan staging, las claves, el proyecto de Supabase, la revocación de Apple y los cambios en la app. La fase 0 sigue pendiente.
+
+Sustituye la versión anterior de este documento, que proponía identidad anónima, Firestore y un servidor mínimo, porque el objetivo pasó a incluir un posible marketplace. Las decisiones están registradas en [la sección 10](#10-decisiones).
 
 Cada dato lleva su origen: **Fuente** (documentación oficial consultada el 9/11/2026), **Medido** (ejecutado sobre el código), **Tabe** (leído en el repositorio `tabe-api` del mismo titular) o **Supuesto** (estimación por comprobar). Este plan no es asesoría legal ni fiscal.
 
@@ -313,7 +317,7 @@ Los secretos nunca se versionan, ni siquiera en respaldos de `.env`. El CI inclu
 
 ### Fases
 
-Antes de la fase 1, registrar un ADR con cuentas, alojamiento y límites: cambia una frontera del sistema. Las fotos de prueba son sintéticas o con licencia, nunca personales.
+El [ADR-011](adr/0011-backend-publico-con-cuentas-opcionales.md) registra cuentas, alojamiento y límites, porque cambian una frontera del sistema. Las fotos de prueba son sintéticas o con licencia, nunca personales.
 
 | Fase | Entrega | Criterio de salida |
 |---|---|---|

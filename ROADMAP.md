@@ -10,7 +10,7 @@ Actualizado: 23 de octubre de 2026. Las fases siguientes son posibilidades, sin 
 
 La iteración actual añade animaciones, vibración configurable y recuperación de errores del formulario. El 27/10/2026 el proyecto pasó a Expo SDK 58 y abre directamente en Expo Go; la [prueba de iPhone](docs/prueba-iphone.md) ya no necesita la copia temporal SDK 54.
 
-Ya hay un [plan de cuentas y datos](docs/cuentas-y-datos.md) y un [plan de despliegue](docs/deploy-plan.md). Supabase y EAS son propuestas para esas fases, no infraestructura desplegada. El [plan del backend público](docs/backend-publico.md) propone NestJS, Postgres y cuentas opcionales, con el clóset local como base y un posible marketplace como etapa condicionada a la demanda.
+Ya hay un [plan de cuentas y datos](docs/cuentas-y-datos.md) y un [plan de despliegue](docs/deploy-plan.md). Supabase y EAS son propuestas para esas fases, no infraestructura desplegada. El [plan del backend público](docs/backend-publico.md) propone NestJS, Postgres y cuentas opcionales, con el clóset local como base y un posible marketplace como etapa condicionada a la demanda. Desde el 11/11/2026 su base y sus cuentas existen en el repositorio `arma-tu-outfit-api`, probadas en local y sin desplegar ([ADR-011](docs/adr/0011-backend-publico-con-cuentas-opcionales.md)); la app todavía no las usa.
 
 ## Secuencia propuesta
 
