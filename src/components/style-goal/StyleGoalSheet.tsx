@@ -3,20 +3,18 @@ import { Text, View } from 'react-native';
 import {
   EMPTY_STYLE_GOAL,
   COLOR_TONE_INFO,
-  STYLE_OPTIONS,
   colorLabels,
   suggestedColors,
   type StyleGoal,
-  type StyleId,
 } from '../../domain';
 import type { LocalData } from '../../storage/local';
 import { ColorTest, ToneSwatches } from '../colorimetry/ColorTest';
 import { Sheet } from '../Sheet';
+import { StylePicker } from '../style/StylePicker';
 import { Button, Chip, colorHex, FieldLabel, useUI } from '../ui';
 
 export interface StyleGoalResult {
   goal: StyleGoal;
-  styleIds: StyleId[];
   colors: string[];
 }
 
@@ -24,28 +22,6 @@ function toggled<T>(values: T[], value: T): T[] {
   return values.includes(value)
     ? values.filter((item) => item !== value)
     : [...values, value];
-}
-
-function StyleChips({
-  value,
-  onChange,
-}: {
-  value: StyleId[];
-  onChange: (next: StyleId[]) => void;
-}) {
-  const { s } = useUI();
-  return (
-    <View style={s.wrap}>
-      {STYLE_OPTIONS.map((style) => (
-        <Chip
-          key={style.id}
-          label={style.label}
-          selected={value.includes(style.id)}
-          onPress={() => onChange(toggled(value, style.id))}
-        />
-      ))}
-    </View>
-  );
 }
 
 export function StyleGoalSheet({
@@ -58,7 +34,6 @@ export function StyleGoalSheet({
   onSave: (result: StyleGoalResult) => void;
 }) {
   const { s } = useUI();
-  const [styleIds, setStyleIds] = useState(data.profile.styleIds);
   const [goal, setGoal] = useState<StyleGoal>(
     data.styleGoal ?? EMPTY_STYLE_GOAL,
   );
@@ -85,12 +60,12 @@ export function StyleGoalSheet({
     );
   return (
     <Sheet title="Cambiar mi estilo" onClose={onClose}>
-      <FieldLabel>Hoy me visto más…</FieldLabel>
-      <StyleChips value={styleIds} onChange={setStyleIds} />
       <FieldLabel>Me gustaría verme más…</FieldLabel>
-      <StyleChips
+      <StylePicker
         value={goal.targetStyleIds}
         onChange={(targetStyleIds) => change({ targetStyleIds })}
+        mark="✦"
+        prefix="Quiero probar"
       />
       <FieldLabel>Tu colorimetría · opcional</FieldLabel>
       {tone ? (
@@ -148,7 +123,6 @@ export function StyleGoalSheet({
               ...goal,
               exploring: goal.exploring && goal.targetStyleIds.length > 0,
             },
-            styleIds,
             colors: colors.filter((color) => suggested.includes(color)),
           })
         }

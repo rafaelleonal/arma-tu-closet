@@ -84,14 +84,14 @@ export function StyleBoard({
         title="Así me visto"
         words={labels(styleIds)}
         empty="Elige tus estilos"
-        action="Editar preferencias"
+        action={styleIds.length ? 'Editar' : 'Elegir'}
         onPress={onEditStyles}
       />
       <Row
         title="Quiero probar"
         words={labels(targetStyleIds)}
         empty="Elige cómo quieres verte"
-        action={targetStyleIds.length ? 'Editar objetivo' : 'Elegir'}
+        action={targetStyleIds.length ? 'Editar' : 'Elegir'}
         mark="✦"
         onPress={onEditGoal}
       />

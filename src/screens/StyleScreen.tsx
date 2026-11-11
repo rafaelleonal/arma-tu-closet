@@ -7,6 +7,7 @@ import { ColorPicker, type ColorMode } from '../components/ColorPicker';
 import { SavedShelf } from '../components/style/SavedShelf';
 import { SettingsButton } from '../components/style/SettingsButton';
 import { StyleBoard } from '../components/style/StyleBoard';
+import { StylesSheet } from '../components/style/StylePicker';
 import {
   StyleGoalSheet,
   type StyleGoalResult,
@@ -31,13 +32,13 @@ export function StyleScreen({
 }) {
   const { palette, s } = useUI();
   const [goalOpen, setGoalOpen] = useState(false);
+  const [stylesOpen, setStylesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [colorMode, setColorMode] = useState<ColorMode>('favorite');
-  const saveGoal = ({ goal, styleIds, colors }: StyleGoalResult) => {
+  const saveGoal = ({ goal, colors }: StyleGoalResult) => {
     update((current) => ({
       ...current,
       styleGoal: goal,
-      profile: { ...current.profile, styleIds },
       preferences: {
         ...current.preferences,
         preferredColors: [
@@ -69,9 +70,23 @@ export function StyleScreen({
       <StyleBoard
         styleIds={data.profile.styleIds}
         targetStyleIds={data.styleGoal?.targetStyleIds ?? []}
-        onEditStyles={onPersonalize}
+        onEditStyles={() => setStylesOpen(true)}
         onEditGoal={() => setGoalOpen(true)}
       />
+      {stylesOpen ? (
+        <StylesSheet
+          styleIds={data.profile.styleIds}
+          onClose={() => setStylesOpen(false)}
+          onSave={(styleIds) => {
+            update((current) => ({
+              ...current,
+              profile: { ...current.profile, styleIds },
+            }));
+            setStylesOpen(false);
+            onNoticeAfterSave('Guardé tus estilos.');
+          }}
+        />
+      ) : null}
       {goalOpen ? (
         <StyleGoalSheet
           data={data}
@@ -93,6 +108,10 @@ export function StyleScreen({
         <SettingsSheet
           data={data}
           update={update}
+          onPersonalize={() => {
+            setSettingsOpen(false);
+            onPersonalize();
+          }}
           onClose={() => setSettingsOpen(false)}
         />
       ) : null}

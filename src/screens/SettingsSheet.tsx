@@ -4,7 +4,7 @@ import type { LocalData } from '../storage/local';
 import type { UpdateData } from '../hooks/useLocalData';
 import { AppearanceSettings } from '../components/AppearanceSettings';
 import { Sheet, SHEET_BLEED } from '../components/Sheet';
-import { Chip, FieldLabel, useUI } from '../components/ui';
+import { Button, Chip, FieldLabel, useUI } from '../components/ui';
 
 const ROTATION_DAYS = [0, 3, 7, 14];
 
@@ -16,10 +16,13 @@ function plural(count: number, one: string, many: string) {
 export function SettingsSheet({
   data,
   update,
+  onPersonalize,
   onClose,
 }: {
   data: LocalData;
   update: UpdateData;
+  /** Goes through the four steps again; garments, photos, saved outfits and history stay. */
+  onPersonalize: () => void;
   onClose: () => void;
 }) {
   const { palette, s } = useUI();
@@ -50,10 +53,17 @@ export function SettingsSheet({
           />
         ))}
       </View>
+      <Button
+        secondary
+        small
+        label="Volver a personalizar"
+        onPress={onPersonalize}
+        style={{ marginTop: 28, alignSelf: 'flex-start' }}
+      />
       <View
         style={[
           s.panel,
-          { marginTop: 30, backgroundColor: palette.wash, gap: 8 },
+          { marginTop: 24, backgroundColor: palette.wash, gap: 8 },
         ]}
       >
         <Text style={{ color: palette.ink, fontSize: 13, fontWeight: '600' }}>

@@ -45,7 +45,7 @@ Opciones de desarrollo:
 
 Usa la URL que indique Expo. En navegador, `localhost` y `127.0.0.1` tienen almacenamientos independientes: cambiar de origen puede mostrar un clóset distinto. Para el iPhone, el proyecto abre directamente en Expo Go de App Store; sigue la [guía de prueba](docs/prueba-iphone.md). La copia temporal SDK 54 que se usó antes queda como histórica.
 
-Para probar el flujo: completa el onboarding, elige **Ver el clóset de ejemplo** o **Vamos con mi ropa**, revisa **Hoy** y cambia una prenda. Con ropa propia necesitas arriba + abajo + calzado, o una prenda completa + calzado. Las preferencias se editan en **Mi estilo → Editar preferencias**.
+Para probar el flujo: completa el onboarding, elige **Ver el clóset de ejemplo** o **Vamos con mi ropa**, revisa **Hoy** y cambia una prenda. Con ropa propia necesitas arriba + abajo + calzado, o una prenda completa + calzado. Las preferencias se editan cada una en su sitio dentro de **Mi estilo**; **Ajustes → Volver a personalizar** repite los cuatro pasos.
 
 ## Clima y análisis de fotos
 

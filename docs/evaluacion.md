@@ -533,3 +533,15 @@ Revisados y sin cambio: bienvenida, pasos 1 a 3, Hoy, Mi clóset y su vacío, Aj
 Expo web a 375 × 812 en `localhost:8093`, con un origen recién creado: [paso 4 de primera vez](evidence/onboarding-paso4-solo-tema-web-375.jpg), elegir el clóset de ejemplo, Cambiar con y sin opciones, Colores sin la nota, un outfit guardado con su aviso de una línea y el editor de una prenda existente. Simulador iPhone 17 Pro (iOS 26.5): Hoy abre y la hoja Cambiar muestra «En lugar de Camisa de mezclilla.» sobre el álbum.
 
 Sin verificar: los textos del análisis de foto y su revisión (hace falta el servidor local con clave), quitar fondo y **Usar la foto con fondo** (necesita una foto propia en el teléfono), Combínala, Hoy sin ideas, la colorimetría, el paso 4 en iOS, un teléfono real, Android y VoiceOver.
+
+## 10/11/2026 — «Así me visto» con su propia hoja
+
+La auditoría de texto encontró que **Así me visto** abría los cuatro pasos del onboarding solo para cambiar los estilos. Ahora abre una hoja con esos estilos, según [la guía](diseno-personalizacion.md#mi-estilo-como-tablero). **Cambiar mi estilo** deja de repetirlos y queda en el objetivo y la colorimetría; antes permitía más de tres estilos objetivo y ahora aplica el mismo límite que el onboarding (un objetivo guardado con más se conserva y solo deja quitar). El recorrido completo sigue disponible en **Ajustes → Volver a personalizar**. No cambia el formato de los datos.
+
+`pnpm typecheck`, `pnpm lint`, `pnpm format:check` y `pnpm test` (103 pruebas) aprobados.
+
+Expo web a 375 × 812 en `localhost:8093`: [hoja Así me visto](evidence/asi-me-visto-hoja-web-375.jpg) con tres elegidos y el aviso al intentar un cuarto; Guardar deja Urbano y Relajado en el tablero y en el documento local (versión 3, mismas prendas y guardados). Cambiar mi estilo cabe en una pantalla; elegir Clásico y guardar cambia solo el objetivo. [Ajustes](evidence/ajustes-volver-a-personalizar-web-375.jpg) → Volver a personalizar abre el paso 1 y cerrarlo no cambia nada.
+
+Simulador iPhone 17 Pro (iOS 26.5): [la hoja Así me visto](evidence/ios-asi-me-visto-iphone17pro.jpg) abre desde el tablero; se cerró sin guardar.
+
+Sin verificar: guardar estilos y Volver a personalizar en iOS, Cambiar mi estilo en iOS, un objetivo previo con más de tres estilos, un teléfono real, Android y VoiceOver.

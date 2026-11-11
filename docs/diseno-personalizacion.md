@@ -39,7 +39,7 @@ Mostrar «n de 4», acción principal y «Atrás». Las elecciones anteriores se
 
 Guardar el progreso permite cerrar y continuar en el mismo paso. Un error de guardado debe indicarse; no afirmar que quedó guardado hasta que termine. Al finalizar, las decisiones se aplican a la app y sobreviven a reiniciar.
 
-La persona que ya tiene clóset abre «Mi estilo → Editar preferencias» y edita sus preferencias. Conservar identificadores, fotos, conjuntos guardados e historial. La elección inicial demo/propio se limita al primer arranque; volver a personalizar no es una acción de restablecimiento. Al migrar datos existentes, usar valores iniciales seguros sin obligar a repetir el alta.
+La persona que ya tiene clóset abre «Mi estilo → Ajustes → Volver a personalizar» y repasa los cuatro pasos. Para un solo cambio no hace falta: los estilos, los colores, el tema, la ocasión y la ciudad se editan cada uno en su sitio. Conservar identificadores, fotos, conjuntos guardados e historial. La elección inicial demo/propio se limita al primer arranque; volver a personalizar no es una acción de restablecimiento. Al migrar datos existentes, usar valores iniciales seguros sin obligar a repetir el alta.
 
 ## Funciones que dependen del backend
 
@@ -123,7 +123,7 @@ La altura de la mesa se calcula con la pantalla para que la acción principal qu
 
 ## Mi estilo como tablero
 
-Mi estilo deja de ser una lista de paneles con botón. Arriba, sobre el mismo fondo de puntos, van los estilos como stickers de palabra: **Así me visto** abre Editar preferencias y **Quiero probar** abre la hoja Cambiar mi estilo; los de objetivo llevan «✦», como Algo nuevo en Hoy. Sin estilos elegidos, cada fila muestra un hueco punteado que dice qué elegir. Cada fila es un solo botón con su texto de acción.
+Mi estilo deja de ser una lista de paneles con botón. Arriba, sobre el mismo fondo de puntos, van los estilos como stickers de palabra: **Así me visto** abre una hoja con solo esos estilos y **Quiero probar** abre la hoja Cambiar mi estilo, que ya no repite los actuales; los de objetivo llevan «✦», como Algo nuevo en Hoy. Sin estilos elegidos, cada fila muestra un hueco punteado que dice qué elegir. Cada fila es un solo botón con su texto de acción.
 
 Debajo, **Guardados** es una fila que se desliza con cada outfit como collage pequeño; tocar uno abre el outfit. A ese tamaño los recortes van sin borde, porque mediría menos de un píxel.
 
@@ -134,6 +134,7 @@ La pantalla termina ahí: estilos, guardados y colores son lo que describe a la 
 - **Tema**: los temas en una fila que se desliza; cada tarjeta es una mini pantalla de Hoy con su paleta y los stickers. La fila abre en el tema en uso, con un poco del anterior a la vista.
 - **Vista**, **Explicaciones** y, en el teléfono, **Vibración**.
 - **Esperar para repetir una prenda**: Nada, 3, 7 o 14 días. La etiqueta sustituye al párrafo que lo explicaba.
+- **Volver a personalizar**: abre los cuatro pasos del inicio; conserva prendas, fotos, guardados e historial.
 - **Tus datos**: tres frases sin personaje sobre dónde se guarda todo, qué pasa al borrar la app y que solo Analizar foto envía la foto de una prenda a OpenAI. Debajo, cuántas prendas propias y usos hay, y el crédito de Open-Meteo que pide su licencia.
 
 Un cambio en la hoja se guarda al tocarlo, como antes en la pantalla; no hay botón de aplicar.
@@ -162,7 +163,7 @@ Las hojas siguen la misma base que las pestañas: la prenda como sticker sobre e
 
 En iPhone la hoja empieza bajo la barra de estado y su pie deja libre el indicador de inicio. Con el teclado arriba, el pie queda pegado al teclado y el campo de nombre del editor se desplaza para quedar a la vista. El fondo de puntos se dibuja con el tamaño medido de su contenedor, no con porcentajes: en nativo un porcentaje deja fuera el margen interior y no sigue a un contenedor que crece.
 
-El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. Las hojas de colorimetría y Cambiar mi estilo no cambian de contenido.
+El compositor sigue eligiendo por categorías; no es un lienzo para arrastrar prendas. En **Así me visto** y en Cambiar mi estilo los estilos se eligen como en el onboarding: stickers de palabra, hasta tres, y un cuarto se rechaza diciendo por qué ([StylePicker.tsx](../src/components/style/StylePicker.tsx)). La colorimetría no cambia de contenido.
 
 **Clima y ocasión** pide solo lo que cambia una sugerencia, en el orden en que más se toca: primero la ocasión; después el clima, con dos pestañas. En **Manual** hay una tarjeta con la temperatura, que se sube o baja con dos botones y sigue cambiando si se mantienen pulsados, y el interruptor de lluvia. En **Automático** va la ciudad en una fila con **Cambiar**, que despliega la búsqueda y **Usar mi ubicación** con su aviso de privacidad, y una línea que dice qué clima manual se usa cuando no hay dato reciente, con **Cambiar** para ajustarlo. **Aplicar** va al pie. Ya no se preguntan la ciudad en modo manual ni la estación: ninguna sugerencia las usa, y sus valores guardados se conservan. La hoja tampoco nombra al proveedor del clima; su crédito, que la licencia de los datos exige, está una sola vez en Mi estilo → Almacenamiento.
 
